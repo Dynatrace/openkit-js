@@ -8,7 +8,7 @@ module.exports = {
   verbose: true,
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: "coverage",
+  coverageDirectory: "build/coverage",
 
   // A set of global variables that need to be available in all test environments
   globals: {

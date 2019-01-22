@@ -4,7 +4,7 @@ module.exports = {
     mode: 'development',
     entry: path.resolve(__dirname, './src/OpenKitBuilder.ts'),
     output: {
-        path: path.resolve(__dirname, './dist/lib'),
+        path: path.resolve(__dirname, './build/lib'),
         filename: 'bundle.js',
         libraryTarget: 'umd'
     },
