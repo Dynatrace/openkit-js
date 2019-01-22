@@ -1,12 +1,11 @@
 
-import {instance, mock, when} from "ts-mockito";
-import {Configuration} from "../src/api/Configuration";
-import {OpenKitBuilder} from "../src/OpenKitBuilder";
+import {instance, mock, when} from 'ts-mockito';
+import {OpenKitBuilder} from '../src/OpenKitBuilder';
 
 describe('OpenKitBuilder', () => {
 
     it('should create an object', () => {
-        const builder = new OpenKitBuilder("url", "url", 4);
+        const builder = new OpenKitBuilder('url', 'url', 4);
 
         expect(builder).toBeTruthy();
     });
@@ -14,10 +13,10 @@ describe('OpenKitBuilder', () => {
     it('should return the correct configuration', () => {
         const builder = new OpenKitBuilder('https://example.com', 'appId-1337', 42);
 
-        expect(builder.getConfig()).toEqual(<Configuration>{
+        expect(builder.getConfig()).toEqual({
             deviceID: 42,
             beaconURL: 'https://example.com',
-            applicationID: 'appId-1337'
+            applicationID: 'appId-1337',
         });
     });
 

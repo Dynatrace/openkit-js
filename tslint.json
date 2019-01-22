@@ -1,12 +1,19 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:latest"
-    ],
-    "jsRules": {},
-    "rules": {
-        "interface-name": [ true, "never-prefix"],
-        "unified-signatures": [false]
-    },
-    "rulesDirectory": []
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:latest"
+  ],
+  "linterOptions": {
+    "exclude": [
+      "test/**/*"
+    ]
+  },
+  "jsRules": {},
+  "rules": {
+    "interface-name": [true, "never-prefix"],
+    "unified-signatures": [false],
+    "quotemark": [true, "single" ],
+    "object-literal-sort-keys": [false]
+  },
+  "rulesDirectory": []
 }

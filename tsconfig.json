@@ -12,9 +12,8 @@
     "node_modules",
     ".gradle",
     ".idea",
-    "build",
-    "dist",
-    "out",
-    "test"
+    "example",
+    "coverage",
+    "dist"
   ]
 }

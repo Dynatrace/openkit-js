@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Configuration} from "./api/Configuration";
+import {Configuration} from './api/Configuration';
 
 export class OpenKitBuilder {
     private readonly config: Configuration;
