@@ -1,0 +1,25 @@
+{
+  "name": "openkit-javascript",
+  "version": "0.0.1",
+  "description": "OpenKit-JavaScript reference implementation",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack",
+    "build:prod": "webpack --mode production",
+    "lint": "tslint --project .",
+    "precommit": "yarn run lint && yarn run test",
+    "completeBuild": "yarn run precommit && yarn run build"
+  },
+  "author": "Dynatrace",
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "@types/jest": "^23.3.13",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.4",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
+    "yarn": "^1.13.0"
+  }
+}

@@ -1,0 +1,16 @@
+# IDEA
+.idea
+*.iml
+
+# npm, yarn
+node_modules
+yarn-error.log
+
+# coverage
+coverage
+
+# Build files
+dist
+
+# Examples - ignore them currently, but add them later
+examples
