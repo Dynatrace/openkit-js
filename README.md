@@ -24,7 +24,8 @@ sudo npm install -g yarn
 ```
 
 ## Building the .js library
-Run `yarn run build` to build the project. 
+Run `yarn build:prod` to build the project in production mode, 
+`yarn build` to build in in development mode.
 
 ### Generated files
 All generated files for the library are in `dist`.
@@ -32,7 +33,9 @@ All generated files for the library are in `dist`.
 * `types` contains the generated definition files for usage with typescript. You still need to include the *.js library.
 
 ### Other commands
-| Command | Description |
-|---------|-------------| 
-| `yarn run lint` | Run tslint |
-| `yarn run test` | Run tests with coverage |
+| Command           | Description               |
+|-------------------|---------------------------| 
+| `yarn lint`       | Run tslint                |
+| `yarn lint:spec`  | Run tslint                |
+| `yarn test`       | Run tests with coverage   |
+| `yarn precommit`  | Run linting and tests     |
