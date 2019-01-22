@@ -18,13 +18,6 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@dynatrace/angular-lint-rules@^0.4.19":
-  version "0.4.19"
-  resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/npm-dynatrace-release-local/@dynatrace/angular-lint-rules/-/@dynatrace/angular-lint-rules-0.4.19.tgz#4278e717ec8505f3c198652d0b4af7f4122de961"
-  integrity sha1-QnjnF+yFBfPBmGUtC0r39BIt6WE=
-  dependencies:
-    stylelint-config-standard "^18.2.0"
-
 "@types/jest@^23.3.13":
   version "23.3.13"
   resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/@types/jest/-/jest-23.3.13.tgz#c81484b6f4ca007bb09887ed15ecb3286d58f928"
@@ -3011,7 +3004,7 @@ lodash.sortby@^4.7.0:
   resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
-lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.4:
+lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5:
   version "4.17.11"
   resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha1-s56mIp72B+zYniyN8SU2iRysm40=
@@ -4568,18 +4561,6 @@ strip-json-comments@~2.0.1:
   resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha1-PFMZQukIwml8DsNEhYwobHygpgo=
 
-stylelint-config-recommended@^2.1.0:
-  version "2.1.0"
-  resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/stylelint-config-recommended/-/stylelint-config-recommended-2.1.0.tgz#f526d5c771c6811186d9eaedbed02195fee30858"
-  integrity sha1-9SbVx3HGgRGG2ertvtAhlf7jCFg=
-
-stylelint-config-standard@^18.2.0:
-  version "18.2.0"
-  resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/stylelint-config-standard/-/stylelint-config-standard-18.2.0.tgz#6283149aba7f64f18731aef8f0abfb35cf619e06"
-  integrity sha1-YoMUmrp/ZPGHMa748Kv7Nc9hngY=
-  dependencies:
-    stylelint-config-recommended "^2.1.0"
-
 supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://artifactory.lab.dynatrace.org/artifactory/api/npm/registry-yarnpkg-com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
@@ -4778,6 +4759,13 @@ ts-loader@^5.3.3:
     loader-utils "^1.0.2"
     micromatch "^3.1.4"
     semver "^5.0.1"
+
+ts-mockito@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/ts-mockito/-/ts-mockito-2.3.1.tgz#4c3467a2ddeb207966000a740a0826c970125ed1"
+  integrity sha512-chcKw0sTApwJxTyKhzbWxI4BTUJ6RStZKUVh2/mfwYqFS09PYy5pvdXZwG35QSkqT5pkdXZlYKBX196RRvEZdQ==
+  dependencies:
+    lodash "^4.17.5"
 
 tslib@^1.9.0:
   version "1.9.3"
