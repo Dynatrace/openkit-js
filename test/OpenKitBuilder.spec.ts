@@ -81,7 +81,7 @@ describe('OpenKitBuilder', () => {
 
         expect(config.deviceId).toEqual('42');
         expect(config.operatingSystem).toEqual('Arch');
-        expect(config.screenSize).toEqual( {width: 400, height: 700});
+        expect(config.screenSize).toEqual({width: 400, height: 700});
         expect(config.dataCollectionLevel).toEqual(DataCollectionLevel.UserBehavior);
         expect(config.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
         expect(config.applicationName).toEqual('App Name');

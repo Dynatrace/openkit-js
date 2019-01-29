@@ -15,8 +15,7 @@
  *
  */
 
-import {version} from 'punycode';
-import {agentTechnologyType, platformTypeOpenKit} from '../../PlatformConstants';
+import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
 import {Configuration} from '../config/Configuration';
 import {HttpClient} from '../http/HttpClient';
 import {QueryBuilder} from '../QueryBuilder';
@@ -51,7 +50,7 @@ export class BeaconSender {
             .add(QueryKey.Type, 'm')
             .add(QueryKey.ServerId, this.config.serverId)
             .add(QueryKey.Application, this.config.applicationId)
-            .add(QueryKey.Version, version)
+            .add(QueryKey.Version, openKitVersion)
             .add(QueryKey.PlatformType, platformTypeOpenKit)
             .add(QueryKey.AgentTechnologyType, agentTechnologyType)
             .buildUrl(this.config.beaconURL);
