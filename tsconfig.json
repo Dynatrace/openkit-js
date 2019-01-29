@@ -1,12 +1,20 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es3",
+    "target": "es5",
     "sourceMap": true,
 
     "declaration": true,
     "declarationDir": "build/types",
-    "declarationMap": true
+    "declarationMap": true,
+    "strict": true,
+    "lib": [
+      "es5",
+      "scripthost",
+      "dom",
+      "es2015.collection",
+      "es2015.promise"
+    ]
   },
   "exclude": [
     "node_modules",

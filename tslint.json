@@ -13,7 +13,12 @@
     "interface-name": [true, "never-prefix"],
     "unified-signatures": [false],
     "quotemark": [true, "single" ],
-    "object-literal-sort-keys": [false]
+    "object-literal-sort-keys": [false],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+    "no-console": false,
+    "arrow-parens": false,
+    "member-ordering": [true, "fields-first"],
+    "interface-over-type-literal": false
   },
   "rulesDirectory": []
 }
