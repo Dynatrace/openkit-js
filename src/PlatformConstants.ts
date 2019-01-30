@@ -17,8 +17,9 @@
 
 /**
  * The OpenKit-JavaScript version.
+ * For now, it must be equal to the mobile agent version.
  */
-export const openKitVersion = '0.0.1';
+export const openKitVersion = '7.0.0000';
 
 /**
  * Constant for the OneAgent Mobile Communication Protocol Version 3.
