@@ -18,7 +18,8 @@
     "no-console": false,
     "arrow-parens": false,
     "member-ordering": [true, "fields-first"],
-    "interface-over-type-literal": false
+    "interface-over-type-literal": false,
+    "ordered-imports": true
   },
   "rulesDirectory": []
 }

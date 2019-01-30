@@ -16,8 +16,8 @@
  */
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
-import {OpenKitState} from '../OpenKitState';
 import {HttpClient} from '../http/HttpClient';
+import {OpenKitState} from '../OpenKitState';
 import {QueryBuilder} from '../QueryBuilder';
 import {StatusResponse} from './StatusResponse';
 

@@ -17,8 +17,8 @@
 import {InitCallback, OpenKit} from '../api/OpenKit';
 import {BeaconSender} from './beacon/BeaconSender';
 import {Configuration} from './config/Configuration';
-import {OpenKitState} from './OpenKitState';
 import {Status} from './http/HttpResponse';
+import {OpenKitState} from './OpenKitState';
 
 /**
  * Implementation of the {@link OpenKit} interface.
