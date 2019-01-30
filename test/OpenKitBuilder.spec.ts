@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {DataCollectionLevel} from '../src/CrashReportingLevel';
-import {CrashReportingLevel} from '../src/DataCollectionLevel';
+import {CrashReportingLevel} from '../src/CrashReportingLevel';
+import {DataCollectionLevel} from '../src/DataCollectionLevel';
 import {OpenKitBuilder} from '../src/OpenKitBuilder';
 
 describe('OpenKitBuilder', () => {

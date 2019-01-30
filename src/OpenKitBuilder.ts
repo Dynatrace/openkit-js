@@ -18,14 +18,18 @@
 import {OpenKit} from './api/OpenKit';
 import {Configuration} from './core/config/Configuration';
 import {OpenKitImpl} from './core/OpenKitImpl';
-import {DataCollectionLevel} from './CrashReportingLevel';
-import {CrashReportingLevel} from './DataCollectionLevel';
+import {CrashReportingLevel} from './CrashReportingLevel';
+import {DataCollectionLevel} from './DataCollectionLevel';
 
 export class OpenKitBuilder {
     private readonly config: Configuration;
 
-    constructor(beaconURL: string, applicationID: string, deviceID: number | string) {
-        this.config = new Configuration(beaconURL, applicationID, deviceID);
+    constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
+        this.config = {
+            beaconURL,
+            applicationId,
+            deviceId,
+        };
     }
 
     public withApplicationName(appName: string): OpenKitBuilder {
@@ -58,7 +62,7 @@ export class OpenKitBuilder {
         return this;
     }
 
-    public getConfig(): Configuration {
+    public getConfig(): Readonly<Configuration> {
         return this.config;
     }
 

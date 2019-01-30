@@ -16,6 +16,7 @@
   "author": "Dynatrace",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
+    "@types/promise-polyfill": "^6.0.1",
     "@types/jest": "^23.3.13",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
@@ -29,7 +30,6 @@
     "yarn": "^1.13.0"
   },
   "dependencies": {
-    "@types/promise-polyfill": "^6.0.1",
     "promise-polyfill": "^8.1.0",
     "ts-mockito": "^2.3.1"
   }

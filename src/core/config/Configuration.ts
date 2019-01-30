@@ -14,56 +14,25 @@
  * limitations under the License.
  */
 
-import {DataCollectionLevel} from '../../CrashReportingLevel';
-import {CrashReportingLevel} from '../../DataCollectionLevel';
-import {defaultMaxBeaconSize, defaultServerId} from '../../PlatformConstants';
-import {StatusResponse} from '../beacon/StatusResponse';
-import {Status} from '../http/HttpResponse';
+import {CrashReportingLevel} from '../../CrashReportingLevel';
+import {DataCollectionLevel} from '../../DataCollectionLevel';
 
-export class Configuration {
-    public readonly beaconURL: string;
-    public readonly applicationId: string;
-    public readonly deviceId: number | string;
+export interface Size {
+    width: number;
+    height: number;
+}
 
-    public applicationName?: string;
-    public applicationVersion?: string;
-    public operatingSystem?: string;
+export interface Configuration {
+    readonly beaconURL: string;
+    readonly applicationId: string;
+    readonly deviceId: number | string;
 
-    public screenSize?: {
-        width: number;
-        height: number;
-    };
+    applicationName?: string;
+    applicationVersion?: string;
+    operatingSystem?: string;
 
-    public dataCollectionLevel?: DataCollectionLevel;
-    public crashReportingLevel?: CrashReportingLevel;
+    screenSize?: Readonly<Size>;
 
-    private _serverId: number = defaultServerId;
-    public get serverId(): number {
-        return this._serverId;
-    }
-
-    private _maxBeaconSize: number = defaultMaxBeaconSize;
-    public get maxBeaconSize(): number {
-        return this._maxBeaconSize;
-    }
-
-    constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
-        this.beaconURL = beaconURL;
-        this.applicationId = applicationId;
-        this.deviceId = deviceId;
-    }
-
-    public updateSettings(response: StatusResponse) {
-        if (response.status !== Status.OK) {
-            return;
-        }
-
-        if (response.serverID !== undefined) {
-           this._serverId = response.serverID;
-        }
-
-        if (response.maxBeaconSize !== undefined) {
-            this._maxBeaconSize = response.maxBeaconSize;
-        }
-    }
+    dataCollectionLevel?: DataCollectionLevel;
+    crashReportingLevel?: CrashReportingLevel;
 }

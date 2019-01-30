@@ -17,28 +17,29 @@
 import {InitCallback, OpenKit} from '../api/OpenKit';
 import {BeaconSender} from './beacon/BeaconSender';
 import {Configuration} from './config/Configuration';
+import {OpenKitState} from './OpenKitState';
 import {Status} from './http/HttpResponse';
 
 /**
  * Implementation of the {@link OpenKit} interface.
  */
 export class OpenKitImpl implements OpenKit {
-    public initCallback?: InitCallback;
+    private initCallback?: InitCallback;
     private initialized = false;
     private isShutdown = false;
 
-    private readonly config: Configuration;
+    private readonly state: OpenKitState;
     private readonly sender: BeaconSender;
 
     constructor(config: Configuration) {
-        this.config = config;
-        this.sender = new BeaconSender(this.config);
+        this.state = new OpenKitState(config);
+        this.sender = new BeaconSender(this.state);
     }
 
     public async initialize(): Promise<void> {
         const statusResponse = await this.sender.sendStatusRequest();
 
-        this.config.updateSettings(statusResponse);
+        this.state.updateState(statusResponse);
 
         if (!this.isShutdown) {
             this.initialized = statusResponse.status === Status.OK;
@@ -49,7 +50,7 @@ export class OpenKitImpl implements OpenKit {
         }
 
         console.debug('OpenKitImpl', statusResponse);
-        console.debug('OpenKitImpl', this.config);
+        console.debug('OpenKitImpl', this.state);
     }
 
     public isInitialized(): boolean {

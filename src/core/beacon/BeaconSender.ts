@@ -16,12 +16,12 @@
  */
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
-import {Configuration} from '../config/Configuration';
+import {OpenKitState} from '../OpenKitState';
 import {HttpClient} from '../http/HttpClient';
 import {QueryBuilder} from '../QueryBuilder';
 import {StatusResponse} from './StatusResponse';
 
-enum QueryKey {
+export const enum QueryKey {
     Type = 'type',
     ServerId = 'srvid',
     Application = 'app',
@@ -32,11 +32,11 @@ enum QueryKey {
 
 export class BeaconSender {
     private readonly http: HttpClient;
-    private readonly config: Configuration;
+    private readonly state: OpenKitState;
 
-    constructor(config: Configuration) {
+    constructor(state: OpenKitState) {
         this.http = new HttpClient();
-        this.config = config;
+        this.state = state;
     }
 
     public async sendStatusRequest(): Promise<StatusResponse> {
@@ -48,11 +48,11 @@ export class BeaconSender {
     private buildMonitorURL() {
         return new QueryBuilder()
             .add(QueryKey.Type, 'm')
-            .add(QueryKey.ServerId, this.config.serverId)
-            .add(QueryKey.Application, this.config.applicationId)
+            .add(QueryKey.ServerId, this.state.serverId)
+            .add(QueryKey.Application, this.state.config.applicationId)
             .add(QueryKey.Version, openKitVersion)
             .add(QueryKey.PlatformType, platformTypeOpenKit)
             .add(QueryKey.AgentTechnologyType, agentTechnologyType)
-            .buildUrl(this.config.beaconURL);
+            .buildUrl(this.state.config.beaconURL);
     }
 }

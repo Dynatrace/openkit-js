@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-export const enum DataCollectionLevel {
+/**
+ * Protocol constants for the crash reporting level.
+ */
+export const enum CrashReportingLevel {
     Off = 0,
-    Performance = 1,
-    UserBehavior = 2,
+    OptOutCrashes = 1,
+    OptInCrashes = 2,
 }

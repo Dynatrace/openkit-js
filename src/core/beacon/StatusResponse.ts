@@ -89,7 +89,8 @@ export class StatusResponse {
     private parseResponse(response: HttpResponse): void {
         const keyValueEntries = response.getValues();
 
-        if (keyValueEntries.type !== 'm') {
+        // tslint:disable-next-line:no-string-literal
+        if (keyValueEntries['type'] !== 'm') {
             this._valid = false;
             return;
         }
@@ -102,13 +103,15 @@ export class StatusResponse {
     private parseEntry(key: string, value: string): void {
         switch (key) {
             case ResponseKeys.Capture:
-                this._capture = value === 'true';
+                this._capture = value === '1';
                 break;
             case ResponseKeys.CaptureCrashes:
-                this._captureCrashes = value === 'true';
+                // 1 (always on) and 2 (only on WiFi) are treated the same
+                this._captureCrashes = parseInt(value, 10) !== 0;
                 break;
             case ResponseKeys.CaptureErrors:
-                this._captureErrors = value === 'true';
+                // 1 (always on) and 2 (only on WiFi) are treated the same
+                this._captureErrors = parseInt(value, 10) !== 0;
                 break;
             case ResponseKeys.MaxBeaconSize:
                 this._maxBeaconSize = parseInt(value, 10);
