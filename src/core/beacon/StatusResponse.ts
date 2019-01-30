@@ -27,8 +27,13 @@ const enum ResponseKeys {
     Multiplicity = 'mp',
 }
 
+export const enum CaptureMode {
+    Off = 0,
+    On = 1,
+}
+
 export class StatusResponse {
-    private _capture?: boolean;
+    private _captureMode?: CaptureMode;
     private _sendInterval?: number;
     private _monitorName?: string;
     private _serverID?: number;
@@ -41,8 +46,8 @@ export class StatusResponse {
 
     private readonly _status: Status;
 
-    public get capture(): boolean | undefined {
-        return this._capture;
+    public get captureMode(): CaptureMode | undefined {
+        return this._captureMode;
     }
 
     public get sendInterval(): number | undefined {
@@ -103,7 +108,8 @@ export class StatusResponse {
     private parseEntry(key: string, value: string): void {
         switch (key) {
             case ResponseKeys.Capture:
-                this._capture = value === '1';
+                // 1 is on, 0 is off. If another value is passed, we disable it to be on the safe side.
+                this._captureMode = parseInt(value, 10) === 1 ? CaptureMode.On : CaptureMode.Off;
                 break;
             case ResponseKeys.CaptureCrashes:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
