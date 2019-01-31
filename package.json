@@ -9,22 +9,28 @@
     "lint": "tslint --project . -c tslint.json",
     "lint:spec": "tslint --project . -c tslint.spec.json",
     "precommit": "yarn lint && yarn lint:spec && yarn run test",
-    "completeBuild": "yarn precommit && yarn build"
+    "completeBuild": "yarn precommit && yarn build",
+    "docs": "typedoc --out build/docs src/OpenKitBuilder.ts src/api",
+    "docs:markdown": "yarn docs --theme markdown"
   },
   "author": "Dynatrace",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
+    "@types/promise-polyfill": "^6.0.1",
     "@types/jest": "^23.3.13",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.3",
     "tslint": "^5.12.1",
+    "typedoc": "^0.14.2",
+    "typedoc-plugin-markdown": "^1.1.25",
     "typescript": "^3.2.4",
     "webpack": "^4.29.0",
     "webpack-cli": "^3.2.1",
     "yarn": "^1.13.0"
   },
   "dependencies": {
+    "promise-polyfill": "^8.1.0",
     "ts-mockito": "^2.3.1"
   }
 }
