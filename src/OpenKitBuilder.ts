@@ -21,8 +21,9 @@ import {OpenKitImpl} from './core/impl/OpenKitImpl';
 import {CrashReportingLevel} from './CrashReportingLevel';
 import {DataCollectionLevel} from './DataCollectionLevel';
 
-export const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
-export const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
+const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
+const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
+const defaultApplicationName = '';
 
 export class OpenKitBuilder {
     private readonly config: Configuration;
@@ -33,8 +34,7 @@ export class OpenKitBuilder {
             applicationId,
             deviceId,
 
-            applicationName: '',
-
+            applicationName: defaultApplicationName,
             crashReportingLevel: defaultCrashReportingLevel,
             dataCollectionLevel: defaultDataCollectionLevel,
         };

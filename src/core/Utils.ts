@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+/**
+ * Removes an element from a given array.
+ * If there are multiple elements of the same instance, only the first is removed.
+ *
+ * @param array The array to search in
+ * @param element The element to remove.
+ */
 export const removeElement = <T>(array: T[], element: T): void => {
     const index = array.indexOf(element);
 

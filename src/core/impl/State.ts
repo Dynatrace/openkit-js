@@ -18,9 +18,9 @@ import {StatusResponse} from '../beacon/StatusResponse';
 import {Configuration} from '../config/Configuration';
 import {HttpStatus} from '../http/HttpResponse';
 
-export const defaultServerId = 1;
-export const defaultMaxBeaconSize = 30 * 1024;
-export const defaultMultiplicity = 1;
+const defaultServerId = 1;
+const defaultMaxBeaconSize = 30 * 1024;
+const defaultMultiplicity = 1;
 
 export class State {
     private readonly _config: Readonly<Configuration>;
