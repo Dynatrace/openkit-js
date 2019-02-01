@@ -29,6 +29,8 @@ export class HttpClient {
         const result = await fetch(url, HttpClient.getOptions(payload));
         const body = await result.text();
 
+        // TODO: david.laubreiter: Use beacons or XmlHttpRequests.
+        // TODO: david.laubreiter: Implement retry strategy.
         const response = new HttpResponse(result.status, result.headers, body);
 
         debug('Finished request, response:', response);
