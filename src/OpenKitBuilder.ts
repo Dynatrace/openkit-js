@@ -17,9 +17,12 @@
 
 import {OpenKit} from './api/OpenKit';
 import {Configuration} from './core/config/Configuration';
-import {OpenKitImpl} from './core/OpenKitImpl';
+import {OpenKitImpl} from './core/impl/OpenKitImpl';
 import {CrashReportingLevel} from './CrashReportingLevel';
 import {DataCollectionLevel} from './DataCollectionLevel';
+
+export const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
+export const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 
 export class OpenKitBuilder {
     private readonly config: Configuration;
@@ -29,6 +32,11 @@ export class OpenKitBuilder {
             beaconURL,
             applicationId,
             deviceId,
+
+            applicationName: '',
+
+            crashReportingLevel: defaultCrashReportingLevel,
+            dataCollectionLevel: defaultDataCollectionLevel,
         };
     }
 

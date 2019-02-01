@@ -17,7 +17,7 @@
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
 import {HttpClient} from '../http/HttpClient';
-import {OpenKitState} from '../OpenKitState';
+import {State} from '../impl/State';
 import {QueryBuilder} from '../QueryBuilder';
 import {StatusResponse} from './StatusResponse';
 
@@ -28,31 +28,53 @@ export const enum QueryKey {
     Version = 'va',
     PlatformType = 'pt',
     AgentTechnologyType = 'tt',
+    NewSession = 'ns',
 }
 
+/**
+ * Class to abstract the requests to the httpclient.
+ */
 export class BeaconSender {
     private readonly http: HttpClient;
-    private readonly state: OpenKitState;
+    private readonly state: State;
 
-    constructor(state: OpenKitState) {
+    constructor(state: State) {
         this.http = new HttpClient();
         this.state = state;
     }
 
     public async sendStatusRequest(): Promise<StatusResponse> {
-        const response = await this.http.send(this.buildMonitorURL());
+        const monitorUrl = this.buildMonitorUrlQueries().buildUrl(this.state.config.beaconURL);
+        const response = await this.http.send(monitorUrl);
 
         return new StatusResponse(response);
     }
 
-    private buildMonitorURL() {
+    public async sendNewSessionRequest(): Promise<StatusResponse> {
+        const monitorUrl = this.buildMonitorUrlQueries()
+            .add(QueryKey.NewSession, 1)
+            .buildUrl(this.state.config.beaconURL);
+
+        const response = await this.http.send(monitorUrl);
+
+        return new StatusResponse(response);
+    }
+
+    public async sendPayload(payload: string): Promise<StatusResponse> {
+        const monitorUrl = this.buildMonitorUrlQueries().buildUrl(this.state.config.beaconURL);
+
+        const response = await this.http.send(monitorUrl, payload);
+
+        return new StatusResponse(response);
+    }
+
+    private buildMonitorUrlQueries(): QueryBuilder {
         return new QueryBuilder()
             .add(QueryKey.Type, 'm')
             .add(QueryKey.ServerId, this.state.serverId)
             .add(QueryKey.Application, this.state.config.applicationId)
             .add(QueryKey.Version, openKitVersion)
             .add(QueryKey.PlatformType, platformTypeOpenKit)
-            .add(QueryKey.AgentTechnologyType, agentTechnologyType)
-            .buildUrl(this.state.config.beaconURL);
+            .add(QueryKey.AgentTechnologyType, agentTechnologyType);
     }
 }

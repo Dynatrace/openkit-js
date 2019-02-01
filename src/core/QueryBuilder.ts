@@ -22,6 +22,13 @@ export class QueryBuilder {
         return this;
     }
 
+    public addIfDefined(key: string, value: string | number | boolean | undefined): QueryBuilder {
+        if (value !== undefined) {
+            this.add(key, value);
+        }
+        return this;
+    }
+
     public buildQueryString() {
         return Object
             .keys(this.options)

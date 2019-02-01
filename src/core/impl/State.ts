@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-import {defaultMaxBeaconSize, defaultServerId} from '../PlatformConstants';
-import {StatusResponse} from './beacon/StatusResponse';
-import {Configuration} from './config/Configuration';
-import {Status} from './http/HttpResponse';
+import {StatusResponse} from '../beacon/StatusResponse';
+import {Configuration} from '../config/Configuration';
+import {HttpStatus} from '../http/HttpResponse';
 
-export class OpenKitState {
+export const defaultServerId = 1;
+export const defaultMaxBeaconSize = 30 * 1024;
+export const defaultMultiplicity = 1;
+
+export class State {
     private readonly _config: Readonly<Configuration>;
     public get config(): Readonly<Configuration> {
         return this._config;
@@ -35,21 +38,42 @@ export class OpenKitState {
         return this._maxBeaconSize;
     }
 
+    private _multiplicity: number = defaultMultiplicity;
+    public get multiplicity(): number {
+        return this._multiplicity;
+    }
+
     constructor(config: Readonly<Configuration>) {
         this._config = config;
     }
 
     public updateState(response: StatusResponse) {
-        if (response.status !== Status.OK) {
+
+        if (response.status !== HttpStatus.OK) {
             return;
         }
 
         if (response.serverID !== undefined) {
-           this._serverId = response.serverID;
+            this._serverId = response.serverID >= 0 ? response.serverID : defaultServerId;
         }
 
         if (response.maxBeaconSize !== undefined) {
-            this._maxBeaconSize = response.maxBeaconSize;
+            this._maxBeaconSize = response.maxBeaconSize >= 0 ? response.maxBeaconSize * 1024 : defaultMaxBeaconSize;
         }
+
+        if (response.multiplicity !== undefined) {
+            // if multiplicity is invalid, we disable it completely
+            this._multiplicity = response.multiplicity >= 0 ? response.multiplicity : 0;
+        }
+    }
+
+    public clone(): State {
+        const clonedState = new State(this._config);
+
+        clonedState._maxBeaconSize = this._maxBeaconSize;
+        clonedState._serverId = this._serverId;
+        clonedState._multiplicity = this._multiplicity;
+
+        return clonedState;
     }
 }
