@@ -17,6 +17,7 @@
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion} from '../../PlatformConstants';
 import {State} from '../impl/State';
 import {QueryBuilder} from '../QueryBuilder';
+import {SequenceIdProvider} from '../SequenceIdProvider';
 import {PayloadKeys} from './PayloadKeys';
 
 const enum EventType {
@@ -32,9 +33,7 @@ export class Beacon {
     private readonly _payloadPrefix: string;
     private readonly _state: State;
     private readonly _payloads: string[] = [];
-
-    private _sequenceNumber: number = 0;
-
+    private readonly _sequenceIdProvider = new SequenceIdProvider();
     private readonly _sessionStartTime = now();
 
     constructor(state: State, clientIp: string, sessionId: number) {
@@ -46,7 +45,7 @@ export class Beacon {
         const payload = new QueryBuilder()
             .add(PayloadKeys.EventType, EventType.SessionStart)
             .add(PayloadKeys.ParentActionId, 0)
-            .add(PayloadKeys.StartSequenceNumber, this.createSequenceNumber())
+            .add(PayloadKeys.StartSequenceNumber, this._sequenceIdProvider.getNextId())
             .add(PayloadKeys.Time0, 0)
             .add(PayloadKeys.ThreadId, 1)
             .buildQueryString();
@@ -58,16 +57,12 @@ export class Beacon {
         const payload = new QueryBuilder()
             .add(PayloadKeys.EventType, EventType.SessionEnd)
             .add(PayloadKeys.ParentActionId, 0)
-            .add(PayloadKeys.StartSequenceNumber, this.createSequenceNumber())
+            .add(PayloadKeys.StartSequenceNumber, this._sequenceIdProvider.getNextId())
             .add(PayloadKeys.ThreadId, 1)
             .add(PayloadKeys.Time0, (now() - this._sessionStartTime))
             .buildQueryString();
 
         this._payloads.push(payload);
-    }
-
-    private createSequenceNumber(): number {
-        return ++this._sequenceNumber;
     }
 
     /**

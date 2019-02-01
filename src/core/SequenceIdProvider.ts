@@ -12,26 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 /**
- * The OpenKit-JavaScript version.
- * For now, it must be equal to the mobile agent version.
+ * Javascript is accurate up to 15 digits.
+ * We use 10 digits with our max value of 2^31, so we are safe without rounding.
  */
-export const openKitVersion = '7.0.0000';
+const MAX_ID_VALUE = Math.pow(2, 31);
 
-/**
- * Constant for the OneAgent Mobile Communication Protocol Version 3.
- */
-export const protocolVersion = 3;
+export class SequenceIdProvider {
+    private _currentId = 0;
 
-/**
- * Constant for all OpenKit platforms.
- */
-export const platformTypeOpenKit = 1;
+    public getNextId(): number {
+        this._currentId++;
 
-/**
- * The OpenKit-JavaScript agent technology type constant.
- */
-export const agentTechnologyType = 'okjs';
+        if (this._currentId === MAX_ID_VALUE) {
+            this._currentId = 1;
+        }
+
+        return this._currentId;
+    }
+}

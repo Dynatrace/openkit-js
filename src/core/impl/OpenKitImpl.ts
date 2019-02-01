@@ -17,6 +17,7 @@
 import {InitCallback, OpenKit} from '../../api/OpenKit';
 import {Session} from '../../api/Session';
 import {Configuration} from '../config/Configuration';
+import {SequenceIdProvider} from '../SequenceIdProvider';
 import {removeElement} from '../Utils';
 import {OpenKitObject, Status, StatusCallback} from './OpenKitObject';
 import {SessionImpl} from './SessionImpl';
@@ -27,7 +28,7 @@ import {State} from './State';
  */
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
     private readonly openSessions: SessionImpl[] = [];
-    private nextSessionId = 1;
+    private readonly sessionIdProvider = new SequenceIdProvider();
 
     constructor(config: Configuration) {
         super(new State({...config}));
@@ -92,7 +93,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @inheritDoc
      */
     public createSession(clientIP: string = ''): Session {
-        const session = new SessionImpl(this, clientIP, this.nextSessionId++);
+        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
 
         this.openSessions.push(session);
 
