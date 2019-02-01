@@ -91,7 +91,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     /**
      * @inheritDoc
      */
-    public createSession(clientIP: string): Session {
+    public createSession(clientIP: string = ''): Session {
         const session = new SessionImpl(this, clientIP, this.nextSessionId++);
 
         this.openSessions.push(session);
