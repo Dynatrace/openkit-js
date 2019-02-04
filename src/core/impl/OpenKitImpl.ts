@@ -30,6 +30,10 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     private readonly openSessions: Session[] = [];
     private readonly sessionIdProvider = new SequenceIdProvider();
 
+    /**
+     * Creates a new OpenKit instance with a copy of the configuration.
+     * @param config The app configuration.
+     */
     constructor(config: Configuration) {
         super(new State({...config}));
     }
