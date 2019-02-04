@@ -42,6 +42,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         const response = await this.sender.sendNewSessionRequest();
 
         this.finishInitialization(response);
+        this.state.setServerIdLocked();
 
         console.debug('[SessionImpl]', 'Successfully initialized Session', this);
     }

@@ -28,6 +28,7 @@ export class State {
         return this._config;
     }
 
+    private _serverIdLocked = false;
     private _serverId: number = defaultServerId;
     public get serverId(): number {
         return this._serverId;
@@ -47,13 +48,17 @@ export class State {
         this._config = config;
     }
 
+    public setServerIdLocked() {
+        this._serverIdLocked = true;
+    }
+
     public updateState(response: StatusResponse) {
 
         if (response.status !== HttpStatus.OK) {
             return;
         }
 
-        if (response.serverID !== undefined) {
+        if (response.serverID !== undefined && this._serverIdLocked === false) {
             this._serverId = response.serverID >= 0 ? response.serverID : defaultServerId;
         }
 
