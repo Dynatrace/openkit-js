@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-export class QueryBuilder {
+export abstract class QueryBuilder<T extends string> {
     private readonly options: {[key: string]: string} = {};
 
-    public add(key: string, value: string | number | boolean): QueryBuilder {
+    public add(key: T, value: string | number | boolean): this {
         this.options[key] = value.toString();
         return this;
     }
 
-    public addIfDefined(key: string, value: string | number | boolean | undefined): QueryBuilder {
+    public addIfDefined(key: T, value: string | number | boolean | undefined): this {
         if (value !== undefined) {
             this.add(key, value);
         }
         return this;
     }
 
-    public buildQueryString() {
+    public build() {
         return Object
             .keys(this.options)
             .map((key: string) => `${encodeURIComponent(key)}=${encodeURIComponent(this.options[key])}`)
             .join('&');
-    }
-
-    public buildUrl(baseUrl: string) {
-        return `${baseUrl}?${this.buildQueryString()}`;
     }
 }

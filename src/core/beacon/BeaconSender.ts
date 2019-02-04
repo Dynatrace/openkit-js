@@ -16,9 +16,9 @@
  */
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
+import {UrlBuilder} from '../builder/UrlBuilder';
 import {HttpClient} from '../http/HttpClient';
 import {State} from '../impl/State';
-import {QueryBuilder} from '../QueryBuilder';
 import {StatusResponse} from './StatusResponse';
 
 export const enum QueryKey {
@@ -54,7 +54,7 @@ export class BeaconSender {
      * @returns The {@see StatusResponse} from the server.
      */
     public async sendStatusRequest(): Promise<StatusResponse> {
-        const monitorUrl = this.buildMonitorUrlQueries().buildUrl(this.state.config.beaconURL);
+        const monitorUrl = this.buildMonitorUrlQueries().build();
         const response = await this.http.send(monitorUrl);
 
         return new StatusResponse(response);
@@ -68,7 +68,7 @@ export class BeaconSender {
     public async sendNewSessionRequest(): Promise<StatusResponse> {
         const monitorUrl = this.buildMonitorUrlQueries()
             .add(QueryKey.NewSession, 1)
-            .buildUrl(this.state.config.beaconURL);
+            .build();
 
         const response = await this.http.send(monitorUrl);
 
@@ -82,15 +82,14 @@ export class BeaconSender {
      * @returns The {@see StatusResponse} for the request.
      */
     public async sendPayload(payload: string): Promise<StatusResponse> {
-        const monitorUrl = this.buildMonitorUrlQueries().buildUrl(this.state.config.beaconURL);
-
+        const monitorUrl = this.buildMonitorUrlQueries().build();
         const response = await this.http.send(monitorUrl, payload);
 
         return new StatusResponse(response);
     }
 
-    private buildMonitorUrlQueries(): QueryBuilder {
-        return new QueryBuilder()
+    private buildMonitorUrlQueries(): UrlBuilder {
+        return new UrlBuilder(this.state.config.beaconURL)
             .add(QueryKey.Type, 'm')
             .add(QueryKey.ServerId, this.state.serverId)
             .add(QueryKey.Application, this.state.config.applicationId)

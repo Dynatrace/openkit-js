@@ -15,8 +15,8 @@
  */
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion} from '../../PlatformConstants';
+import {PayloadBuilder} from '../builder/PayloadBuilder';
 import {State} from '../impl/State';
-import {QueryBuilder} from '../QueryBuilder';
 import {SequenceIdProvider} from '../SequenceIdProvider';
 import {PayloadKeys} from './PayloadKeys';
 
@@ -42,25 +42,25 @@ export class Beacon {
     }
 
     public startSession(): void {
-        const payload = new QueryBuilder()
+        const payload = new PayloadBuilder()
             .add(PayloadKeys.EventType, EventType.SessionStart)
             .add(PayloadKeys.ParentActionId, 0)
             .add(PayloadKeys.StartSequenceNumber, this._sequenceIdProvider.getNextId())
             .add(PayloadKeys.Time0, 0)
             .add(PayloadKeys.ThreadId, 1)
-            .buildQueryString();
+            .build();
 
         this._payloads.push(payload);
     }
 
     public endSession() {
-        const payload = new QueryBuilder()
+        const payload = new PayloadBuilder()
             .add(PayloadKeys.EventType, EventType.SessionEnd)
             .add(PayloadKeys.ParentActionId, 0)
             .add(PayloadKeys.StartSequenceNumber, this._sequenceIdProvider.getNextId())
             .add(PayloadKeys.ThreadId, 1)
             .add(PayloadKeys.Time0, (now() - this._sessionStartTime))
-            .buildQueryString();
+            .build();
 
         this._payloads.push(payload);
     }
@@ -90,16 +90,16 @@ export class Beacon {
     }
 
     private getMutableBeaconData(): string {
-        return new QueryBuilder()
+        return new PayloadBuilder()
             .add(PayloadKeys.SessionStartTime, this._sessionStartTime)
             .add(PayloadKeys.Multiplicity, this._state.multiplicity)
-            .buildQueryString();
+            .build();
     }
 
     public buildPayloadPrefix(clientIpAddress: string, sessionId: number): string {
         const config = this._state.config;
 
-        return new QueryBuilder()
+        return new PayloadBuilder()
             .add(PayloadKeys.ProtocolVersion, protocolVersion)
             .add(PayloadKeys.OpenKitVersion, openKitVersion)
             .add(PayloadKeys.ApplicationId, config.applicationId)
@@ -114,6 +114,6 @@ export class Beacon {
 
             .add(PayloadKeys.DataCollectionLevel, config.dataCollectionLevel)
             .add(PayloadKeys.CrashReportingLevel, config.crashReportingLevel)
-            .buildQueryString();
+            .build();
     }
 }
