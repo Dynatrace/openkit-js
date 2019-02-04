@@ -27,7 +27,7 @@ import {State} from './State';
  * Implementation of the {@link OpenKit} interface.
  */
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
-    private readonly openSessions: SessionImpl[] = [];
+    private readonly openSessions: Session[] = [];
     private readonly sessionIdProvider = new SequenceIdProvider();
 
     constructor(config: Configuration) {

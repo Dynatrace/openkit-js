@@ -80,11 +80,8 @@ export abstract class OpenKitObject {
      * Call all registered callbacks with the current status.
      */
     private callInitCallbacks() {
-        let callback;
-        while (this._initializationListener.length !== 0) {
-            callback = this._initializationListener.pop();
-            callback!(this._status);
-        }
+        this._initializationListener.forEach(cb => cb(this._status));
+        this._initializationListener = [];
     }
 
     /**
