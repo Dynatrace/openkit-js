@@ -79,18 +79,25 @@ export class SessionImpl extends OpenKitObject implements Session {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public end(): void {
-        this.registerOnInitializedCallback((status) => {
-            if (status === Status.Initialized) {
-                this.endSession();
-            }
-            this.shutdown();
+        this.registerOnInitializedCallback(() => {
+            this.endSession();
         });
     }
 
-    private endSession() {
-        this.beaconData.endSession();
-        this.flush();
+    /**
+     * Ends the session.
+     * If the session is initialized, all data is flushed before shutting the session down.
+     */
+    private async endSession() {
+        if (this.status === Status.Initialized) {
+            this.beaconData.endSession();
+            await this.flush();
+        }
         this.ok.removeSession(this);
+        this.shutdown();
     }
 }
