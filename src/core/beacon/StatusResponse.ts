@@ -33,6 +33,7 @@ export const enum CaptureMode {
 
 /**
  * Holds the status information after a request.
+ * Most of the settings can be configured in the Dynatrace UI.
  *
  * Ignored flags:
  * * si (Send Interval)

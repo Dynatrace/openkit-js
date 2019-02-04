@@ -57,7 +57,7 @@ export abstract class OpenKitObject {
      * Does only execute if the object has not yet been initialized.
      * Calls all registered callbacks with the new status.
      *
-     * @param successfully
+     * @param response The response which finishes the initialization.
      */
     public finishInitialization(response: StatusResponse): void {
         if (this._status !== Status.Idle) {

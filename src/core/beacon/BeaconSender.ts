@@ -32,17 +32,27 @@ export const enum QueryKey {
 }
 
 /**
- * Class to abstract the requests to the httpclient.
+ * Wrapper class for the {@see HttpClient}.
+ * It abstracts the calls the the HttpClient, which then sends the actual requests to the server.
  */
 export class BeaconSender {
     private readonly http: HttpClient;
     private readonly state: State;
 
+    /**
+     * Creates the BeaconSender.
+     * @param state The State of the Object which wants to send data.
+     */
     constructor(state: State) {
         this.http = new HttpClient();
         this.state = state;
     }
 
+    /**
+     * Sends a status request to the server.
+     *
+     * @returns The {@see StatusResponse} from the server.
+     */
     public async sendStatusRequest(): Promise<StatusResponse> {
         const monitorUrl = this.buildMonitorUrlQueries().buildUrl(this.state.config.beaconURL);
         const response = await this.http.send(monitorUrl);
@@ -50,6 +60,11 @@ export class BeaconSender {
         return new StatusResponse(response);
     }
 
+    /**
+     * Sends a new session request to the server.
+     *
+     * @returns The {@see StatusResponse} for the new session.
+     */
     public async sendNewSessionRequest(): Promise<StatusResponse> {
         const monitorUrl = this.buildMonitorUrlQueries()
             .add(QueryKey.NewSession, 1)
@@ -60,6 +75,12 @@ export class BeaconSender {
         return new StatusResponse(response);
     }
 
+    /**
+     * Sends a payload to the server.
+     *
+     * @param payload The payload to send in UTF8-encoding.
+     * @returns The {@see StatusResponse} for the request.
+     */
     public async sendPayload(payload: string): Promise<StatusResponse> {
         const monitorUrl = this.buildMonitorUrlQueries().buildUrl(this.state.config.beaconURL);
 
