@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-import {CrashReportingLevel} from '../../CrashReportingLevel';
-import {DataCollectionLevel} from '../../DataCollectionLevel';
+/**
+ * Javascript is accurate up to 15 digits.
+ * We use 10 digits with our max value of 2^31, so we are safe without rounding.
+ */
+const MAX_ID_VALUE = Math.pow(2, 31);
 
-export interface Size {
-    width: number;
-    height: number;
-}
+export class SequenceIdProvider {
+    private _currentId = 0;
 
-export interface Configuration {
-    readonly beaconURL: string;
-    readonly applicationId: string;
-    readonly deviceId: number | string;
+    public getNextId(): number {
+        this._currentId++;
 
-    applicationName: string;
-    applicationVersion?: string;
-    operatingSystem?: string;
+        if (this._currentId === MAX_ID_VALUE) {
+            this._currentId = 1;
+        }
 
-    screenSize?: Readonly<Size>;
-
-    dataCollectionLevel: DataCollectionLevel;
-    crashReportingLevel: CrashReportingLevel;
+        return this._currentId;
+    }
 }

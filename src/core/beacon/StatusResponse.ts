@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import {HttpResponse, Status} from '../http/HttpResponse';
+import {HttpResponse, HttpStatus} from '../http/HttpResponse';
 
 const enum ResponseKeys {
     Capture = 'cp',
-    SendInterval = 'si',
     MonitorName = 'bn',
     ServerId = 'id',
     MaxBeaconSize = 'bl',
@@ -32,9 +31,19 @@ export const enum CaptureMode {
     On = 1,
 }
 
+/**
+ * Holds the status information after a request.
+ * Most of the settings can be configured in the Dynatrace UI.
+ *
+ * Ignored flags:
+ * * si (Send Interval)
+ * * cl (Capture lifecycle)
+ *
+ */
 export class StatusResponse {
+    private readonly _status: HttpStatus;
+
     private _captureMode?: CaptureMode;
-    private _sendInterval?: number;
     private _monitorName?: string;
     private _serverID?: number;
     private _maxBeaconSize?: number;
@@ -44,14 +53,8 @@ export class StatusResponse {
 
     private _valid: boolean = true;
 
-    private readonly _status: Status;
-
     public get captureMode(): CaptureMode | undefined {
         return this._captureMode;
-    }
-
-    public get sendInterval(): number | undefined {
-        return this._sendInterval;
     }
 
     public get monitorName(): string | undefined {
@@ -78,11 +81,14 @@ export class StatusResponse {
         return this._multiplicity;
     }
 
+    /**
+     * A StatusResponse is valid, if the type=m and the status code is 200.
+     */
     public get valid(): boolean {
         return this._valid;
     }
 
-    public get status(): Status {
+    public get status(): HttpStatus {
         return this._status;
     }
 
@@ -95,7 +101,7 @@ export class StatusResponse {
         const keyValueEntries = response.getValues();
 
         // tslint:disable-next-line:no-string-literal
-        if (keyValueEntries['type'] !== 'm') {
+        if (keyValueEntries['type'] !== 'm' || response.getStatus() !== HttpStatus.OK) {
             this._valid = false;
             return;
         }
@@ -128,11 +134,9 @@ export class StatusResponse {
             case ResponseKeys.Multiplicity:
                 this._multiplicity = parseInt(value, 10);
                 break;
-            case ResponseKeys.SendInterval:
-                this._sendInterval = parseInt(value, 10);
-                break;
             case ResponseKeys.ServerId:
                 this._serverID = parseInt(value, 10);
+                break;
         }
     }
 }

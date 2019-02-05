@@ -17,18 +17,35 @@
 
 import {HttpResponse} from './HttpResponse';
 
+const debug = (...args: any[]) => {
+    console.debug('[HttpClient]', ...args);
+};
+
 export class HttpClient {
 
-    public async send(url: string): Promise<HttpResponse> {
-        console.debug('HttpClient', 'Sending request', url);
+    public async send(url: string, payload?: string): Promise<HttpResponse> {
+        debug('Sending request', {url, payload});
 
-        const result = await fetch(url);
+        const result = await fetch(url, HttpClient.getOptions(payload));
         const body = await result.text();
 
+        // TODO: david.laubreiter: Use beacons or XmlHttpRequests.
+        // TODO: david.laubreiter: Implement retry strategy.
         const response = new HttpResponse(result.status, result.headers, body);
 
-        console.debug('HttpClient', 'Finished request, response:', response);
+        debug('Finished request, response:', response);
 
         return response;
+    }
+
+    private static getOptions(payload?: string) {
+        if (payload === undefined) {
+            return {};
+        }
+
+        return {
+            method: 'POST',
+            body: payload,
+        };
     }
 }

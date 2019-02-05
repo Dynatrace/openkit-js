@@ -35,13 +35,3 @@ export const platformTypeOpenKit = 1;
  * The OpenKit-JavaScript agent technology type constant.
  */
 export const agentTechnologyType = 'okjs';
-
-/**
- * The default server id, where the first request should be send.
- */
-export const defaultServerId = 1;
-
-/**
- * The default maximum size for all beacons which are send to the server.
- */
-export const defaultMaxBeaconSize = 30 * 1024;

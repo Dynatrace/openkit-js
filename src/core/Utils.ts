@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-import {CrashReportingLevel} from '../../CrashReportingLevel';
-import {DataCollectionLevel} from '../../DataCollectionLevel';
+/**
+ * Removes an element from a given array.
+ * If there are multiple elements of the same instance, only the first is removed.
+ *
+ * @param array The array to search in
+ * @param element The element to remove.
+ */
+export const removeElement = <T>(array: T[], element: T): void => {
+    const index = array.indexOf(element);
 
-export interface Size {
-    width: number;
-    height: number;
-}
+    if (index < 0) {
+        return;
+    }
 
-export interface Configuration {
-    readonly beaconURL: string;
-    readonly applicationId: string;
-    readonly deviceId: number | string;
-
-    applicationName: string;
-    applicationVersion?: string;
-    operatingSystem?: string;
-
-    screenSize?: Readonly<Size>;
-
-    dataCollectionLevel: DataCollectionLevel;
-    crashReportingLevel: CrashReportingLevel;
-}
+    array.splice(index, 1);
+};

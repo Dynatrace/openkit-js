@@ -16,9 +16,9 @@
  */
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
+import {UrlBuilder} from '../builder/UrlBuilder';
 import {HttpClient} from '../http/HttpClient';
-import {OpenKitState} from '../OpenKitState';
-import {QueryBuilder} from '../QueryBuilder';
+import {State} from '../impl/State';
 import {StatusResponse} from './StatusResponse';
 
 export const enum QueryKey {
@@ -28,31 +28,73 @@ export const enum QueryKey {
     Version = 'va',
     PlatformType = 'pt',
     AgentTechnologyType = 'tt',
+    NewSession = 'ns',
 }
 
+/**
+ * Wrapper class for the {@see HttpClient}.
+ * It abstracts the calls the the HttpClient, which then sends the actual requests to the server.
+ */
 export class BeaconSender {
     private readonly http: HttpClient;
-    private readonly state: OpenKitState;
+    private readonly state: State;
 
-    constructor(state: OpenKitState) {
+    /**
+     * Creates the BeaconSender.
+     * @param state The State of the Object which wants to send data.
+     */
+    constructor(state: State) {
         this.http = new HttpClient();
         this.state = state;
     }
 
+    /**
+     * Sends a status request to the server.
+     *
+     * @returns The {@see StatusResponse} from the server.
+     */
     public async sendStatusRequest(): Promise<StatusResponse> {
-        const response = await this.http.send(this.buildMonitorURL());
+        const monitorUrl = this.buildMonitorUrlQueries().build();
+        const response = await this.http.send(monitorUrl);
 
         return new StatusResponse(response);
     }
 
-    private buildMonitorURL() {
-        return new QueryBuilder()
+    /**
+     * Sends a new session request to the server.
+     *
+     * @returns The {@see StatusResponse} for the new session.
+     */
+    public async sendNewSessionRequest(): Promise<StatusResponse> {
+        const monitorUrl = this.buildMonitorUrlQueries()
+            .add(QueryKey.NewSession, 1)
+            .build();
+
+        const response = await this.http.send(monitorUrl);
+
+        return new StatusResponse(response);
+    }
+
+    /**
+     * Sends a payload to the server.
+     *
+     * @param payload The payload to send in UTF8-encoding.
+     * @returns The {@see StatusResponse} for the request.
+     */
+    public async sendPayload(payload: string): Promise<StatusResponse> {
+        const monitorUrl = this.buildMonitorUrlQueries().build();
+        const response = await this.http.send(monitorUrl, payload);
+
+        return new StatusResponse(response);
+    }
+
+    private buildMonitorUrlQueries(): UrlBuilder {
+        return new UrlBuilder(this.state.config.beaconURL)
             .add(QueryKey.Type, 'm')
             .add(QueryKey.ServerId, this.state.serverId)
             .add(QueryKey.Application, this.state.config.applicationId)
             .add(QueryKey.Version, openKitVersion)
             .add(QueryKey.PlatformType, platformTypeOpenKit)
-            .add(QueryKey.AgentTechnologyType, agentTechnologyType)
-            .buildUrl(this.state.config.beaconURL);
+            .add(QueryKey.AgentTechnologyType, agentTechnologyType);
     }
 }

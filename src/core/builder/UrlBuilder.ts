@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-export class QueryBuilder {
-    private readonly options: {[key: string]: string} = {};
+import {QueryKey} from '../beacon/BeaconSender';
+import {QueryBuilder} from './QueryBuilder';
 
-    public add(key: string, value: string | number | boolean): QueryBuilder {
-        this.options[key] = value.toString();
-        return this;
+export class UrlBuilder extends QueryBuilder<QueryKey> {
+    constructor(private readonly url: string) {
+        super();
     }
 
-    public buildQueryString() {
-        return Object
-            .keys(this.options)
-            .map((key: string) => `${encodeURIComponent(key)}=${encodeURIComponent(this.options[key])}`)
-            .join('&');
-    }
-
-    public buildUrl(baseUrl: string) {
-        return `${baseUrl}?${this.buildQueryString()}`;
+    public build(): string {
+        return `${this.url}?${super.build()}`;
     }
 }

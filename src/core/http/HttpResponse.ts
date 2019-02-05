@@ -15,7 +15,7 @@
  *
  */
 
-export enum Status {
+export enum HttpStatus {
     OK = 200,
     UNKNOWN = -1,
 }
@@ -42,10 +42,10 @@ export class HttpResponse {
         this._values = parseBody(body);
     }
 
-    public getStatus(): Status {
+    public getStatus(): HttpStatus {
         switch (this._statusCode) {
-            case Status.OK: return Status.OK;
-            default: return Status.UNKNOWN;
+            case HttpStatus.OK: return HttpStatus.OK;
+            default: return HttpStatus.UNKNOWN;
         }
     }
 

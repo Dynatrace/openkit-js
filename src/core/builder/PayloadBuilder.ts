@@ -14,25 +14,7 @@
  * limitations under the License.
  */
 
-import {CrashReportingLevel} from '../../CrashReportingLevel';
-import {DataCollectionLevel} from '../../DataCollectionLevel';
+import {PayloadKeys} from '../beacon/PayloadKeys';
+import {QueryBuilder} from './QueryBuilder';
 
-export interface Size {
-    width: number;
-    height: number;
-}
-
-export interface Configuration {
-    readonly beaconURL: string;
-    readonly applicationId: string;
-    readonly deviceId: number | string;
-
-    applicationName: string;
-    applicationVersion?: string;
-    operatingSystem?: string;
-
-    screenSize?: Readonly<Size>;
-
-    dataCollectionLevel: DataCollectionLevel;
-    crashReportingLevel: CrashReportingLevel;
-}
+export class PayloadBuilder extends QueryBuilder<PayloadKeys> {}

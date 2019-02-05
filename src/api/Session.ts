@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-import {CrashReportingLevel} from '../../CrashReportingLevel';
-import {DataCollectionLevel} from '../../DataCollectionLevel';
+/**
+ * Session public interface
+ */
+export interface Session {
 
-export interface Size {
-    width: number;
-    height: number;
-}
-
-export interface Configuration {
-    readonly beaconURL: string;
-    readonly applicationId: string;
-    readonly deviceId: number | string;
-
-    applicationName: string;
-    applicationVersion?: string;
-    operatingSystem?: string;
-
-    screenSize?: Readonly<Size>;
-
-    dataCollectionLevel: DataCollectionLevel;
-    crashReportingLevel: CrashReportingLevel;
+    /**
+     * Ends the session and sends all remaining data.
+     */
+    end(): void;
 }

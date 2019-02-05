@@ -15,8 +15,13 @@
  *
  */
 
+import {Session} from './Session';
+
 export type InitCallback = (success: boolean) => void;
 
+/**
+ * OpenKit public interface
+ */
 export interface OpenKit {
     /**
      * Checks if OpenKit has successfully initialized.
@@ -24,6 +29,18 @@ export interface OpenKit {
      * @return true if OpenKit initialized successfully, false otherwise.
      */
     isInitialized(): boolean;
+
+    /**
+     * Creates a new session and returns its instance.
+     */
+    createSession(): Session;
+
+    /**
+     * Creates a new session and returns its instance.
+     *
+     * @param clientIP the clients ip
+     */
+    createSession(clientIP: string): Session;
 
     /**
      * Calls the callback after the initialization finished, no matter if it was successfully finished or failed.
