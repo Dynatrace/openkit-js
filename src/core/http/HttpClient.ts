@@ -15,7 +15,7 @@
  *
  */
 
-import {createLogger} from '../Logger';
+import {createLogger} from '../utils/Logger';
 import {HttpResponse} from './HttpResponse';
 
 const log = createLogger('HttpClient');

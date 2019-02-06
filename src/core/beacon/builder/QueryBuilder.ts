@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {PayloadKey} from '../protocol/PayloadKey';
-import {QueryKey} from '../protocol/QueryKey';
+import {PayloadKey} from '../../protocol/PayloadKey';
+import {QueryKey} from '../../protocol/QueryKey';
 
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: {[key: string]: string} = {};

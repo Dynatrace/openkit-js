@@ -15,12 +15,12 @@
  */
 
 import {agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion} from '../../PlatformConstants';
-import {PayloadQueryBuilder} from '../builder/PayloadQueryBuilder';
 import {Configuration} from '../config/Configuration';
 import {ActionImpl} from '../impl/ActionImpl';
 import {EventType} from '../protocol/EventType';
 import {PayloadKey} from '../protocol/PayloadKey';
-import {now} from '../Utils';
+import {now} from '../utils/Utils';
+import {PayloadQueryBuilder} from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
     private constructor() {}

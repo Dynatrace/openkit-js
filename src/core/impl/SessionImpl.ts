@@ -18,8 +18,8 @@ import {Action} from '../../api/Action';
 import {Session} from '../../api/Session';
 import {PayloadData} from '../beacon/PayloadData';
 import {PayloadSender} from '../beacon/PayloadSender';
-import {createLogger} from '../Logger';
-import {removeElement} from '../Utils';
+import {createLogger} from '../utils/Logger';
+import {removeElement} from '../utils/Utils';
 import {ActionImpl} from './ActionImpl';
 import {OpenKitImpl} from './OpenKitImpl';
 import {OpenKitObject, Status} from './OpenKitObject';
@@ -31,16 +31,16 @@ export class SessionImpl extends OpenKitObject implements Session {
     private readonly openActions: Action[] = [];
     private readonly payloadSender: PayloadSender;
 
-    public readonly beaconData: PayloadData;
+    public readonly payloadData: PayloadData;
 
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
         super(openKit.state.clone());
 
         this.openKit = openKit;
-        this.beaconData = new PayloadData(this, clientIp, sessionId);
-        this.payloadSender = new PayloadSender(this.state, this.beaconData);
+        this.payloadData = new PayloadData(this, clientIp, sessionId);
+        this.payloadSender = new PayloadSender(this.state, this.payloadData);
 
-        this.beaconData.startSession();
+        this.payloadData.startSession();
 
         openKit.registerOnInitializedCallback(status => {
            if (status === Status.Initialized) {
@@ -82,7 +82,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.openActions.forEach(action => action.leaveAction());
 
         if (this.status === Status.Initialized) {
-            this.beaconData.endSession();
+            this.payloadData.endSession();
             await this.flush();
         }
 
@@ -91,7 +91,7 @@ export class SessionImpl extends OpenKitObject implements Session {
     }
 
     public enterAction(actionName: string): Action {
-        const action = new ActionImpl(this, actionName, this.beaconData);
+        const action = new ActionImpl(this, actionName, this.payloadData);
 
         this.openActions.push(action);
 

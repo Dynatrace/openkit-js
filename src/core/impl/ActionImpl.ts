@@ -16,8 +16,8 @@
 
 import {Action} from '../../api/Action';
 import {PayloadData} from '../beacon/PayloadData';
-import {createLogger} from '../Logger';
-import {now} from '../Utils';
+import {createLogger} from '../utils/Logger';
+import {now} from '../utils/Utils';
 import {SessionImpl} from './SessionImpl';
 
 const log = createLogger('ActionImpl');

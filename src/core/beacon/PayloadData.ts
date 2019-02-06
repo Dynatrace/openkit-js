@@ -17,8 +17,8 @@
 import {ActionImpl} from '../impl/ActionImpl';
 import {SessionImpl} from '../impl/SessionImpl';
 import {State} from '../impl/State';
-import {SequenceIdProvider} from '../SequenceIdProvider';
-import {now} from '../Utils';
+import {SequenceIdProvider} from '../utils/SequenceIdProvider';
+import {now} from '../utils/Utils';
 import {PayloadBuilder} from './PayloadBuilder';
 
 /**

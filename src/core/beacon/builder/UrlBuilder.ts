@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {QueryKey} from '../protocol/QueryKey';
+import {QueryKey} from '../../protocol/QueryKey';
 import {QueryBuilder} from './QueryBuilder';
 
 export class UrlBuilder extends QueryBuilder<QueryKey> {
