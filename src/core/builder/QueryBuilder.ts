@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-export abstract class QueryBuilder<T extends string> {
+import {PayloadKey} from '../protocol/PayloadKey';
+import {QueryKey} from '../protocol/QueryKey';
+
+export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: {[key: string]: string} = {};
 
     public add(key: T, value: string | number | boolean): this {

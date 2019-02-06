@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import {Action} from './Action';
+export class Logger {
+    constructor(private readonly name: string) {}
 
-/**
- * Session public interface
- */
-export interface Session {
-
-    /**
-     * Enter a new rootAction
-     */
-    enterAction(actionName: string): Action;
-
-    /**
-     * Ends the session and sends all remaining data.
-     */
-    end(): void;
+    public debug(...msg: any[]) {
+        console.debug(`[${this.name}]`, ...msg);
+    }
 }
+
+export const createLogger = (name: string): Logger => new Logger(name);

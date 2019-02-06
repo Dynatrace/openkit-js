@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-import {Action} from './Action';
+import {PayloadKey} from '../protocol/PayloadKey';
+import {QueryBuilder} from './QueryBuilder';
 
-/**
- * Session public interface
- */
-export interface Session {
-
-    /**
-     * Enter a new rootAction
-     */
-    enterAction(actionName: string): Action;
-
-    /**
-     * Ends the session and sends all remaining data.
-     */
-    end(): void;
-}
+export class PayloadQueryBuilder extends QueryBuilder<PayloadKey> {}

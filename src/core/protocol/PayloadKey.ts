@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-export const enum PayloadKeys {
+export const enum PayloadKey {
     ProtocolVersion = 'vv',
     OpenKitVersion = 'va',
     ApplicationId = 'ap',
     ApplicationName = 'an',
-    ApplicationVersion = 'av',
+    ApplicationVersion = 'vn',
     PlatformType = 'pt',
     AgentTechnologyType = 'tt',
     VisitorId = 'vi',

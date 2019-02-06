@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import {PayloadKeys} from '../beacon/PayloadKeys';
-import {QueryBuilder} from './QueryBuilder';
-
-export class PayloadBuilder extends QueryBuilder<PayloadKeys> {}
+export const enum EventType {
+    ManualAction = 1,
+    SessionStart = 18,
+    SessionEnd = 19,
+}

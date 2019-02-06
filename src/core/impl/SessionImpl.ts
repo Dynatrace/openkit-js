@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
+import {Action} from '../../api/Action';
 import {Session} from '../../api/Session';
-import {Beacon} from '../beacon/Beacon';
+import {PayloadData} from '../beacon/PayloadData';
+import {PayloadSender} from '../beacon/PayloadSender';
+import {createLogger} from '../Logger';
+import {removeElement} from '../Utils';
+import {ActionImpl} from './ActionImpl';
 import {OpenKitImpl} from './OpenKitImpl';
 import {OpenKitObject, Status} from './OpenKitObject';
 
+const log = createLogger('SessionImpl');
+
 export class SessionImpl extends OpenKitObject implements Session {
-    private readonly beaconData: Beacon;
-    private readonly ok: OpenKitImpl;
+    private readonly openKit: OpenKitImpl;
+    private readonly openActions: Action[] = [];
+    private readonly payloadSender: PayloadSender;
+
+    public readonly beaconData: PayloadData;
 
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
         super(openKit.state.clone());
 
-        this.ok = openKit;
-        this.beaconData = new Beacon(this.state, clientIp, sessionId);
+        this.openKit = openKit;
+        this.beaconData = new PayloadData(this, clientIp, sessionId);
+        this.payloadSender = new PayloadSender(this.state, this.beaconData);
 
         this.beaconData.startSession();
 
@@ -44,39 +55,14 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.finishInitialization(response);
         this.state.setServerIdLocked();
 
-        console.debug('[SessionImpl]', 'Successfully initialized Session', this);
+        log.debug('Successfully initialized Session', this);
     }
 
     /**
      * Flush all remaining data
      */
-    private async flush() {
-        let payload = this.beaconData.getNextPayload();
-
-        while (payload !== undefined && this.status !== Status.Shutdown) {
-            await this.flushSingle(payload);
-
-            payload = this.beaconData.getNextPayload();
-        }
-    }
-
-    /**
-     * Flush single payload. If the response is invalid, the session is shutdown.
-     *
-     * @param payload The payload to send.
-     */
-    private async flushSingle(payload: string): Promise<void> {
-        if (this.state.multiplicity === 0) {
-           return;
-        }
-
-        const response = await this.sender.sendPayload(payload);
-
-        if (response.valid) {
-            this.state.updateState(response);
-        } else {
-            this.shutdown();
-        }
+    public async flush() {
+        this.payloadSender.flush();
     }
 
     /**
@@ -93,11 +79,26 @@ export class SessionImpl extends OpenKitObject implements Session {
      * If the session is initialized, all data is flushed before shutting the session down.
      */
     private async endSession() {
+        this.openActions.forEach(action => action.leaveAction());
+
         if (this.status === Status.Initialized) {
             this.beaconData.endSession();
             await this.flush();
         }
-        this.ok.removeSession(this);
+
+        this.openKit.removeSession(this);
         this.shutdown();
+    }
+
+    public enterAction(actionName: string): Action {
+        const action = new ActionImpl(this, actionName, this.beaconData);
+
+        this.openActions.push(action);
+
+        return action;
+    }
+
+    public removeAction(action: Action) {
+        removeElement(this.openActions, action);
     }
 }
