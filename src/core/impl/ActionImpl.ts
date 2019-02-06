@@ -44,11 +44,11 @@ export class ActionImpl implements Action {
         this.startSequenceNumber = this.beacon.createSequenceNumber();
         this.actionId = this.beacon.createId();
 
-        log.debug('Created', this);
+        log.debug(`Created action '${name}'`, this);
     }
 
     public leaveAction(): null {
-        log.debug('leaveAction()');
+        log.debug(`Leaving action '${this.name}'`);
 
         this.endSequenceNumber = this.beacon.createSequenceNumber();
         this._duration = now() - this.startTime;
