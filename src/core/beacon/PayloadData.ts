@@ -15,7 +15,6 @@
  */
 
 import {ActionImpl} from '../impl/ActionImpl';
-import {SessionImpl} from '../impl/SessionImpl';
 import {State} from '../impl/State';
 import {SequenceIdProvider} from '../utils/SequenceIdProvider';
 import {now} from '../utils/Utils';
@@ -28,7 +27,6 @@ export class PayloadData {
     private readonly payloadQueue: string[] = [];
 
     private readonly state: State;
-    private readonly session: SessionImpl;
 
     private readonly sequenceId = new SequenceIdProvider();
     private readonly nextId = new SequenceIdProvider();
@@ -36,10 +34,8 @@ export class PayloadData {
     private readonly sessionStartTime = now();
     private readonly payloadPrefix: string;
 
-    constructor(session: SessionImpl, clientIp: string, sessionId: number) {
-        this.session = session;
-        this.state = session.state;
-
+    constructor(state: State, clientIp: string, sessionId: number) {
+        this.state = state;
         this.payloadPrefix = PayloadBuilder.prefix(this.state.config, sessionId, clientIp);
     }
 
@@ -64,7 +60,7 @@ export class PayloadData {
     }
 
     private getCompletePayloadPrefix() {
-        return `${this.payloadPrefix}&${PayloadBuilder.mutable(this.sessionStartTime, this.state.multiplicity)}`;
+        return `${this.payloadPrefix}&${PayloadBuilder.mutable(this.sessionStartTime, this.state.multiplicity, now())}`;
     }
 
     private addPayload(payload: string): void {

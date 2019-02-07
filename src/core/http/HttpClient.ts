@@ -30,7 +30,7 @@ export class HttpClient {
 
         // TODO: david.laubreiter: Use beacons or XmlHttpRequests.
         // TODO: david.laubreiter: Implement retry strategy.
-        const response = new HttpResponse(result.status, result.headers, body);
+        const response = new HttpResponse(result.status, body);
 
         log.debug('Finished request, response:', response);
 

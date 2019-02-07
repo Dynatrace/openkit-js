@@ -20,7 +20,7 @@ export enum HttpStatus {
     UNKNOWN = -1,
 }
 
-const parseBody = (body: string): {[key: string]: string} => {
+export const parsePayload = (body: string): {[key: string]: string} => {
     const pairs: {[key: string]: string} = {};
 
     body
@@ -33,13 +33,11 @@ const parseBody = (body: string): {[key: string]: string} => {
 
 export class HttpResponse {
     private readonly _statusCode: number;
-    private readonly _headers: Headers;
     private readonly _values: {[key: string]: string};
 
-    constructor(statusCode: number, headers: Headers, body: string) {
+    constructor(statusCode: number, body: string) {
         this._statusCode = statusCode;
-        this._headers = headers;
-        this._values = parseBody(body);
+        this._values = parsePayload(body);
     }
 
     public getStatus(): HttpStatus {

@@ -19,7 +19,6 @@ import {Configuration} from '../config/Configuration';
 import {ActionImpl} from '../impl/ActionImpl';
 import {EventType} from '../protocol/EventType';
 import {PayloadKey} from '../protocol/PayloadKey';
-import {now} from '../utils/Utils';
 import {PayloadQueryBuilder} from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
@@ -78,12 +77,12 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static mutable(sessionStartTime: number, multiplicity: number): string {
+    public static mutable(sessionStartTime: number, multiplicity: number, transmissionTime: number): string {
         return new PayloadQueryBuilder()
             .add(PayloadKey.SessionStartTime, sessionStartTime)
             .add(PayloadKey.Multiplicity, multiplicity)
             .add(PayloadKey.TimesyncTime, sessionStartTime)
-            .add(PayloadKey.TransmissionTime, now())
+            .add(PayloadKey.TransmissionTime, transmissionTime)
             .build();
     }
 }

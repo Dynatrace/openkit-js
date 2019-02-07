@@ -20,12 +20,12 @@ import {QueryKey} from '../../protocol/QueryKey';
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: {[key: string]: string} = {};
 
-    public add(key: T, value: string | number | boolean): this {
+    public add(key: T, value: string | number): this {
         this.options[key] = value.toString();
         return this;
     }
 
-    public addIfDefined(key: T, value: string | number | boolean | undefined): this {
+    public addIfDefined(key: T, value: string | number | undefined): this {
         if (value !== undefined) {
             this.add(key, value);
         }
