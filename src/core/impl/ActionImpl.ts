@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-import {Action} from '../../api/Action';
-import {PayloadData} from '../beacon/PayloadData';
-import {createLogger} from '../utils/Logger';
-import {now} from '../utils/Utils';
-import {SessionImpl} from './SessionImpl';
+import { Action } from '../../api/Action';
+import { PayloadData } from '../beacon/PayloadData';
+import { createLogger } from '../utils/Logger';
+import { now } from '../utils/Utils';
+import { SessionImpl } from './SessionImpl';
 
 const log = createLogger('ActionImpl');
 
 export class ActionImpl implements Action {
-    private readonly beacon: PayloadData;
-
-    private _duration: number = 0;
-    public get duration(): number {
-        return this._duration;
-    }
-
-    private readonly session: SessionImpl;
     public readonly name: string;
     public readonly startTime = now();
     public readonly startSequenceNumber: number;
     public readonly actionId: number;
     public endSequenceNumber?: number;
+
+    private readonly session: SessionImpl;
+    private readonly beacon: PayloadData;
+
+    private _duration = 0;
+    public get duration(): number {
+        return this._duration;
+    }
 
     constructor(session: SessionImpl, name: string, beacon: PayloadData) {
         this.session = session;

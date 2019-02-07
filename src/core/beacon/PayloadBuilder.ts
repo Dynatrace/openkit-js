@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-import {agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion} from '../../PlatformConstants';
-import {Configuration} from '../config/Configuration';
-import {ActionImpl} from '../impl/ActionImpl';
-import {EventType} from '../protocol/EventType';
-import {PayloadKey} from '../protocol/PayloadKey';
-import {PayloadQueryBuilder} from './builder/PayloadQueryBuilder';
+import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../../PlatformConstants';
+import { Configuration } from '../config/Configuration';
+import { ActionImpl } from '../impl/ActionImpl';
+import { EventType } from '../protocol/EventType';
+import { PayloadKey } from '../protocol/PayloadKey';
+import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
-    private constructor() {}
-
     public static startSession(sequenceNumber: number): string {
         return new PayloadQueryBuilder()
             .add(PayloadKey.EventType, EventType.SessionStart)
@@ -85,4 +83,6 @@ export class PayloadBuilder {
             .add(PayloadKey.TransmissionTime, transmissionTime)
             .build();
     }
+
+    private constructor() {}
 }

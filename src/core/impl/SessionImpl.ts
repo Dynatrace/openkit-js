@@ -14,54 +14,45 @@
  * limitations under the License.
  */
 
-import {Action} from '../../api/Action';
-import {Session} from '../../api/Session';
-import {PayloadData} from '../beacon/PayloadData';
-import {PayloadSender} from '../beacon/PayloadSender';
-import {createLogger} from '../utils/Logger';
-import {removeElement} from '../utils/Utils';
-import {ActionImpl} from './ActionImpl';
-import {OpenKitImpl} from './OpenKitImpl';
-import {OpenKitObject, Status} from './OpenKitObject';
+import { Action } from '../../api/Action';
+import { Session } from '../../api/Session';
+import { PayloadData } from '../beacon/PayloadData';
+import { PayloadSender } from '../beacon/PayloadSender';
+import { createLogger } from '../utils/Logger';
+import { removeElement } from '../utils/Utils';
+import { ActionImpl } from './ActionImpl';
+import { OpenKitImpl } from './OpenKitImpl';
+import { OpenKitObject, Status } from './OpenKitObject';
 
 const log = createLogger('SessionImpl');
 
 export class SessionImpl extends OpenKitObject implements Session {
+
+    public readonly payloadData: PayloadData;
     private readonly openKit: OpenKitImpl;
     private readonly openActions: Action[] = [];
     private readonly payloadSender: PayloadSender;
-
-    public readonly payloadData: PayloadData;
 
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
         super(openKit.state.clone());
 
         this.openKit = openKit;
-        this.payloadData = new PayloadData(this, clientIp, sessionId);
+        this.payloadData = new PayloadData(this.state, clientIp, sessionId);
         this.payloadSender = new PayloadSender(this.state, this.payloadData);
 
         this.payloadData.startSession();
 
-        openKit.registerOnInitializedCallback(status => {
+        openKit.registerOnInitializedCallback((status) => {
            if (status === Status.Initialized) {
                this.init();
            }
         });
     }
 
-    private async init() {
-        const response = await this.sender.sendNewSessionRequest();
-
-        this.finishInitialization(response);
-        this.state.setServerIdLocked();
-
-        log.debug('Successfully initialized Session', this);
-    }
-
     /**
      * Flush all remaining data
      */
-    public async flush() {
+    public async flush(): Promise<void> {
         this.payloadSender.flush();
     }
 
@@ -74,12 +65,24 @@ export class SessionImpl extends OpenKitObject implements Session {
         });
     }
 
+    public enterAction(actionName: string): Action {
+        const action = new ActionImpl(this, actionName, this.payloadData);
+
+        this.openActions.push(action);
+
+        return action;
+    }
+
+    public removeAction(action: Action): void {
+        removeElement(this.openActions, action);
+    }
+
     /**
      * Ends the session.
      * If the session is initialized, all data is flushed before shutting the session down.
      */
-    private async endSession() {
-        this.openActions.forEach(action => action.leaveAction());
+    private async endSession(): Promise<void> {
+        this.openActions.forEach((action) => action.leaveAction());
 
         if (this.status === Status.Initialized) {
             this.payloadData.endSession();
@@ -90,15 +93,12 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.shutdown();
     }
 
-    public enterAction(actionName: string): Action {
-        const action = new ActionImpl(this, actionName, this.payloadData);
+    private async init(): Promise<void> {
+        const response = await this.sender.sendNewSessionRequest();
 
-        this.openActions.push(action);
+        this.finishInitialization(response);
+        this.state.setServerIdLocked();
 
-        return action;
-    }
-
-    public removeAction(action: Action) {
-        removeElement(this.openActions, action);
+        log.debug('Successfully initialized Session', this);
     }
 }

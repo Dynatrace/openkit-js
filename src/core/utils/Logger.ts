@@ -17,7 +17,8 @@
 export class Logger {
     constructor(private readonly name: string) {}
 
-    public debug(...msg: any[]) {
+    public debug(...msg: any[]): void {
+        // tslint:disable-next-line:no-console
         console.debug(`[${this.name}]`, ...msg);
     }
 }

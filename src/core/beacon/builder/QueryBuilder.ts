@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {PayloadKey} from '../../protocol/PayloadKey';
-import {QueryKey} from '../../protocol/QueryKey';
+import { PayloadKey } from '../../protocol/PayloadKey';
+import { QueryKey } from '../../protocol/QueryKey';
 
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: {[key: string]: string} = {};
@@ -32,7 +32,7 @@ export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
         return this;
     }
 
-    public build() {
+    public build(): string {
         return Object
             .keys(this.options)
             .map((key: string) => `${encodeURIComponent(key)}=${encodeURIComponent(this.options[key])}`)

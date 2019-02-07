@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {CrashReportingLevel} from '../../CrashReportingLevel';
-import {DataCollectionLevel} from '../../DataCollectionLevel';
+import { CrashReportingLevel } from '../../CrashReportingLevel';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 
 export interface Size {
     width: number;

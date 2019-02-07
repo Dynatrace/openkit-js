@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import {ActionImpl} from '../impl/ActionImpl';
-import {State} from '../impl/State';
-import {SequenceIdProvider} from '../utils/SequenceIdProvider';
-import {now} from '../utils/Utils';
-import {PayloadBuilder} from './PayloadBuilder';
+import { ActionImpl } from '../impl/ActionImpl';
+import { State } from '../impl/State';
+import { SequenceIdProvider } from '../utils/SequenceIdProvider';
+import { now } from '../utils/Utils';
+import { PayloadBuilder } from './PayloadBuilder';
 
 /**
  * Responsible for creating and holding all payload data for a session.
@@ -51,20 +51,12 @@ export class PayloadData {
         this.addPayload(PayloadBuilder.startSession(this.createId()));
     }
 
-    public endSession() {
+    public endSession(): void {
         this.addPayload(PayloadBuilder.endSession(this.createSequenceNumber(), now() - this.sessionStartTime));
     }
 
-    public addAction(action: ActionImpl) {
+    public addAction(action: ActionImpl): void {
         this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
-    }
-
-    private getCompletePayloadPrefix() {
-        return `${this.payloadPrefix}&${PayloadBuilder.mutable(this.sessionStartTime, this.state.multiplicity, now())}`;
-    }
-
-    private addPayload(payload: string): void {
-        this.payloadQueue.push(payload);
     }
 
     public getNextPayload(): string | undefined {
@@ -85,7 +77,15 @@ export class PayloadData {
         return currentPayload;
     }
 
-    public hasPayloadsLeft() {
+    public hasPayloadsLeft(): boolean {
         return this.payloadQueue.length > 0;
+    }
+
+    private getCompletePayloadPrefix(): string {
+        return `${this.payloadPrefix}&${PayloadBuilder.mutable(this.sessionStartTime, this.state.multiplicity, now())}`;
+    }
+
+    private addPayload(payload: string): void {
+        this.payloadQueue.push(payload);
     }
 }

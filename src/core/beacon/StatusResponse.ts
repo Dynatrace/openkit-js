@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {HttpResponse, HttpStatus} from '../http/HttpResponse';
+import { HttpResponse, HttpStatus } from '../http/HttpResponse';
 
 const enum ResponseKeys {
     Capture = 'cp',
@@ -51,7 +51,7 @@ export class StatusResponse {
     private _captureCrashes?: boolean;
     private _multiplicity?: number;
 
-    private _valid: boolean = true;
+    private _valid = true;
 
     public get captureMode(): CaptureMode | undefined {
         return this._captureMode;
@@ -108,7 +108,7 @@ export class StatusResponse {
 
         Object
             .keys(keyValueEntries)
-            .forEach(key => this.parseEntry(key, keyValueEntries[key]));
+            .forEach((key) => this.parseEntry(key, keyValueEntries[key]));
     }
 
     private parseEntry(key: string, value: string): void {
@@ -136,7 +136,6 @@ export class StatusResponse {
                 break;
             case ResponseKeys.ServerId:
                 this._serverID = parseInt(value, 10);
-                break;
         }
     }
 }

@@ -15,11 +15,11 @@
  *
  */
 
-import {OpenKit} from './api/OpenKit';
-import {Configuration} from './core/config/Configuration';
-import {OpenKitImpl} from './core/impl/OpenKitImpl';
-import {CrashReportingLevel} from './CrashReportingLevel';
-import {DataCollectionLevel} from './DataCollectionLevel';
+import { OpenKit } from './api/OpenKit';
+import { Configuration } from './core/config/Configuration';
+import { OpenKitImpl } from './core/impl/OpenKitImpl';
+import { CrashReportingLevel } from './CrashReportingLevel';
+import { DataCollectionLevel } from './DataCollectionLevel';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;

@@ -15,7 +15,7 @@
  *
  */
 
-import {Session} from './Session';
+import { Session } from './Session';
 
 export type InitCallback = (success: boolean) => void;
 
@@ -32,23 +32,10 @@ export interface OpenKit {
 
     /**
      * Creates a new session and returns its instance.
-     */
-    createSession(): Session;
-
-    /**
-     * Creates a new session and returns its instance.
      *
-     * @param clientIP the clients ip
+     * @param clientIp the clients ip
      */
-    createSession(clientIP: string): Session;
-
-    /**
-     * Calls the callback after the initialization finished, no matter if it was successfully finished or failed.
-     * The first argument of the callback is a boolean, which states if the initialization was successful.
-     *
-     * @param callback The callback which is executed after initialization.
-     */
-    waitForInit(callback: InitCallback): void;
+    createSession(clientIp?: string): Session;
 
     /**
      * The same as {@link waitForInit}, but with a timeout in milliseconds. If the time runs out before the
@@ -58,7 +45,7 @@ export interface OpenKit {
      * @param callback The callback which is executed after initialization, or after the timeout runs out.
      * @param timeout The timeout for the initialization
      */
-    waitForInit(callback: InitCallback, timeout: number): void;
+    waitForInit(callback: InitCallback, timeout?: number): void;
 
     /**
      * Shutdown OpenKit.

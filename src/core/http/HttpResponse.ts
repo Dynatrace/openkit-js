@@ -25,7 +25,7 @@ export const parsePayload = (body: string): {[key: string]: string} => {
 
     body
         .split('&')
-        .map(entry => entry.split('=') as [string, string])
+        .map((entry) => entry.split('=') as [string, string])
         .forEach((pair: [string, string]) => pairs[pair[0]] = pair[1]);
 
     return pairs;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Action} from './Action';
+import { Action } from './Action';
 
 /**
  * Session public interface
