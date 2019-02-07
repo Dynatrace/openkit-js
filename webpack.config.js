@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = {
     mode: 'development',
@@ -9,7 +9,7 @@ module.exports = {
         libraryTarget: 'umd'
     },
     resolve: {
-        extensions: ['.ts']
+        extensions: ['.ts', '.js']
     },
     module: {
         rules: [

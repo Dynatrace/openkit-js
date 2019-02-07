@@ -39,7 +39,7 @@
     ],
     "no-implicit-dependencies": false,
     "no-parameter-properties": false,
-    "no-submodule-imports": [true],
+    "no-submodule-imports": [true, "es6-promise"],
     "no-unnecessary-class": [
       false,
       "allow-static-only",
