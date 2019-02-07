@@ -17,7 +17,7 @@
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
 import { SequenceIdProvider } from '../utils/SequenceIdProvider';
-import { now } from '../utils/Utils';
+import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
 import { PayloadBuilder } from './PayloadBuilder';
 
 /**
@@ -30,12 +30,20 @@ export class PayloadData {
 
     private readonly sequenceId = new SequenceIdProvider();
     private readonly nextId = new SequenceIdProvider();
+    private readonly timestampProvider: TimestampProvider;
 
-    private readonly sessionStartTime = now();
+    private readonly sessionStartTime: number;
     private readonly payloadPrefix: string;
 
-    constructor(state: State, clientIp: string, sessionId: number) {
+    constructor(
+        state: State,
+        clientIp: string,
+        sessionId: number,
+        timestampProvider: TimestampProvider = defaultTimestampProvider) {
         this.state = state;
+        this.timestampProvider = timestampProvider;
+        this.sessionStartTime = timestampProvider.getCurrentTimestamp();
+
         this.payloadPrefix = PayloadBuilder.prefix(this.state.config, sessionId, clientIp);
     }
 
@@ -52,7 +60,8 @@ export class PayloadData {
     }
 
     public endSession(): void {
-        this.addPayload(PayloadBuilder.endSession(this.createSequenceNumber(), now() - this.sessionStartTime));
+        const duration = this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime;
+        this.addPayload(PayloadBuilder.endSession(this.createSequenceNumber(), duration));
     }
 
     public addAction(action: ActionImpl): void {
@@ -82,7 +91,10 @@ export class PayloadData {
     }
 
     private getCompletePayloadPrefix(): string {
-        return `${this.payloadPrefix}&${PayloadBuilder.mutable(this.sessionStartTime, this.state.multiplicity, now())}`;
+        const mutablePart = PayloadBuilder.mutable(
+            this.sessionStartTime, this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
+
+        return `${this.payloadPrefix}&${mutablePart}`;
     }
 
     private addPayload(payload: string): void {

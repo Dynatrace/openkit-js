@@ -74,7 +74,7 @@ describe('PayloadBuilder', () => {
         when(actionMock.startSequenceNumber).thenReturn(12345);
         when(actionMock.endSequenceNumber).thenReturn(98765);
         when(actionMock.startTime).thenReturn(543);
-        when(actionMock.duration).thenReturn(2);
+        when(actionMock.endTime).thenReturn(545);
 
         const actionInstance = instance(actionMock);
 

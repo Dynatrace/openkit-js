@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-/**
- * Removes an element from a given array.
- * If there are multiple elements of the same instance, only the first is removed.
- *
- * @param array The array to search in
- * @param element The element to remove.
- */
-export const removeElement = <T>(array: T[], element: T): void => {
-    const index = array.indexOf(element);
+import {removeElement} from '../../../src/core/utils/Utils';
 
-    if (index < 0) {
-        return;
-    }
+describe('Utils', () => {
+   describe('removeElement', () => {
+       it('should remove the element if it is in the array', () => {
+           const array = [1,2,3,4];
+           removeElement(array, 3);
 
-    array.splice(index, 1);
-};
+           expect(array).toEqual([1,2,4]);
+       });
+       it('should not remove any element if it is not in the array', () => {
+           const array = [1,2,3,4];
+           removeElement(array, 6);
+
+           expect(array).toEqual([1,2,3,4]);
+       });
+   });
+});

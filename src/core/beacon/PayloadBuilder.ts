@@ -52,7 +52,7 @@ export class PayloadBuilder {
             .add(PayloadKey.StartSequenceNumber, action.startSequenceNumber)
             .add(PayloadKey.EndSequenceNumber, action.endSequenceNumber!)
             .add(PayloadKey.Time0, action.startTime - sessionStartTime)
-            .add(PayloadKey.Time1, action.duration)
+            .add(PayloadKey.Time1, action.endTime - action.startTime)
             .build();
     }
 

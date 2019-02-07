@@ -21,6 +21,7 @@ import {parsePayload} from '../../../src/core/http/HttpResponse';
 import {ActionImpl} from '../../../src/core/impl/ActionImpl';
 import {State} from '../../../src/core/impl/State';
 import {EventType} from '../../../src/core/protocol/EventType';
+import {defaultTimestampProvider} from '../../../src/core/utils/TimestampProvider';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
 
@@ -39,7 +40,7 @@ when(actionMock.actionId).thenReturn(6);
 when(actionMock.startSequenceNumber).thenReturn(12345);
 when(actionMock.endSequenceNumber).thenReturn(98765);
 when(actionMock.startTime).thenReturn(543);
-when(actionMock.duration).thenReturn(2);
+when(actionMock.endTime).thenReturn(545);
 const actionInstance = instance(actionMock);
 
 describe('PayloadData', () => {
@@ -50,12 +51,12 @@ describe('PayloadData', () => {
     });
 
     it('should create', () => {
-        expect(new PayloadData(state, '', 5)).toBeTruthy();
+        expect(new PayloadData(state, '', 5, defaultTimestampProvider)).toBeTruthy();
     });
 
     it('should fetch the payload after a created session', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5);
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
 
         // when
@@ -73,7 +74,7 @@ describe('PayloadData', () => {
 
     it('should fetch the payload after a ending a session', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5);
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
 
         // when
@@ -91,7 +92,7 @@ describe('PayloadData', () => {
 
     it('should fetch the payload after adding an action', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5);
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
 
         // when
@@ -108,7 +109,7 @@ describe('PayloadData', () => {
     });
 
     it('should return undefined if getNextPayload is called without any payloads', () => {
-        const payloadData = new PayloadData(state, '', 5);
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
 
         expect(payloadData.getNextPayload()).toBeUndefined();
     });
