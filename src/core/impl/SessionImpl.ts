@@ -81,12 +81,12 @@ export class SessionImpl extends OpenKitObject implements Session {
      * Ends the session.
      * If the session is initialized, all data is flushed before shutting the session down.
      */
-    private async endSession(): Promise<void> {
+    private endSession(): void {
         this.openActions.forEach((action) => action.leaveAction());
 
         if (this.status === Status.Initialized) {
             this.payloadData.endSession();
-            await this.flush();
+            this.flush();
         }
 
         this.openKit.removeSession(this);
