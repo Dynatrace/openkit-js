@@ -20,6 +20,7 @@ import { Configuration } from '../config/Configuration';
 import { createLogger } from '../utils/Logger';
 import { SequenceIdProvider } from '../utils/SequenceIdProvider';
 import { removeElement } from '../utils/Utils';
+import { defaultNullSession } from './NullSession';
 import { OpenKitObject, Status, StatusCallback } from './OpenKitObject';
 import { SessionImpl } from './SessionImpl';
 import { State } from './State';
@@ -84,6 +85,10 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @inheritDoc
      */
     public createSession(clientIP: string = ''): Session {
+        if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
+            return defaultNullSession;
+        }
+
         const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
 
         this.openSessions.push(session);

@@ -21,6 +21,7 @@ import { PayloadSender } from '../beacon/PayloadSender';
 import { createLogger } from '../utils/Logger';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
+import { defaultNullAction } from './NullAction';
 import { OpenKitImpl } from './OpenKitImpl';
 import { OpenKitObject, Status } from './OpenKitObject';
 
@@ -66,6 +67,10 @@ export class SessionImpl extends OpenKitObject implements Session {
     }
 
     public enterAction(actionName: string): Action {
+        if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
+            return defaultNullAction;
+        }
+
         const action = new ActionImpl(this, actionName, this.payloadData);
 
         this.openActions.push(action);
