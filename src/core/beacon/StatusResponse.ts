@@ -27,12 +27,12 @@ export enum HttpStatus {
     UNKNOWN = -1,
 }
 
-const parseBody = (body: string): Record<string, string> => {
+export const parsePayload = (body: string): Record<string, string> => {
     const pairs: {[key: string]: string} = {};
 
     body
         .split('&')
-        .map(entry => entry.split('=') as [string, string])
+        .map((entry) => entry.split('=') as [string, string])
         .forEach((pair: [string, string]) => pairs[pair[0]] = pair[1]);
 
     return pairs;
@@ -105,7 +105,7 @@ export class StatusResponse {
     }
 
     private parseResponse(response: Readonly<HttpResponse>): void {
-        const keyValueEntries = parseBody(response.payload);
+        const keyValueEntries = parsePayload(response.payload);
 
         // tslint:disable-next-line:no-string-literal
         if (keyValueEntries['type'] !== 'm' || response.status !== HttpStatus.OK) {

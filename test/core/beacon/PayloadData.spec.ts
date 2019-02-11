@@ -16,14 +16,15 @@
 
 import {instance, mock, when} from 'ts-mockito';
 import {PayloadData} from '../../../src/core/beacon/PayloadData';
+import {parsePayload} from '../../../src/core/beacon/StatusResponse';
 import {Configuration} from '../../../src/core/config/Configuration';
-import {parsePayload} from '../../../src/core/http/HttpResponse';
 import {ActionImpl} from '../../../src/core/impl/ActionImpl';
 import {State} from '../../../src/core/impl/State';
 import {EventType} from '../../../src/core/protocol/EventType';
 import {defaultTimestampProvider} from '../../../src/core/utils/TimestampProvider';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
+import {mockHttpClient} from '../../MockValues';
 
 const baseConfiguration: Readonly<Configuration> = {
     beaconURL: 'https://example.com',
@@ -32,6 +33,7 @@ const baseConfiguration: Readonly<Configuration> = {
     applicationId: 'app-id',
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
+    httpClient: mockHttpClient,
 };
 
 const actionMock: ActionImpl = mock(ActionImpl);
