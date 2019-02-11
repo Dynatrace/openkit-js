@@ -1,24 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
     "sourceMap": true,
-
     "declaration": true,
-    "declarationDir": "build/types",
+    "declarationDir": "dist/types",
     "declarationMap": true,
-    "strict": true,
-    "lib": [
-      "es5",
-      "scripthost",
-      "dom",
-      "es2015.promise"
-    ]
+    "strict": true
   },
   "exclude": [
     "node_modules",
-    ".gradle",
-    ".idea",
     "example",
     "build"
   ]

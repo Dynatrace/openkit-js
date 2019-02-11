@@ -35,8 +35,8 @@ export class BeaconSender {
      * @param state The State of the Object which wants to send data.
      */
     constructor(state: State) {
-        this.http = new HttpClient();
         this.state = state;
+        this.http = state.config.httpClient;
     }
 
     /**
@@ -46,7 +46,7 @@ export class BeaconSender {
      */
     public async sendStatusRequest(): Promise<StatusResponse> {
         const monitorUrl = this.buildMonitorUrlQueries().build();
-        const response = await this.http.send(monitorUrl);
+        const response = await this.http.sendStatusRequest(monitorUrl);
 
         return new StatusResponse(response);
     }
@@ -61,7 +61,7 @@ export class BeaconSender {
             .add(QueryKey.NewSession, 1)
             .build();
 
-        const response = await this.http.send(monitorUrl);
+        const response = await this.http.sendStatusRequest(monitorUrl);
 
         return new StatusResponse(response);
     }
@@ -74,7 +74,7 @@ export class BeaconSender {
      */
     public async sendPayload(payload: string): Promise<StatusResponse> {
         const monitorUrl = this.buildMonitorUrlQueries().build();
-        const response = await this.http.send(monitorUrl, payload);
+        const response = await this.http.sendPayloadData(monitorUrl, payload);
 
         return new StatusResponse(response);
     }

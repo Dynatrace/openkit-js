@@ -81,17 +81,23 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     }
 
     private waitForInitWithTimeout(callback: StatusCallback, timeout: number) {
-        let timeoutId = -1;
+        let timeoutId: any = -1;
 
         const proxy = (status: Status) => {
             callback(status);
-            window.clearTimeout(timeoutId);
+
+            if (timeoutId !== -1) {
+                // cleanTimeout could be window.clearTimeout or NodeJs.clearTimeout.
+                // Since we do not know, we just pass the object in, since on one platform
+                // there is always just one of the both
+                clearTimeout(timeoutId);
+            }
         };
 
-        timeoutId = window.setTimeout(() => {
+        timeoutId = setTimeout(() => {
             callback(Status.Shutdown);
             this.unregisterOnInitializedCallback(proxy);
-        }, timeout);
+        }, timeout) as any;
 
         this.registerOnInitializedCallback(proxy);
     }

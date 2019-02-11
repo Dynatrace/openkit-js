@@ -61,8 +61,8 @@ export class SessionImpl extends OpenKitObject implements Session {
     /**
      * Flush all remaining data
      */
-    public async flush() {
-        this.payloadSender.flush();
+    public flush() {
+        this.registerOnInitializedCallback(() => this.payloadSender.flush());
     }
 
     /**

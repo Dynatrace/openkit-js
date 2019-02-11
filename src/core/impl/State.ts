@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import {StatusResponse} from '../beacon/StatusResponse';
+import {HttpStatus, StatusResponse} from '../beacon/StatusResponse';
 import {Configuration} from '../config/Configuration';
-import {HttpStatus} from '../http/HttpResponse';
 
 const defaultServerId = 1;
 const defaultMaxBeaconSize = 30 * 1024;

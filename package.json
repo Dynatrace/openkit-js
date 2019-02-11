@@ -1,26 +1,26 @@
 {
-  "name": "openkit-javascript",
+  "name": "@dynatrace/openkit-js",
   "version": "0.0.1",
   "description": "OpenKit-JavaScript reference implementation",
   "scripts": {
     "test": "jest",
-    "build": "webpack",
-    "build:prod": "webpack --mode production",
     "lint": "tslint --project . -c tslint.json",
     "lint:spec": "tslint --project . -c tslint.spec.json",
-    "precommit": "yarn lint && yarn lint:spec && yarn run test",
-    "completeBuild": "yarn precommit && yarn build",
-    "docs": "typedoc --out build/docs src/OpenKitBuilder.ts src/api",
-    "docs:markdown": "yarn docs --theme markdown"
+    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --theme markdown",
+    "build": "yarn build:browser && yarn build:node",
+    "build:node": "tsc -p tsconfig.node.json",
+    "build:browser": "webpack --mode production",
+    "build:browser:dev": "webpack"
   },
   "author": "Dynatrace",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
-    "@types/promise-polyfill": "^6.0.1",
     "@types/jest": "^23.3.13",
+    "@types/promise-polyfill": "^6.0.1",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.3",
+    "ts-mockito": "^2.3.1",
     "tslint": "^5.12.1",
     "typedoc": "^0.14.2",
     "typedoc-plugin-markdown": "^1.1.25",
@@ -30,7 +30,11 @@
     "yarn": "^1.13.0"
   },
   "dependencies": {
-    "promise-polyfill": "^8.1.0",
-    "ts-mockito": "^2.3.1"
-  }
+    "axios": "^0.18.0",
+    "promise-polyfill": "^8.1.0"
+  },
+  "files": [
+    "dist",
+    "docs"
+  ]
 }

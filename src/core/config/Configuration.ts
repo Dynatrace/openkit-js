@@ -16,6 +16,7 @@
 
 import {CrashReportingLevel} from '../../CrashReportingLevel';
 import {DataCollectionLevel} from '../../DataCollectionLevel';
+import {HttpClient} from '../http/HttpClient';
 
 export interface Size {
     width: number;
@@ -35,4 +36,6 @@ export interface Configuration {
 
     dataCollectionLevel: DataCollectionLevel;
     crashReportingLevel: CrashReportingLevel;
+
+    httpClient: HttpClient;
 }

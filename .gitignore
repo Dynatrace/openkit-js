@@ -8,6 +8,8 @@ yarn-error.log
 
 # Build files
 build
+dist
 
 # Examples - ignore them currently, but add them later
 examples
+docs
