@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import {HttpStatus, StatusResponse} from '../beacon/StatusResponse';
-import {Configuration} from '../config/Configuration';
+import { HttpStatus, StatusResponse } from '../beacon/StatusResponse';
+import { Configuration } from '../config/Configuration';
 
 const defaultServerId = 1;
-const defaultMaxBeaconSize = 30 * 1024;
+const defaultMaxBeaconSize = 30720; // 30 * 1024
 const defaultMultiplicity = 1;
 
 /**
@@ -52,15 +52,15 @@ export class State {
         this._config = config;
     }
 
-    public setServerIdLocked() {
+    public setServerIdLocked(): void {
         this._serverIdLocked = true;
     }
 
-    public stopCommunication() {
+    public stopCommunication(): void {
         this._multiplicity = 0;
     }
 
-    public updateState(response: StatusResponse) {
+    public updateState(response: StatusResponse): void {
 
         if (response.status !== HttpStatus.OK) {
             return;

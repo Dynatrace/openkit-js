@@ -15,13 +15,16 @@
  *
  */
 
-import {OpenKit} from './api/OpenKit';
-import {Configuration} from './core/config/Configuration';
-import {OpenKitHttpClient} from './core/http/OpenKitHttpClient';
-import {HttpClient} from './core/http/HttpClient';
-import {OpenKitImpl} from './core/impl/OpenKitImpl';
-import {CrashReportingLevel} from './CrashReportingLevel';
-import {DataCollectionLevel} from './DataCollectionLevel';
+import { OpenKit } from './api/OpenKit';
+import { Configuration } from './core/config/Configuration';
+import { HttpClient } from './core/http/HttpClient';
+import { OpenKitHttpClient } from './core/http/OpenKitHttpClient';
+import { OpenKitImpl } from './core/impl/OpenKitImpl';
+import { CrashReportingLevel } from './CrashReportingLevel';
+import { DataCollectionLevel } from './DataCollectionLevel';
+
+// Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
+import 'es6-promise/auto';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;

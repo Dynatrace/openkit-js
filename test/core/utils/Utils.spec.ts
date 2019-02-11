@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-export class Logger {
-    constructor(private readonly name: string) {}
+import {removeElement} from '../../../src/core/utils/Utils';
 
-    public debug(...msg: any[]): void {
-        // tslint:disable-next-line:no-console
-        console.debug(`[${this.name}]`, ...msg);
-    }
-}
+describe('Utils', () => {
+   describe('removeElement', () => {
+       it('should remove the element if it is in the array', () => {
+           const array = [1,2,3,4];
+           removeElement(array, 3);
 
-export const createLogger = (name: string): Logger => new Logger(name);
+           expect(array).toEqual([1,2,4]);
+       });
+       it('should not remove any element if it is not in the array', () => {
+           const array = [1,2,3,4];
+           removeElement(array, 6);
+
+           expect(array).toEqual([1,2,3,4]);
+       });
+   });
+});

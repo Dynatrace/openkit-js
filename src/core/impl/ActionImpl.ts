@@ -14,44 +14,56 @@
  * limitations under the License.
  */
 
-import {Action} from '../../api/Action';
-import {PayloadData} from '../beacon/PayloadData';
-import {createLogger} from '../utils/Logger';
-import {now} from '../utils/Utils';
-import {SessionImpl} from './SessionImpl';
+import { Action } from '../../api/Action';
+import { PayloadData } from '../beacon/PayloadData';
+import { createLogger } from '../utils/Logger';
+import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
+import { SessionImpl } from './SessionImpl';
 
 const log = createLogger('ActionImpl');
 
 export class ActionImpl implements Action {
-    private readonly beacon: PayloadData;
-
-    private _duration: number = 0;
-    public get duration(): number {
-        return this._duration;
-    }
-
-    private readonly session: SessionImpl;
     public readonly name: string;
-    public readonly startTime = now();
+    public readonly startTime: number;
     public readonly startSequenceNumber: number;
     public readonly actionId: number;
     public endSequenceNumber?: number;
 
-    constructor(session: SessionImpl, name: string, beacon: PayloadData) {
+    private readonly session: SessionImpl;
+    private readonly beacon: PayloadData;
+    private readonly timestampProvider: TimestampProvider;
+
+    private _endTime = -1;
+    public get endTime(): number {
+        return this._endTime;
+    }
+
+    constructor(
+        session: SessionImpl,
+        name: string,
+        beacon: PayloadData,
+        timestampProvider: TimestampProvider = defaultTimestampProvider) {
+
         this.session = session;
         this.name = name;
         this.beacon = beacon;
+        this.startTime = timestampProvider.getCurrentTimestamp();
         this.startSequenceNumber = this.beacon.createSequenceNumber();
         this.actionId = this.beacon.createId();
+        this.timestampProvider = timestampProvider;
 
         log.debug(`Created action '${name}'`, this);
     }
 
     public leaveAction(): null {
+        if (this.endTime !== -1) {
+            return null;
+        }
+
         log.debug(`Leaving action '${this.name}'`);
 
         this.endSequenceNumber = this.beacon.createSequenceNumber();
-        this._duration = now() - this.startTime;
+        this._endTime = this.timestampProvider.getCurrentTimestamp();
         this.beacon.addAction(this);
         this.session.removeAction(this);
         this.session.flush();

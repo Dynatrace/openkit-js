@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import {InitCallback, OpenKit} from '../../api/OpenKit';
-import {Session} from '../../api/Session';
-import {Configuration} from '../config/Configuration';
-import {createLogger} from '../utils/Logger';
-import {SequenceIdProvider} from '../utils/SequenceIdProvider';
-import {removeElement} from '../utils/Utils';
-import {OpenKitObject, Status, StatusCallback} from './OpenKitObject';
-import {SessionImpl} from './SessionImpl';
-import {State} from './State';
+import { InitCallback, OpenKit } from '../../api/OpenKit';
+import { Session } from '../../api/Session';
+import { Configuration } from '../config/Configuration';
+import { createLogger } from '../utils/Logger';
+import { SequenceIdProvider } from '../utils/SequenceIdProvider';
+import { removeElement } from '../utils/Utils';
+import { OpenKitObject, Status, StatusCallback } from './OpenKitObject';
+import { SessionImpl } from './SessionImpl';
+import { State } from './State';
 
 const log = createLogger('OpenKitImpl');
 
@@ -62,7 +62,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @inheritDoc
      */
     public shutdown(): void {
-        this.openSessions.forEach(session => session.end());
+        this.openSessions.forEach((session) => session.end());
 
         super.shutdown();
     }
@@ -80,7 +80,27 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         }
     }
 
-    private waitForInitWithTimeout(callback: StatusCallback, timeout: number) {
+    /**
+     * @inheritDoc
+     */
+    public createSession(clientIP: string = ''): Session {
+        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
+
+        this.openSessions.push(session);
+
+        log.debug(`Created session with ip='${clientIP}'`);
+
+        return session;
+    }
+
+    /**
+     * Removes a session from the openSessions array.
+     */
+    public removeSession(session: SessionImpl): void {
+        removeElement(this.openSessions, session);
+    }
+
+    private waitForInitWithTimeout(callback: StatusCallback, timeout: number): void {
         let timeoutId: any = -1;
 
         const proxy = (status: Status) => {
@@ -100,25 +120,5 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         }, timeout) as any;
 
         this.registerOnInitializedCallback(proxy);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public createSession(clientIP: string = ''): Session {
-        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
-
-        this.openSessions.push(session);
-
-        log.debug(`Created session with ip='${clientIP}'`);
-
-        return session;
-    }
-
-    /**
-     * Removes a session from the openSessions array.
-     */
-    public removeSession(session: SessionImpl) {
-        removeElement(this.openSessions, session);
     }
 }

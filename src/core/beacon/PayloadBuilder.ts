@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-import {agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion} from '../../PlatformConstants';
-import {Configuration} from '../config/Configuration';
-import {ActionImpl} from '../impl/ActionImpl';
-import {EventType} from '../protocol/EventType';
-import {PayloadKey} from '../protocol/PayloadKey';
-import {now} from '../utils/Utils';
-import {PayloadQueryBuilder} from './builder/PayloadQueryBuilder';
+import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../../PlatformConstants';
+import { Configuration } from '../config/Configuration';
+import { ActionImpl } from '../impl/ActionImpl';
+import { EventType } from '../protocol/EventType';
+import { PayloadKey } from '../protocol/PayloadKey';
+import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
-    private constructor() {}
-
     public static startSession(sequenceNumber: number): string {
         return new PayloadQueryBuilder()
             .add(PayloadKey.EventType, EventType.SessionStart)
@@ -55,7 +52,7 @@ export class PayloadBuilder {
             .add(PayloadKey.StartSequenceNumber, action.startSequenceNumber)
             .add(PayloadKey.EndSequenceNumber, action.endSequenceNumber!)
             .add(PayloadKey.Time0, action.startTime - sessionStartTime)
-            .add(PayloadKey.Time1, action.duration)
+            .add(PayloadKey.Time1, action.endTime - action.startTime)
             .build();
     }
 
@@ -78,12 +75,14 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static mutable(sessionStartTime: number, multiplicity: number): string {
+    public static mutable(sessionStartTime: number, multiplicity: number, transmissionTime: number): string {
         return new PayloadQueryBuilder()
             .add(PayloadKey.SessionStartTime, sessionStartTime)
             .add(PayloadKey.Multiplicity, multiplicity)
             .add(PayloadKey.TimesyncTime, sessionStartTime)
-            .add(PayloadKey.TransmissionTime, now())
+            .add(PayloadKey.TransmissionTime, transmissionTime)
             .build();
     }
+
+    private constructor() {}
 }

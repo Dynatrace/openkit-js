@@ -15,12 +15,12 @@
  *
  */
 
-import {agentTechnologyType, openKitVersion, platformTypeOpenKit} from '../../PlatformConstants';
-import {HttpClient} from '../http/HttpClient';
-import {State} from '../impl/State';
-import {QueryKey} from '../protocol/QueryKey';
-import {UrlBuilder} from './builder/UrlBuilder';
-import {StatusResponse} from './StatusResponse';
+import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../PlatformConstants';
+import { HttpClient } from '../http/HttpClient';
+import { State } from '../impl/State';
+import { QueryKey } from '../protocol/QueryKey';
+import { UrlBuilder } from './builder/UrlBuilder';
+import { StatusResponse } from './StatusResponse';
 
 /**
  * Wrapper class for the {@see HttpClient}.

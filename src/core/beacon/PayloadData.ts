@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import {ActionImpl} from '../impl/ActionImpl';
-import {SessionImpl} from '../impl/SessionImpl';
-import {State} from '../impl/State';
-import {SequenceIdProvider} from '../utils/SequenceIdProvider';
-import {now} from '../utils/Utils';
-import {PayloadBuilder} from './PayloadBuilder';
+import { ActionImpl } from '../impl/ActionImpl';
+import { State } from '../impl/State';
+import { SequenceIdProvider } from '../utils/SequenceIdProvider';
+import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
+import { PayloadBuilder } from './PayloadBuilder';
 
 /**
  * Responsible for creating and holding all payload data for a session.
@@ -28,17 +27,22 @@ export class PayloadData {
     private readonly payloadQueue: string[] = [];
 
     private readonly state: State;
-    private readonly session: SessionImpl;
 
     private readonly sequenceId = new SequenceIdProvider();
     private readonly nextId = new SequenceIdProvider();
+    private readonly timestampProvider: TimestampProvider;
 
-    private readonly sessionStartTime = now();
+    private readonly sessionStartTime: number;
     private readonly payloadPrefix: string;
 
-    constructor(session: SessionImpl, clientIp: string, sessionId: number) {
-        this.session = session;
-        this.state = session.state;
+    constructor(
+        state: State,
+        clientIp: string,
+        sessionId: number,
+        timestampProvider: TimestampProvider = defaultTimestampProvider) {
+        this.state = state;
+        this.timestampProvider = timestampProvider;
+        this.sessionStartTime = timestampProvider.getCurrentTimestamp();
 
         this.payloadPrefix = PayloadBuilder.prefix(this.state.config, sessionId, clientIp);
     }
@@ -55,20 +59,13 @@ export class PayloadData {
         this.addPayload(PayloadBuilder.startSession(this.createId()));
     }
 
-    public endSession() {
-        this.addPayload(PayloadBuilder.endSession(this.createSequenceNumber(), now() - this.sessionStartTime));
+    public endSession(): void {
+        const duration = this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime;
+        this.addPayload(PayloadBuilder.endSession(this.createSequenceNumber(), duration));
     }
 
-    public addAction(action: ActionImpl) {
+    public addAction(action: ActionImpl): void {
         this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
-    }
-
-    private getCompletePayloadPrefix() {
-        return `${this.payloadPrefix}&${PayloadBuilder.mutable(this.sessionStartTime, this.state.multiplicity)}`;
-    }
-
-    private addPayload(payload: string): void {
-        this.payloadQueue.push(payload);
     }
 
     public getNextPayload(): string | undefined {
@@ -89,7 +86,18 @@ export class PayloadData {
         return currentPayload;
     }
 
-    public hasPayloadsLeft() {
+    public hasPayloadsLeft(): boolean {
         return this.payloadQueue.length > 0;
+    }
+
+    private getCompletePayloadPrefix(): string {
+        const mutablePart = PayloadBuilder.mutable(
+            this.sessionStartTime, this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
+
+        return `${this.payloadPrefix}&${mutablePart}`;
+    }
+
+    private addPayload(payload: string): void {
+        this.payloadQueue.push(payload);
     }
 }

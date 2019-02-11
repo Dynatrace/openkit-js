@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.13",
     "@types/promise-polyfill": "^6.0.1",
+    "codelyzer": "^4.5.0",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.3",
@@ -31,7 +32,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "promise-polyfill": "^8.1.0"
+    "es6-promise": "4.2.5"
   },
   "files": [
     "dist",

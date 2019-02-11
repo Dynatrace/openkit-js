@@ -18,10 +18,14 @@
  * Javascript is accurate up to 15 digits.
  * We use 10 digits with our max value of 2^31, so we are safe without rounding.
  */
-const MAX_ID_VALUE = Math.pow(2, 31);
+const MAX_ID_VALUE = 2 ** 31;
 
 export class SequenceIdProvider {
-    private _currentId = 0;
+    private _currentId: number;
+
+    constructor(startId: number = 0) {
+        this._currentId = startId < 0 || startId >= MAX_ID_VALUE ? 0 : startId;
+    }
 
     public getNextId(): number {
         this._currentId++;

@@ -1,7 +1,9 @@
 {
-  "defaultSeverity": "error",
   "extends": [
     "tslint:latest"
+  ],
+  "rulesDirectory": [
+    "codelyzer"
   ],
   "linterOptions": {
     "exclude": [
@@ -10,16 +12,76 @@
   },
   "jsRules": {},
   "rules": {
-    "interface-name": [true, "never-prefix"],
-    "unified-signatures": [false],
-    "quotemark": [true, "single" ],
-    "object-literal-sort-keys": [false],
-    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
-    "no-console": false,
-    "arrow-parens": false,
-    "member-ordering": [true, "fields-first"],
-    "interface-over-type-literal": false,
-    "ordered-imports": true
-  },
-  "rulesDirectory": []
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "completed-docs": false,
+    "file-name-casing": [true, "pascal-case"],
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "linebreak-style": false,
+    "max-line-length": [
+      true,
+      {
+        "limit": 132,
+        "ignore-pattern": "^import |^export {(.*?)}"
+      }
+    ],
+    "member-access": false,
+    "member-ordering": [
+      true,
+      {
+        "order": "statics-first"
+      }
+    ],
+    "no-implicit-dependencies": false,
+    "no-parameter-properties": false,
+    "no-submodule-imports": [true, "es6-promise"],
+    "no-unnecessary-class": [
+      false,
+      "allow-static-only",
+      "allow-constructor-only"
+    ],
+    "no-unsafe-any": false,
+    "no-unused-variable": false,
+    "prefer-function-over-method": false,
+    "object-literal-sort-keys": false,
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "strict-boolean-expressions": [
+      true,
+      "allow-null-union",
+      "allow-undefined-union",
+      "allow-string"
+    ],
+    "typedef": [
+      true,
+      "call-signature",
+      "parameter",
+      "property-declaration"
+    ],
+    "variable-name": [
+      true,
+      "allow-leading-underscore"
+    ],
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-type",
+      "check-typecast",
+      "check-preblock",
+      "check-type-operator",
+      "check-rest-spread"
+    ]
+  }
 }

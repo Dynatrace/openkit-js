@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {State} from '../impl/State';
-import {BeaconSender} from './BeaconSender';
-import {PayloadData} from './PayloadData';
+import { State } from '../impl/State';
+import { BeaconSender } from './BeaconSender';
+import { PayloadData } from './PayloadData';
 
 /**
  * Responsible for building and sending payloads to the beacon.
@@ -49,13 +49,13 @@ export class PayloadSender {
         this.flushing = false;
     }
 
-    private async sendPayloads() {
+    private async sendPayloads(): Promise<void> {
         while (this.state.multiplicity !== 0 && this.beacon.hasPayloadsLeft()) {
             await this.sendPayload();
         }
     }
 
-    private async sendPayload() {
+    private async sendPayload(): Promise<void> {
         const payload = this.beacon.getNextPayload();
         if (payload === undefined) {
             return;
