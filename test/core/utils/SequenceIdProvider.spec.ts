@@ -29,9 +29,15 @@ describe('SequenceIdProvider', () => {
         expect(provider.getNextId()).toBe(1);
     });
 
-    it('if the initial value exceeds 2^31, the value is calculated modulo', () => {
+    it('if the initial value exceeds 2^31, the next value is 1', () => {
         const provider = new SequenceIdProvider(2**31 + 1);
 
-        expect(provider.getNextId()).toBe(2);
-    })
+        expect(provider.getNextId()).toBe(1);
+    });
+
+    it('if the initial value is negative, the next id is 1', () => {
+        const provider = new SequenceIdProvider(-5);
+
+        expect(provider.getNextId()).toBe(1);
+    });
 });

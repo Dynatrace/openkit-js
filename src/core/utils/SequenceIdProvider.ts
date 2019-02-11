@@ -24,7 +24,7 @@ export class SequenceIdProvider {
     private _currentId: number;
 
     constructor(startId: number = 0) {
-        this._currentId = startId % MAX_ID_VALUE;
+        this._currentId = startId < 0 || startId >= MAX_ID_VALUE ? 0 : startId;
     }
 
     public getNextId(): number {
