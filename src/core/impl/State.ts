@@ -22,6 +22,11 @@ const defaultServerId = 1;
 const defaultMaxBeaconSize = 30 * 1024;
 const defaultMultiplicity = 1;
 
+/**
+ * State received from the server, which can be updated with every response.
+ *
+ * If multiplicity is set to 0, no data for this session will be send to the server anymore.
+ */
 export class State {
     private readonly _config: Readonly<Configuration>;
     public get config(): Readonly<Configuration> {
@@ -50,6 +55,10 @@ export class State {
 
     public setServerIdLocked() {
         this._serverIdLocked = true;
+    }
+
+    public stopCommunication() {
+        this._multiplicity = 0;
     }
 
     public updateState(response: StatusResponse) {

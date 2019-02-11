@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-import {QueryKey} from '../beacon/BeaconSender';
-import {QueryBuilder} from './QueryBuilder';
-
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
-    }
-
-    public build(): string {
-        return `${this.url}?${super.build()}`;
-    }
+export const enum EventType {
+    ManualAction = 1,
+    SessionStart = 18,
+    SessionEnd = 19,
 }

@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-import {Action} from './Action';
-
 /**
- * Session public interface
+ * Removes an element from a given array.
+ * If there are multiple elements of the same instance, only the first is removed.
+ *
+ * @param array The array to search in
+ * @param element The element to remove.
  */
-export interface Session {
+export const removeElement = <T>(array: T[], element: T): void => {
+    const index = array.indexOf(element);
 
-    /**
-     * Enter a new rootAction
-     */
-    enterAction(actionName: string): Action;
+    if (index < 0) {
+        return;
+    }
 
-    /**
-     * Ends the session and sends all remaining data.
-     */
-    end(): void;
-}
+    array.splice(index, 1);
+};
+
+export const now = () => {
+    return new Date().getTime();
+};

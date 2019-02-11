@@ -15,16 +15,15 @@
  *
  */
 
+import {createLogger} from '../utils/Logger';
 import {HttpResponse} from './HttpResponse';
 
-const debug = (...args: any[]) => {
-    console.debug('[HttpClient]', ...args);
-};
+const log = createLogger('HttpClient');
 
 export class HttpClient {
 
     public async send(url: string, payload?: string): Promise<HttpResponse> {
-        debug('Sending request', {url, payload});
+        log.debug('Sending request', {url, payload});
 
         const result = await fetch(url, HttpClient.getOptions(payload));
         const body = await result.text();
@@ -33,7 +32,7 @@ export class HttpClient {
         // TODO: david.laubreiter: Implement retry strategy.
         const response = new HttpResponse(result.status, result.headers, body);
 
-        debug('Finished request, response:', response);
+        log.debug('Finished request, response:', response);
 
         return response;
     }

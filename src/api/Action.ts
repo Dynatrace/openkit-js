@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {PayloadKeys} from '../beacon/PayloadKeys';
-import {QueryBuilder} from './QueryBuilder';
-
-export class PayloadBuilder extends QueryBuilder<PayloadKeys> {}
+export interface Action {
+    leaveAction(): null;
+}

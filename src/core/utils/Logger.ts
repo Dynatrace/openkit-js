@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-/**
- * Removes an element from a given array.
- * If there are multiple elements of the same instance, only the first is removed.
- *
- * @param array The array to search in
- * @param element The element to remove.
- */
-export const removeElement = <T>(array: T[], element: T): void => {
-    const index = array.indexOf(element);
+export class Logger {
+    constructor(private readonly name: string) {}
 
-    if (index < 0) {
-        return;
+    public debug(...msg: any[]) {
+        console.debug(`[${this.name}]`, ...msg);
     }
+}
 
-    array.splice(index, 1);
-};
+export const createLogger = (name: string): Logger => new Logger(name);

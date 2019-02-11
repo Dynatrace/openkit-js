@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import {Action} from './Action';
-
-/**
- * Session public interface
- */
-export interface Session {
-
-    /**
-     * Enter a new rootAction
-     */
-    enterAction(actionName: string): Action;
-
-    /**
-     * Ends the session and sends all remaining data.
-     */
-    end(): void;
+export const enum QueryKey {
+    Type = 'type',
+    ServerId = 'srvid',
+    Application = 'app',
+    Version = 'va',
+    PlatformType = 'pt',
+    AgentTechnologyType = 'tt',
+    NewSession = 'ns',
 }

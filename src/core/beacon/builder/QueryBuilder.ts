@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {QueryKey} from '../beacon/BeaconSender';
-import {PayloadKeys} from '../beacon/PayloadKeys';
+import {PayloadKey} from '../../protocol/PayloadKey';
+import {QueryKey} from '../../protocol/QueryKey';
 
-export abstract class QueryBuilder<T extends (QueryKey | PayloadKeys)> {
+export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: {[key: string]: string} = {};
 
     public add(key: T, value: string | number | boolean): this {

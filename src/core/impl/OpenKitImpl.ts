@@ -17,11 +17,14 @@
 import {InitCallback, OpenKit} from '../../api/OpenKit';
 import {Session} from '../../api/Session';
 import {Configuration} from '../config/Configuration';
-import {SequenceIdProvider} from '../SequenceIdProvider';
-import {removeElement} from '../Utils';
+import {createLogger} from '../utils/Logger';
+import {SequenceIdProvider} from '../utils/SequenceIdProvider';
+import {removeElement} from '../utils/Utils';
 import {OpenKitObject, Status, StatusCallback} from './OpenKitObject';
 import {SessionImpl} from './SessionImpl';
 import {State} from './State';
+
+const log = createLogger('OpenKitImpl');
 
 /**
  * Implementation of the {@link OpenKit} interface.
@@ -100,6 +103,8 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
 
         this.openSessions.push(session);
+
+        log.debug(`Created session with ip='${clientIP}'`);
 
         return session;
     }

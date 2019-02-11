@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-import {Action} from './Action';
+import {QueryKey} from '../../protocol/QueryKey';
+import {QueryBuilder} from './QueryBuilder';
 
-/**
- * Session public interface
- */
-export interface Session {
+export class UrlBuilder extends QueryBuilder<QueryKey> {
+    constructor(private readonly url: string) {
+        super();
+    }
 
-    /**
-     * Enter a new rootAction
-     */
-    enterAction(actionName: string): Action;
-
-    /**
-     * Ends the session and sends all remaining data.
-     */
-    end(): void;
+    public build(): string {
+        return `${this.url}?${super.build()}`;
+    }
 }

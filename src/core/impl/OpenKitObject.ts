@@ -16,7 +16,7 @@
 
 import {BeaconSender} from '../beacon/BeaconSender';
 import {StatusResponse} from '../beacon/StatusResponse';
-import {removeElement} from '../Utils';
+import {removeElement} from '../utils/Utils';
 import {State} from './State';
 
 /**
@@ -89,6 +89,7 @@ export abstract class OpenKitObject {
      */
     public shutdown() {
         this._status = Status.Shutdown;
+        this.state.stopCommunication();
         this.callInitCallbacks();
     }
 
