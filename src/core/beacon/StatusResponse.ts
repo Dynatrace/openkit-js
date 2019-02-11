@@ -15,16 +15,7 @@
  */
 
 import { HttpResponse, HttpStatus } from '../http/HttpResponse';
-
-const enum ResponseKeys {
-    Capture = 'cp',
-    MonitorName = 'bn',
-    ServerId = 'id',
-    MaxBeaconSize = 'bl',
-    CaptureErrors = 'er',
-    CaptureCrashes = 'cr',
-    Multiplicity = 'mp',
-}
+import { ResponseKey } from '../protocol/ResponseKey';
 
 export const enum CaptureMode {
     Off = 0,
@@ -113,28 +104,28 @@ export class StatusResponse {
 
     private parseEntry(key: string, value: string): void {
         switch (key) {
-            case ResponseKeys.Capture:
+            case ResponseKey.Capture:
                 // 1 is on, 0 is off. If another value is passed, we disable it to be on the safe side.
                 this._captureMode = parseInt(value, 10) === 1 ? CaptureMode.On : CaptureMode.Off;
                 break;
-            case ResponseKeys.CaptureCrashes:
+            case ResponseKey.CaptureCrashes:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
                 this._captureCrashes = parseInt(value, 10) !== 0;
                 break;
-            case ResponseKeys.CaptureErrors:
+            case ResponseKey.CaptureErrors:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
                 this._captureErrors = parseInt(value, 10) !== 0;
                 break;
-            case ResponseKeys.MaxBeaconSize:
+            case ResponseKey.MaxBeaconSize:
                 this._maxBeaconSize = parseInt(value, 10);
                 break;
-            case ResponseKeys.MonitorName:
+            case ResponseKey.MonitorName:
                 this._monitorName = value;
                 break;
-            case ResponseKeys.Multiplicity:
+            case ResponseKey.Multiplicity:
                 this._multiplicity = parseInt(value, 10);
                 break;
-            case ResponseKeys.ServerId:
+            case ResponseKey.ServerId:
                 this._serverID = parseInt(value, 10);
         }
     }
