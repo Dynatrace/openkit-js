@@ -101,6 +101,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     }
 
     private waitForInitWithTimeout(callback: StatusCallback, timeout: number): void {
+        // TODO: Provide a timeout interface, since we cannot relay that setTimeout and clearTimeout is present.
         let timeoutId: any = -1;
 
         const proxy = (status: Status) => {

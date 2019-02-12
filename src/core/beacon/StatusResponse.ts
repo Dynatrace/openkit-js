@@ -27,6 +27,7 @@ export enum HttpStatus {
     UNKNOWN = -1,
 }
 
+// TODO: Implement a PayloadDecoder instead of moving this method around.
 export const parsePayload = (body: string): Record<string, string> => {
     const pairs: {[key: string]: string} = {};
 
