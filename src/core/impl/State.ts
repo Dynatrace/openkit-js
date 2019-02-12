@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { CaptureMode, StatusResponse } from '../beacon/StatusResponse';
-import { HttpStatus, StatusResponse } from '../beacon/StatusResponse';
+import { CaptureMode, HttpStatus, StatusResponse } from '../beacon/StatusResponse';
 import { Configuration } from '../config/Configuration';
 
 const defaultServerId = 1;

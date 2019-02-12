@@ -1,4 +1,3 @@
-/* tslint:disable:file-name-casing */
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,13 +14,24 @@
  * limitations under the License.
  */
 
-export * from './CrashReportingLevel';
-export * from './DataCollectionLevel';
-export * from './OpenKitBuilder';
-export * from './PlatformConstants';
+import { IdProvider } from './IdProvider';
 
-export * from './api/OpenKit';
-export * from './api/Session';
-export * from './api/Action';
-export * from './api/http/HttpClient';
-export * from './api/RandomNumberProvider';
+/**
+ * Provides an IdProvider which a fixed identification number.
+ */
+export class SingleIdProvider implements IdProvider {
+
+    /**
+     * Create a new singleIdProvider with a fixed identification number.
+     *
+     * @param id The fixed identification number.
+     */
+    constructor(private readonly id: number) {}
+
+    /**
+     * Returns a fixed id.
+     */
+    public next(): number {
+        return this.id;
+    }
+}

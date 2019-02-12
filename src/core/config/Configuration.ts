@@ -15,6 +15,7 @@
  */
 
 import { HttpClient } from '../../api/http/HttpClient';
+import { RandomNumberProvider } from '../../api/RandomNumberProvider';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 
@@ -24,9 +25,9 @@ export interface Size {
 }
 
 export interface Configuration {
-    readonly beaconURL: string;
-    readonly applicationId: string;
-    readonly deviceId: number | string;
+    beaconURL: string;
+    applicationId: string;
+    deviceId: number | string;
 
     applicationName: string;
     applicationVersion?: string;
@@ -38,4 +39,5 @@ export interface Configuration {
     crashReportingLevel: CrashReportingLevel;
 
     httpClient: HttpClient;
+    random: RandomNumberProvider;
 }

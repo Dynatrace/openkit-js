@@ -15,16 +15,18 @@
  *
  */
 
-import { HttpClient } from './api/http/HttpClient';
-import { OpenKit } from './api/OpenKit';
-import { Configuration } from './core/config/Configuration';
-import { DefaultHttpClient } from './core/http/DefaultHttpClient';
-import { OpenKitImpl } from './core/impl/OpenKitImpl';
-import { CrashReportingLevel } from './CrashReportingLevel';
-import { DataCollectionLevel } from './DataCollectionLevel';
-
 // Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
 import 'es6-promise/auto';
+import { HttpClient } from './api/http/HttpClient';
+import { OpenKit } from './api/OpenKit';
+import { RandomNumberProvider } from './api/RandomNumberProvider';
+import { Configuration } from './core/config/Configuration';
+import { DefaultHttpClient } from './core/http/DefaultHttpClient';
+import { defaultNullOpenKit } from './core/impl/NullOpenKit';
+import { OpenKitImpl } from './core/impl/OpenKitImpl';
+import { DefaultRandomNumberProvider } from './core/utils/DefaultRandomNumberProvider';
+import { CrashReportingLevel } from './CrashReportingLevel';
+import { DataCollectionLevel } from './DataCollectionLevel';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
@@ -44,6 +46,7 @@ export class OpenKitBuilder {
             dataCollectionLevel: defaultDataCollectionLevel,
 
             httpClient: new DefaultHttpClient(),
+            random: new DefaultRandomNumberProvider(),
         };
     }
 
@@ -83,11 +86,26 @@ export class OpenKitBuilder {
         return this;
     }
 
+    public withRandomNumberProvider(random: RandomNumberProvider): this {
+        this.config.random = random;
+
+        return this;
+    }
+
     public getConfig(): Readonly<Configuration> {
         return this.config;
     }
 
     public build(): OpenKit {
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+           return defaultNullOpenKit;
+        }
+
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Performance) {
+            // user does not allow data tracking
+            this.config.deviceId = this.config.random.nextPositiveInteger();
+        }
+
         const openKit = new OpenKitImpl(this.config);
         openKit.initialize();
 
