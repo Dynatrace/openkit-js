@@ -15,8 +15,8 @@
  *
  */
 
+import { HttpClient } from '../../api/http/HttpClient';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../PlatformConstants';
-import { HttpClient } from '../http/HttpClient';
 import { State } from '../impl/State';
 import { QueryKey } from '../protocol/QueryKey';
 import { UrlBuilder } from './builder/UrlBuilder';

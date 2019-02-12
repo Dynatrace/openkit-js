@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { HttpClient } from '../../api/http/HttpClient';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
-import { HttpClient } from '../http/HttpClient';
 
 export interface Size {
     width: number;

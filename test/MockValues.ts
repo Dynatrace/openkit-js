@@ -15,7 +15,7 @@
  */
 
 import {HttpStatus} from '../src/core/beacon/StatusResponse';
-import {HttpClient, HttpResponse} from '../src/core/http/HttpClient';
+import {HttpClient, HttpResponse} from '../src/api/http/HttpClient';
 
 export const mockHttpResponsePromise = Promise.resolve({ status: HttpStatus.OK, payload: '' });
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpResponse } from '../http/HttpClient';
+import { HttpResponse } from '../../api/http/HttpClient';
 import { ResponseKey } from '../protocol/ResponseKey';
 
 export const enum CaptureMode {

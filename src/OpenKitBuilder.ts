@@ -15,9 +15,9 @@
  *
  */
 
+import { HttpClient } from './api/http/HttpClient';
 import { OpenKit } from './api/OpenKit';
 import { Configuration } from './core/config/Configuration';
-import { HttpClient } from './core/http/HttpClient';
 import { OpenKitHttpClient } from './core/http/OpenKitHttpClient';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { CrashReportingLevel } from './CrashReportingLevel';

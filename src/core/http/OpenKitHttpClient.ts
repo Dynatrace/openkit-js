@@ -15,8 +15,8 @@
  */
 
 import Axios from 'axios';
-import {createLogger} from '../utils/Logger';
-import {HttpClient, HttpResponse} from './HttpClient';
+import { HttpClient, HttpResponse } from '../../api/http/HttpClient';
+import { createLogger } from '../utils/Logger';
 
 const log = createLogger('HttpClient');
 
