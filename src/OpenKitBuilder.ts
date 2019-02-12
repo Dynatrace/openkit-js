@@ -18,7 +18,7 @@
 import { HttpClient } from './api/http/HttpClient';
 import { OpenKit } from './api/OpenKit';
 import { Configuration } from './core/config/Configuration';
-import { OpenKitHttpClient } from './core/http/OpenKitHttpClient';
+import { DefaultHttpClient } from './core/http/DefaultHttpClient';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
@@ -43,7 +43,7 @@ export class OpenKitBuilder {
             crashReportingLevel: defaultCrashReportingLevel,
             dataCollectionLevel: defaultDataCollectionLevel,
 
-            httpClient: new OpenKitHttpClient(),
+            httpClient: new DefaultHttpClient(),
         };
     }
 

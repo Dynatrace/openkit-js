@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 import { HttpClient, HttpResponse } from '../../api/http/HttpClient';
 import { createLogger } from '../utils/Logger';
 
 const log = createLogger('HttpClient');
 
-export class OpenKitHttpClient implements HttpClient {
+export class DefaultHttpClient implements HttpClient {
 
     public async sendStatusRequest(url: string): Promise<HttpResponse> {
+        log.debug('Sending status request', url);
         const response = await Axios.get<string>(url);
 
-        return {
-            status: response.status,
-            payload: response.data,
-        };
+        return this.parseAxiosResponse(response);
     }
 
     public async sendPayloadData(url: string, payload: string): Promise<HttpResponse> {
+        log.debug('Sending payload data', {url, payload});
+
         const response = await Axios.post<string>(url, payload);
+
+        return this.parseAxiosResponse(response);
+    }
+
+    private parseAxiosResponse(response: AxiosResponse<string>): HttpResponse {
+        log.debug('Finished request', response);
 
         return {
             status: response.status,
