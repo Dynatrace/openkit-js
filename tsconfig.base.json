@@ -10,6 +10,8 @@
   "exclude": [
     "node_modules",
     "example",
-    "build"
+    "build",
+    "dist",
+    "test"
   ]
 }

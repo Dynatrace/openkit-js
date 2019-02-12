@@ -2,13 +2,6 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist/node",
-    "target": "es6",
-
-    "lib": [
-      "es6"
-    ]
-  },
-  "exclude": [
-    "test"
-  ]
+    "target": "es6"
+  }
 }

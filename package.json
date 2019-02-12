@@ -4,8 +4,8 @@
   "description": "OpenKit-JavaScript reference implementation",
   "scripts": {
     "test": "jest",
-    "lint": "tslint --project . -c tslint.json",
-    "lint:spec": "tslint --project . -c tslint.spec.json",
+    "lint": "tslint --project ./tsconfig.base.json -c tslint.json",
+    "lint:spec": "tslint --project ./tsconfig.base.json -c tslint.spec.json",
     "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --theme markdown",
     "build": "yarn build:browser && yarn build:node",
     "build:node": "tsc -p tsconfig.node.json",
@@ -13,6 +13,8 @@
     "build:browser:dev": "webpack"
   },
   "author": "Dynatrace",
+  "types": "dist/types/index.d.ts",
+  "main": "dist/node/index.js",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "@types/jest": "^23.3.13",
