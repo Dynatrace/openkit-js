@@ -16,11 +16,12 @@
   "author": "Dynatrace",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
-    "@types/promise-polyfill": "^6.0.1",
     "@types/jest": "^23.3.13",
+    "codelyzer": "^4.5.0",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.3",
+    "ts-mockito": "^2.3.1",
     "tslint": "^5.12.1",
     "typedoc": "^0.14.2",
     "typedoc-plugin-markdown": "^1.1.25",
@@ -30,7 +31,7 @@
     "yarn": "^1.13.0"
   },
   "dependencies": {
-    "promise-polyfill": "^8.1.0",
-    "ts-mockito": "^2.3.1"
+    "es6-promise": "4.2.5",
+    "whatwg-fetch": "^3.0.0"
   }
 }

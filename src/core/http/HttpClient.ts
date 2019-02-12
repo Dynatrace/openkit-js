@@ -15,36 +15,36 @@
  *
  */
 
-import {createLogger} from '../utils/Logger';
-import {HttpResponse} from './HttpResponse';
+import { createLogger } from '../utils/Logger';
+import { HttpResponse } from './HttpResponse';
 
 const log = createLogger('HttpClient');
+
+const getOptions = (payload?: string) => {
+    if (payload === undefined) {
+        return {};
+    }
+
+    return {
+        method: 'POST',
+        body: payload,
+    };
+};
 
 export class HttpClient {
 
     public async send(url: string, payload?: string): Promise<HttpResponse> {
         log.debug('Sending request', {url, payload});
 
-        const result = await fetch(url, HttpClient.getOptions(payload));
+        const result = await fetch(url, getOptions(payload));
         const body = await result.text();
 
         // TODO: david.laubreiter: Use beacons or XmlHttpRequests.
         // TODO: david.laubreiter: Implement retry strategy.
-        const response = new HttpResponse(result.status, result.headers, body);
+        const response = new HttpResponse(result.status, body);
 
         log.debug('Finished request, response:', response);
 
         return response;
-    }
-
-    private static getOptions(payload?: string) {
-        if (payload === undefined) {
-            return {};
-        }
-
-        return {
-            method: 'POST',
-            body: payload,
-        };
     }
 }

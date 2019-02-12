@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {BeaconSender} from '../beacon/BeaconSender';
-import {StatusResponse} from '../beacon/StatusResponse';
-import {removeElement} from '../utils/Utils';
-import {State} from './State';
+import { BeaconSender } from '../beacon/BeaconSender';
+import { StatusResponse } from '../beacon/StatusResponse';
+import { removeElement } from '../utils/Utils';
+import { State } from './State';
 
 /**
  * Status of an {@see OpenKitObject}.
@@ -37,10 +37,10 @@ export type StatusCallback = (status: Status) => void;
  * Common base for all OpenKit-Objects which should be initialized async.
  */
 export abstract class OpenKitObject {
-    private _initializationListener: StatusCallback[] = [];
-
     public readonly state: State;
     public readonly sender: BeaconSender;
+
+    private _initializationListener: StatusCallback[] = [];
 
     private _status: Status = Status.Idle;
     public get status(): Status {
@@ -77,17 +77,9 @@ export abstract class OpenKitObject {
     }
 
     /**
-     * Call all registered callbacks with the current status.
-     */
-    private callInitCallbacks() {
-        this._initializationListener.forEach(cb => cb(this._status));
-        this._initializationListener = [];
-    }
-
-    /**
      * Set the status to shutdown, and call all registered callbacks that the object did not initialize.
      */
-    public shutdown() {
+    public shutdown(): void {
         this._status = Status.Shutdown;
         this.state.stopCommunication();
         this.callInitCallbacks();
@@ -99,7 +91,7 @@ export abstract class OpenKitObject {
      *
      * @param callback The callback which should be executed after the object initialized.
      */
-    public registerOnInitializedCallback(callback: StatusCallback) {
+    public registerOnInitializedCallback(callback: StatusCallback): void {
         if (this._status !== Status.Idle) {
             callback(this._status);
         } else {
@@ -111,7 +103,15 @@ export abstract class OpenKitObject {
      * Unregister a callback. This is only possible if the callback has not been executed already.
      * @param callback The callback to unregister
      */
-    public unregisterOnInitializedCallback(callback: StatusCallback) {
+    public unregisterOnInitializedCallback(callback: StatusCallback): void {
         removeElement(this._initializationListener, callback);
+    }
+
+    /**
+     * Call all registered callbacks with the current status.
+     */
+    private callInitCallbacks(): void {
+        this._initializationListener.forEach((cb) => cb(this._status));
+        this._initializationListener = [];
     }
 }

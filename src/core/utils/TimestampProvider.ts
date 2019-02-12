@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-export class Logger {
-    constructor(private readonly name: string) {}
-
-    public debug(...msg: any[]): void {
-        // tslint:disable-next-line:no-console
-        console.debug(`[${this.name}]`, ...msg);
+export class TimestampProvider {
+    public getCurrentTimestamp(): number {
+        return new Date().getTime();
     }
 }
 
-export const createLogger = (name: string): Logger => new Logger(name);
+export const defaultTimestampProvider = new TimestampProvider();

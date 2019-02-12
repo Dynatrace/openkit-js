@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-export class Logger {
-    constructor(private readonly name: string) {}
-
-    public debug(...msg: any[]): void {
-        // tslint:disable-next-line:no-console
-        console.debug(`[${this.name}]`, ...msg);
-    }
+export const enum ResponseKey {
+    Capture = 'cp',
+    MonitorName = 'bn',
+    ServerId = 'id',
+    MaxBeaconSize = 'bl',
+    CaptureErrors = 'er',
+    CaptureCrashes = 'cr',
+    Multiplicity = 'mp',
 }
-
-export const createLogger = (name: string): Logger => new Logger(name);

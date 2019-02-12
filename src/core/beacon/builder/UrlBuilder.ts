@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {QueryKey} from '../../protocol/QueryKey';
-import {QueryBuilder} from './QueryBuilder';
+import { QueryKey } from '../../protocol/QueryKey';
+import { QueryBuilder } from './QueryBuilder';
 
 export class UrlBuilder extends QueryBuilder<QueryKey> {
     constructor(private readonly url: string) {
@@ -23,6 +23,8 @@ export class UrlBuilder extends QueryBuilder<QueryKey> {
     }
 
     public build(): string {
-        return `${this.url}?${super.build()}`;
+        const query = super.build();
+
+        return query.length === 0 ? this.url : `${this.url}?${query}`;
     }
 }

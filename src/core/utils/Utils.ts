@@ -30,7 +30,3 @@ export const removeElement = <T>(array: T[], element: T): void => {
 
     array.splice(index, 1);
 };
-
-export const now = () => {
-    return new Date().getTime();
-};
