@@ -82,7 +82,6 @@ export class OpenKitBuilder {
 
     public withCustomHttpClient(httpClient: HttpClient): this {
         this.config.httpClient = httpClient;
-
         return this;
     }
 

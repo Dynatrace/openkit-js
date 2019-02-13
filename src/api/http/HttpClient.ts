@@ -29,11 +29,11 @@ export interface HttpClient {
     sendStatusRequest(url: string): Promise<HttpResponse>;
 
     /**
-     * Executes a HTTP POST-request to the specified url and the specified payload. Returns a {@see HttpResponse} as a
-     * Promise.
+     * Executes a HTTP POST-request to the specified url and the specified payload.
      *
      * @param url The target URL for the POST-request
      * @param payload A Promise of a {@see HttpResponse}
+     * @returns {@see HttpResponse} as a Promise.
      */
     sendPayloadData(url: string, payload: string): Promise<HttpResponse>;
 }

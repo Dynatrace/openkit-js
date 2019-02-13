@@ -29,7 +29,7 @@ export enum HttpStatus {
 
 // TODO: Implement a PayloadDecoder instead of moving this method around.
 export const parsePayload = (body: string): Record<string, string> => {
-    const pairs: {[key: string]: string} = {};
+    const pairs: Record<string, string> = {};
 
     body
         .split('&')
@@ -144,6 +144,7 @@ export class StatusResponse {
                 break;
             case ResponseKey.ServerId:
                 this._serverID = parseInt(value, 10);
+                break;
         }
     }
 }
