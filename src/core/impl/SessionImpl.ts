@@ -16,6 +16,7 @@
 
 import { Action } from '../../api/Action';
 import { Session } from '../../api/Session';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { PayloadSender } from '../beacon/PayloadSender';
 import { createLogger } from '../utils/Logger';
@@ -67,6 +68,11 @@ export class SessionImpl extends OpenKitObject implements Session {
     }
 
     public enterAction(actionName: string): Action {
+        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            // Do not track any action data
+            return defaultNullAction;
+        }
+
         if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
             return defaultNullAction;
         }

@@ -16,9 +16,11 @@
 
 import { InitCallback, OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { Configuration } from '../config/Configuration';
 import { createLogger } from '../utils/Logger';
 import { SequenceIdProvider } from '../utils/SequenceIdProvider';
+import { SingleIdProvider } from '../utils/SingleIdProvider';
 import { removeElement } from '../utils/Utils';
 import { defaultNullSession } from './NullSession';
 import { OpenKitObject, Status, StatusCallback } from './OpenKitObject';
@@ -32,7 +34,7 @@ const log = createLogger('OpenKitImpl');
  */
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
     private readonly openSessions: Session[] = [];
-    private readonly sessionIdProvider = new SequenceIdProvider();
+    private readonly sessionIdProvider;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
@@ -40,6 +42,9 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      */
     constructor(config: Configuration) {
         super(new State({...config}));
+
+        this.sessionIdProvider = config.dataCollectionLevel !== DataCollectionLevel.UserBehavior ?
+            new SequenceIdProvider() : new SingleIdProvider(1);
     }
 
     /**
@@ -89,7 +94,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
             return defaultNullSession;
         }
 
-        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
+        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.next());
 
         this.openSessions.push(session);
 

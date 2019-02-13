@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
-import { IdProvider } from '../utils/IdProvider';
 import { SequenceIdProvider } from '../utils/SequenceIdProvider';
-import { SingleIdProvider } from '../utils/SingleIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
 import { PayloadBuilder } from './PayloadBuilder';
 
@@ -32,7 +29,7 @@ export class PayloadData {
     private readonly state: State;
 
     private readonly sequenceId = new SequenceIdProvider();
-    private readonly nextId: IdProvider;
+    private readonly nextId = new SequenceIdProvider();
     private readonly timestampProvider: TimestampProvider;
 
     private readonly sessionStartTime: number;
@@ -46,9 +43,6 @@ export class PayloadData {
         this.state = state;
         this.timestampProvider = timestampProvider;
         this.sessionStartTime = timestampProvider.getCurrentTimestamp();
-
-        this.nextId = state.config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
-            new SequenceIdProvider() : new SingleIdProvider(1);
 
         this.payloadPrefix = PayloadBuilder.prefix(this.state.config, sessionId, clientIp);
     }
