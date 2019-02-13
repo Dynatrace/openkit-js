@@ -14,13 +14,30 @@
  * limitations under the License.
  */
 
-import { HttpResponse, HttpStatus } from '../http/HttpResponse';
+import { HttpResponse } from '../../api/http/HttpClient';
 import { ResponseKey } from '../protocol/ResponseKey';
 
 export const enum CaptureMode {
     Off = 0,
     On = 1,
 }
+
+export enum HttpStatus {
+    OK = 200,
+    UNKNOWN = -1,
+}
+
+// TODO: Implement a PayloadDecoder instead of moving this method around.
+export const parsePayload = (body: string): Record<string, string> => {
+    const pairs: Record<string, string> = {};
+
+    body
+        .split('&')
+        .map((entry) => entry.split('=') as [string, string])
+        .forEach((pair: [string, string]) => pairs[pair[0]] = pair[1]);
+
+    return pairs;
+};
 
 /**
  * Holds the status information after a request.
@@ -83,16 +100,16 @@ export class StatusResponse {
         return this._status;
     }
 
-    constructor(response: HttpResponse) {
-        this._status = response.getStatus();
+    constructor(response: Readonly<HttpResponse>) {
+        this._status = response.status === 200 ? HttpStatus.OK : HttpStatus.UNKNOWN;
         this.parseResponse(response);
     }
 
-    private parseResponse(response: HttpResponse): void {
-        const keyValueEntries = response.getValues();
+    private parseResponse(response: Readonly<HttpResponse>): void {
+        const keyValueEntries = parsePayload(response.payload);
 
         // tslint:disable-next-line:no-string-literal
-        if (keyValueEntries['type'] !== 'm' || response.getStatus() !== HttpStatus.OK) {
+        if (keyValueEntries['type'] !== 'm' || response.status !== HttpStatus.OK) {
             this._valid = false;
             return;
         }
@@ -127,6 +144,7 @@ export class StatusResponse {
                 break;
             case ResponseKey.ServerId:
                 this._serverID = parseInt(value, 10);
+                break;
         }
     }
 }

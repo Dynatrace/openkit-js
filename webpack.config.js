@@ -4,8 +4,8 @@ module.exports = {
     mode: 'development',
     entry: path.resolve(__dirname, './src/OpenKitBuilder.ts'),
     output: {
-        path: path.resolve(__dirname, './build/lib'),
-        filename: 'bundle.js',
+        path: path.resolve(__dirname, './dist/browser'),
+        filename: 'openkit.js',
         libraryTarget: 'umd'
     },
     resolve: {
@@ -17,6 +17,9 @@ module.exports = {
                 test: /\.ts$/,
                 exclude: [/node_modules/],
                 loader: 'ts-loader',
+                options: {
+                    configFile: 'tsconfig.browser.json'
+                }
             }
         ]
     }

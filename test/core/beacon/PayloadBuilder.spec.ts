@@ -16,17 +16,18 @@
 
 import {instance, mock, when} from 'ts-mockito';
 import {PayloadBuilder} from '../../../src/core/beacon/PayloadBuilder';
+import {parsePayload} from '../../../src/core/beacon/StatusResponse';
 import {Configuration} from '../../../src/core/config/Configuration';
-import {HttpResponse} from '../../../src/core/http/HttpResponse';
 import {ActionImpl} from '../../../src/core/impl/ActionImpl';
 import {EventType} from '../../../src/core/protocol/EventType';
 import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
+import {mockHttpClient} from '../../MockValues';
 
 const parse = (payload: string) => {
     // We misuse in this test the HttpResponse, for easily checking values
-    const pairs = new HttpResponse(0, payload).getValues();
+    const pairs = parsePayload(payload);
 
     return {
         keys: Object.keys(pairs),
@@ -108,6 +109,7 @@ describe('PayloadBuilder', () => {
                 deviceId: '654',
                 applicationId: 'app-id',
                 beaconURL: 'https://example.com',
+                httpClient: mockHttpClient,
             };
         });
 
@@ -122,8 +124,8 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.ApplicationId, config.applicationId);
             payloadExpect(pairs, PayloadKey.ApplicationName, config.applicationName);
             payloadExpect(pairs, PayloadKey.PlatformType, '1');
-            payloadExpect(pairs, PayloadKey.AgentTechnologyType, 'okjs')
-            payloadExpect(pairs, PayloadKey.VisitorId, config.deviceId.toString())
+            payloadExpect(pairs, PayloadKey.AgentTechnologyType, 'okjs');
+            payloadExpect(pairs, PayloadKey.VisitorId, config.deviceId.toString());
             payloadExpect(pairs, PayloadKey.ClientIpAddress, '');
             payloadExpect(pairs, PayloadKey.DataCollectionLevel, DataCollectionLevel.UserBehavior.toString());
             payloadExpect(pairs, PayloadKey.CrashReportingLevel, CrashReportingLevel.OptOutCrashes.toString());
@@ -142,6 +144,4 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
         });
     });
-
-
 });

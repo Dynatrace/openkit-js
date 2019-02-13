@@ -15,15 +15,16 @@
  *
  */
 
+import { HttpClient } from './api/http/HttpClient';
 import { OpenKit } from './api/OpenKit';
 import { Configuration } from './core/config/Configuration';
+import { DefaultHttpClient } from './core/http/DefaultHttpClient';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
 
 // Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
 import 'es6-promise/auto';
-import 'whatwg-fetch';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
@@ -41,36 +42,43 @@ export class OpenKitBuilder {
             applicationName: defaultApplicationName,
             crashReportingLevel: defaultCrashReportingLevel,
             dataCollectionLevel: defaultDataCollectionLevel,
+
+            httpClient: new DefaultHttpClient(),
         };
     }
 
-    public withApplicationName(appName: string): OpenKitBuilder {
+    public withApplicationName(appName: string): this {
         this.config.applicationName = appName;
         return this;
     }
 
-    public withOperatingSystem(operatingSystem: string): OpenKitBuilder {
+    public withOperatingSystem(operatingSystem: string): this {
         this.config.operatingSystem = operatingSystem;
         return this;
     }
 
-    public withApplicationVersion(appVersion: string): OpenKitBuilder {
+    public withApplicationVersion(appVersion: string): this {
         this.config.applicationVersion = appVersion;
         return this;
     }
 
-    public withScreenSize(width: number, height: number): OpenKitBuilder {
+    public withScreenSize(width: number, height: number): this {
         this.config.screenSize = { width, height };
         return this;
     }
 
-    public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): OpenKitBuilder {
+    public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
         this.config.dataCollectionLevel = dataCollectionLevel;
         return this;
     }
 
-    public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): OpenKitBuilder {
+    public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
         this.config.crashReportingLevel = crashReportingLevel;
+        return this;
+    }
+
+    public withCustomHttpClient(httpClient: HttpClient): this {
+        this.config.httpClient = httpClient;
         return this;
     }
 

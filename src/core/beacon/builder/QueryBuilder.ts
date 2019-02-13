@@ -18,7 +18,7 @@ import { PayloadKey } from '../../protocol/PayloadKey';
 import { QueryKey } from '../../protocol/QueryKey';
 
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
-    private readonly options: {[key: string]: string} = {};
+    private readonly options: Record<string, string> = {};
 
     public add(key: T, value: string | number): this {
         this.options[key] = value.toString();
