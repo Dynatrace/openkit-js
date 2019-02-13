@@ -19,7 +19,7 @@
  */
 export interface RandomNumberProvider {
     /**
-     * Generates a random number between 0 and 2**1, inclusive.
+     * Generates a random number between 0 and 2**31, inclusive.
      */
     nextPositiveInteger(): number;
 }

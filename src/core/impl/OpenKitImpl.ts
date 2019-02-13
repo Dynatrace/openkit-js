@@ -43,7 +43,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     constructor(config: Configuration) {
         super(new State({...config}));
 
-        this.sessionIdProvider = config.dataCollectionLevel !== DataCollectionLevel.UserBehavior ?
+        this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
     }
 

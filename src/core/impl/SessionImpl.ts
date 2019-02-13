@@ -68,12 +68,7 @@ export class SessionImpl extends OpenKitObject implements Session {
     }
 
     public enterAction(actionName: string): Action {
-        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
-            // Do not track any action data
-            return defaultNullAction;
-        }
-
-        if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
+        if (!this.mayEnterAction()) {
             return defaultNullAction;
         }
 
@@ -86,6 +81,12 @@ export class SessionImpl extends OpenKitObject implements Session {
 
     public removeAction(action: Action): void {
         removeElement(this.openActions, action);
+    }
+
+    private mayEnterAction(): boolean {
+        return this.status !== Status.Shutdown &&
+            this.state.multiplicity !== 0 &&
+            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 
     /**
