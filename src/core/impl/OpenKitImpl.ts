@@ -91,6 +91,9 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @inheritDoc
      */
     public createSession(clientIP: string = ''): Session {
+        // We always send the createSession-request to the server, even when DataCollectionLevel = Off, but no user
+        // activity is recorded.
+
         if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
             return defaultNullSession;
         }

@@ -94,6 +94,11 @@ export class SessionImpl extends OpenKitObject implements Session {
      * If the session is initialized, all data is flushed before shutting the session down.
      */
     private endSession(): void {
+        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            // We only send the end-session event if the user enabled monitoring.
+            return;
+        }
+
         this.openActions.forEach((action) => action.leaveAction());
 
         if (this.status === Status.Initialized) {
