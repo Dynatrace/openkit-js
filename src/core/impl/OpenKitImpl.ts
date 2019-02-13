@@ -18,6 +18,7 @@ import { InitCallback, OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { Configuration } from '../config/Configuration';
+import { IdProvider } from '../utils/IdProvider';
 import { createLogger } from '../utils/Logger';
 import { SequenceIdProvider } from '../utils/SequenceIdProvider';
 import { SingleIdProvider } from '../utils/SingleIdProvider';
@@ -34,7 +35,7 @@ const log = createLogger('OpenKitImpl');
  */
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
     private readonly openSessions: Session[] = [];
-    private readonly sessionIdProvider;
+    private readonly sessionIdProvider: IdProvider;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.

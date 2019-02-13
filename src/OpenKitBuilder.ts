@@ -87,7 +87,6 @@ export class OpenKitBuilder {
 
     public withRandomNumberProvider(random: RandomNumberProvider): this {
         this.config.random = random;
-
         return this;
     }
 

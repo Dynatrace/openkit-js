@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { mock } from 'ts-mockito';
+import { DefaultHttpClient } from '../src/core/http/DefaultHttpClient';
+import { DefaultRandomNumberProvider } from '../src/core/utils/DefaultRandomNumberProvider';
 import {CrashReportingLevel} from '../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../src/DataCollectionLevel';
 import {OpenKitBuilder} from '../src/OpenKitBuilder';
@@ -67,6 +70,22 @@ describe('OpenKitBuilder', () => {
         builder.withScreenSize(350, 500);
 
         expect(builder.getConfig().screenSize).toEqual({width: 350, height: 500});
+    });
+
+    it('should set the http provider', () => {
+        const httpClient = mock(DefaultHttpClient);
+
+        builder.withCustomHttpClient(httpClient);
+
+        expect(builder.getConfig().httpClient).toBe(httpClient);
+    });
+
+    it('should set the random provider', () => {
+        const random = mock(DefaultRandomNumberProvider);
+
+        builder.withRandomNumberProvider(random);
+
+        expect(builder.getConfig().random).toBe(random);
     });
 
     it('should set multiple values at once', () => {

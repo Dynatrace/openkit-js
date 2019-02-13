@@ -15,12 +15,12 @@
  */
 
 import {instance, mock, when} from 'ts-mockito';
+import { HttpClient, RandomNumberProvider } from '../../../src';
 import {HttpStatus, StatusResponse} from '../../../src/core/beacon/StatusResponse';
 import {Configuration} from '../../../src/core/config/Configuration';
 import {State} from '../../../src/core/impl/State';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
-import {mockHttpClient} from '../../MockValues';
 
 const config: Readonly<Configuration> = {
     beaconURL: 'https://example.com',
@@ -29,7 +29,8 @@ const config: Readonly<Configuration> = {
     applicationId: 'app-id',
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
-    httpClient: mockHttpClient,
+    httpClient: {} as HttpClient,
+    random: {} as RandomNumberProvider,
 };
 
 const mockStatusResponse = (status: HttpStatus, values: { id?: number, size?: number, multiplicity?: number }) => {

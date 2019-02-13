@@ -15,6 +15,7 @@
  */
 
 import {instance, mock, when} from 'ts-mockito';
+import { HttpClient, RandomNumberProvider } from '../../../src';
 import {PayloadBuilder} from '../../../src/core/beacon/PayloadBuilder';
 import {parsePayload} from '../../../src/core/beacon/StatusResponse';
 import {Configuration} from '../../../src/core/config/Configuration';
@@ -23,7 +24,6 @@ import {EventType} from '../../../src/core/protocol/EventType';
 import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
-import {mockHttpClient} from '../../MockValues';
 
 const parse = (payload: string) => {
     // We misuse in this test the HttpResponse, for easily checking values
@@ -109,7 +109,8 @@ describe('PayloadBuilder', () => {
                 deviceId: '654',
                 applicationId: 'app-id',
                 beaconURL: 'https://example.com',
-                httpClient: mockHttpClient,
+                httpClient: {} as HttpClient,
+                random: {} as RandomNumberProvider,
             };
         });
 
