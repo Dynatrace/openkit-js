@@ -68,6 +68,14 @@ export class PayloadData {
         this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
     }
 
+    public identifyUser(userTag: string): void {
+        this.addPayload(PayloadBuilder.identifyUser(
+            userTag,
+            this.createSequenceNumber(),
+            this.timestampProvider.getCurrentTimestamp(),
+            this.sessionStartTime));
+    }
+
     public getNextPayload(): string | undefined {
         if (this.payloadQueue.length === 0) {
             return undefined;

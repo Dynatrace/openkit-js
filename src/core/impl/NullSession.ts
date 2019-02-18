@@ -26,6 +26,10 @@ export class NullSession implements Session {
     public end(): void {
         // stub
     }
+
+    public identifyUser(userTag: string): void {
+        // stub
+    }
 }
 
 export const defaultNullSession = new NullSession();

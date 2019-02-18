@@ -67,6 +67,29 @@ export class SessionImpl extends OpenKitObject implements Session {
         });
     }
 
+    /**
+     * @inheritDoc
+     */
+    public identifyUser(userTag: string): void {
+        // Only capture userTag if we track everything.
+        if (this.status === Status.Shutdown ||
+            this.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+
+            return;
+        }
+
+        // Only allow non-empty strings as userTag
+        if (typeof userTag !== 'string' || userTag.length === 0) {
+            return;
+        }
+
+        log.debug('Identify User', userTag);
+        this.payloadData.identifyUser(userTag);
+
+        // Send immediately as we can not be sure that the session has a correct 'end'
+        this.flush();
+    }
+
     public enterAction(actionName: string): Action {
         if (!this.mayEnterAction()) {
             return defaultNullAction;

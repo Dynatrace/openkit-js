@@ -24,6 +24,7 @@ import {EventType} from '../../../src/core/protocol/EventType';
 import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
+import arrayContaining = jasmine.arrayContaining;
 
 const parse = (payload: string) => {
     // We misuse in this test the HttpResponse, for easily checking values
@@ -143,6 +144,22 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.Multiplicity, '765');
             payloadExpect(pairs, PayloadKey.TimesyncTime, '123456');
             payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+        });
+    });
+
+    describe('identifyUser', () => {
+        it('should build the correct payload', () => {
+            const payload = PayloadBuilder.identifyUser('Dynatrace Power User', 6, 100, 40);
+
+            const {keys, pairs} = parse(payload);
+            expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0]));
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.IdentifyUser.toString());
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.KeyName, 'Dynatrace%20Power%20User');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '0');
+            payloadExpect(pairs, PayloadKey.Time0, '60');
         });
     });
 });
