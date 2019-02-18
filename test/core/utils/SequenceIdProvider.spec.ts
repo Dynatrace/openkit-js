@@ -20,24 +20,24 @@ describe('SequenceIdProvider', () => {
     it('the first default id is 1', () => {
         const provider = new SequenceIdProvider();
 
-        expect(provider.getNextId()).toBe(1);
+        expect(provider.next()).toBe(1);
     });
 
     it('if the id exceeds 2^31, the next value is 1 again', () => {
         const provider = new SequenceIdProvider(2 ** 31 - 1);
 
-        expect(provider.getNextId()).toBe(1);
+        expect(provider.next()).toBe(1);
     });
 
     it('if the initial value exceeds 2^31, the next value is 1', () => {
         const provider = new SequenceIdProvider(2**31 + 1);
 
-        expect(provider.getNextId()).toBe(1);
+        expect(provider.next()).toBe(1);
     });
 
     it('if the initial value is negative, the next id is 1', () => {
         const provider = new SequenceIdProvider(-5);
 
-        expect(provider.getNextId()).toBe(1);
+        expect(provider.next()).toBe(1);
     });
 });

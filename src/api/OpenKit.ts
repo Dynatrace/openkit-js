@@ -33,7 +33,7 @@ export interface OpenKit {
     /**
      * Creates a new session and returns its instance.
      *
-     * @param clientIp the clients ip
+     * @param clientIp the client's ip
      */
     createSession(clientIp?: string): Session;
 

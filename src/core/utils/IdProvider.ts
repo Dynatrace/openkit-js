@@ -1,4 +1,3 @@
-/* tslint:disable:file-name-casing */
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,13 +14,12 @@
  * limitations under the License.
  */
 
-export * from './CrashReportingLevel';
-export * from './DataCollectionLevel';
-export * from './OpenKitBuilder';
-export * from './PlatformConstants';
-
-export * from './api/OpenKit';
-export * from './api/Session';
-export * from './api/Action';
-export * from './api/http/HttpClient';
-export * from './api/RandomNumberProvider';
+/**
+ * Interface for providing identification numbers.
+ */
+export interface IdProvider {
+    /**
+     * Provides the next identification number as an integer in the range between [0, 2*31)
+     */
+    next(): number;
+}

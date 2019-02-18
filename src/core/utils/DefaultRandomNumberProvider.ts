@@ -1,4 +1,3 @@
-/* tslint:disable:file-name-casing */
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,13 +14,27 @@
  * limitations under the License.
  */
 
-export * from './CrashReportingLevel';
-export * from './DataCollectionLevel';
-export * from './OpenKitBuilder';
-export * from './PlatformConstants';
+import { RandomNumberProvider } from '../../api/RandomNumberProvider';
 
-export * from './api/OpenKit';
-export * from './api/Session';
-export * from './api/Action';
-export * from './api/http/HttpClient';
-export * from './api/RandomNumberProvider';
+const random = (low: number, high: number): number => {
+    return Math.random() * (high - low) + low;
+};
+
+const randomInteger = (low: number, high: number): number => {
+    return Math.floor(random(low, high));
+};
+
+/**
+ * Default RandomNumberProvider.
+ *
+ * @see RandomNumberProvider
+ */
+export class DefaultRandomNumberProvider implements RandomNumberProvider {
+
+    /**
+     * @inheritDoc
+     */
+    public nextPositiveInteger(): number {
+            return randomInteger(0, 2 ** 31);
+    }
+}

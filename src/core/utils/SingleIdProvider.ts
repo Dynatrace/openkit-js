@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-import {HttpStatus} from '../src/core/beacon/StatusResponse';
-import {HttpClient, HttpResponse} from '../src/api/http/HttpClient';
+import { IdProvider } from './IdProvider';
 
-export const mockHttpResponsePromise = Promise.resolve({ status: HttpStatus.OK, payload: '' });
+/**
+ * Provides an IdProvider which a fixed identification number.
+ */
+export class SingleIdProvider implements IdProvider {
 
-export const mockHttpClient: HttpClient = {
-    sendPayloadData(url: string, payload: string): Promise<HttpResponse> {
-        return mockHttpResponsePromise;
-    },
-    sendStatusRequest(url: string): Promise<HttpResponse> {
-        return mockHttpResponsePromise;
+    /**
+     * Create a new singleIdProvider with a fixed identification number.
+     *
+     * @param id The fixed identification number.
+     */
+    constructor(private readonly id: number) {}
+
+    /**
+     * Returns a fixed id.
+     */
+    public next(): number {
+        return this.id;
     }
-};
+}

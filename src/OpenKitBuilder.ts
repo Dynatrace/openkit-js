@@ -17,9 +17,11 @@
 
 import { HttpClient } from './api/http/HttpClient';
 import { OpenKit } from './api/OpenKit';
+import { RandomNumberProvider } from './api/RandomNumberProvider';
 import { Configuration } from './core/config/Configuration';
 import { DefaultHttpClient } from './core/http/DefaultHttpClient';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
+import { DefaultRandomNumberProvider } from './core/utils/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
 
@@ -44,6 +46,7 @@ export class OpenKitBuilder {
             dataCollectionLevel: defaultDataCollectionLevel,
 
             httpClient: new DefaultHttpClient(),
+            random: new DefaultRandomNumberProvider(),
         };
     }
 
@@ -82,11 +85,21 @@ export class OpenKitBuilder {
         return this;
     }
 
+    public withRandomNumberProvider(random: RandomNumberProvider): this {
+        this.config.random = random;
+        return this;
+    }
+
     public getConfig(): Readonly<Configuration> {
         return this.config;
     }
 
     public build(): OpenKit {
+        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            // user does not allow data tracking
+            this.config.deviceId = this.config.random.nextPositiveInteger();
+        }
+
         const openKit = new OpenKitImpl(this.config);
         openKit.initialize();
 

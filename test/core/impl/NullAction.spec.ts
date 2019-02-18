@@ -1,4 +1,3 @@
-/* tslint:disable:file-name-casing */
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,13 +14,12 @@
  * limitations under the License.
  */
 
-export * from './CrashReportingLevel';
-export * from './DataCollectionLevel';
-export * from './OpenKitBuilder';
-export * from './PlatformConstants';
+import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { defaultNullSession } from '../../../src/core/impl/NullSession';
 
-export * from './api/OpenKit';
-export * from './api/Session';
-export * from './api/Action';
-export * from './api/http/HttpClient';
-export * from './api/RandomNumberProvider';
+describe('NullSession', () => {
+    it('should return the defaultNullAction on entering an action', () => {
+        expect(defaultNullSession.enterAction('someActionName'))
+            .toBe(defaultNullAction);
+    })
+});

@@ -15,6 +15,7 @@
  */
 
 import {instance, mock, when} from 'ts-mockito';
+import { HttpClient, RandomNumberProvider } from '../../../src';
 import {PayloadData} from '../../../src/core/beacon/PayloadData';
 import {parsePayload} from '../../../src/core/beacon/StatusResponse';
 import {Configuration} from '../../../src/core/config/Configuration';
@@ -24,7 +25,6 @@ import {EventType} from '../../../src/core/protocol/EventType';
 import {defaultTimestampProvider} from '../../../src/core/utils/TimestampProvider';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
-import {mockHttpClient} from '../../MockValues';
 
 const baseConfiguration: Readonly<Configuration> = {
     beaconURL: 'https://example.com',
@@ -33,7 +33,8 @@ const baseConfiguration: Readonly<Configuration> = {
     applicationId: 'app-id',
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
-    httpClient: mockHttpClient,
+    httpClient: {} as HttpClient,
+    random: {} as RandomNumberProvider,
 };
 
 const actionMock: ActionImpl = mock(ActionImpl);

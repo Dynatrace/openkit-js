@@ -16,10 +16,14 @@
 
 import { InitCallback, OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { Configuration } from '../config/Configuration';
+import { IdProvider } from '../utils/IdProvider';
 import { createLogger } from '../utils/Logger';
 import { SequenceIdProvider } from '../utils/SequenceIdProvider';
+import { SingleIdProvider } from '../utils/SingleIdProvider';
 import { removeElement } from '../utils/Utils';
+import { defaultNullSession } from './NullSession';
 import { OpenKitObject, Status, StatusCallback } from './OpenKitObject';
 import { SessionImpl } from './SessionImpl';
 import { State } from './State';
@@ -31,7 +35,7 @@ const log = createLogger('OpenKitImpl');
  */
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
     private readonly openSessions: Session[] = [];
-    private readonly sessionIdProvider = new SequenceIdProvider();
+    private readonly sessionIdProvider: IdProvider;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
@@ -39,6 +43,9 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      */
     constructor(config: Configuration) {
         super(new State({...config}));
+
+        this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
+            new SequenceIdProvider() : new SingleIdProvider(1);
     }
 
     /**
@@ -84,7 +91,14 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @inheritDoc
      */
     public createSession(clientIP: string = ''): Session {
-        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.getNextId());
+        // We always send the createSession-request to the server, even when DataCollectionLevel = Off, but no user
+        // activity is recorded.
+
+        if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
+            return defaultNullSession;
+        }
+
+        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.next());
 
         this.openSessions.push(session);
 

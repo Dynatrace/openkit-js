@@ -48,11 +48,11 @@ export class PayloadData {
     }
 
     public createId(): number {
-        return this.nextId.getNextId();
+        return this.nextId.next();
     }
 
     public createSequenceNumber(): number {
-        return this.sequenceId.getNextId();
+        return this.sequenceId.next();
     }
 
     public startSession(): void {

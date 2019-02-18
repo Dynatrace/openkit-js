@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpStatus, StatusResponse } from '../beacon/StatusResponse';
+import { CaptureMode, HttpStatus, StatusResponse } from '../beacon/StatusResponse';
 import { Configuration } from '../config/Configuration';
 
 const defaultServerId = 1;
@@ -77,6 +77,10 @@ export class State {
         if (response.multiplicity !== undefined) {
             // if multiplicity is invalid, we disable it completely
             this._multiplicity = response.multiplicity >= 0 ? response.multiplicity : 0;
+        }
+
+        if (response.captureMode === CaptureMode.Off) {
+            this.stopCommunication();
         }
     }
 

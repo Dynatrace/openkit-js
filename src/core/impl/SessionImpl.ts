@@ -16,11 +16,13 @@
 
 import { Action } from '../../api/Action';
 import { Session } from '../../api/Session';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { PayloadSender } from '../beacon/PayloadSender';
 import { createLogger } from '../utils/Logger';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
+import { defaultNullAction } from './NullAction';
 import { OpenKitImpl } from './OpenKitImpl';
 import { OpenKitObject, Status } from './OpenKitObject';
 
@@ -66,6 +68,10 @@ export class SessionImpl extends OpenKitObject implements Session {
     }
 
     public enterAction(actionName: string): Action {
+        if (!this.mayEnterAction()) {
+            return defaultNullAction;
+        }
+
         const action = new ActionImpl(this, actionName, this.payloadData);
 
         this.openActions.push(action);
@@ -77,11 +83,22 @@ export class SessionImpl extends OpenKitObject implements Session {
         removeElement(this.openActions, action);
     }
 
+    private mayEnterAction(): boolean {
+        return this.status !== Status.Shutdown &&
+            this.state.multiplicity !== 0 &&
+            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off;
+    }
+
     /**
      * Ends the session.
      * If the session is initialized, all data is flushed before shutting the session down.
      */
     private endSession(): void {
+        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            // We only send the end-session event if the user enabled monitoring.
+            return;
+        }
+
         this.openActions.forEach((action) => action.leaveAction());
 
         if (this.status === Status.Initialized) {

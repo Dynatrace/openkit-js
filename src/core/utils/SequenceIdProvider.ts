@@ -14,20 +14,35 @@
  * limitations under the License.
  */
 
+import { IdProvider } from './IdProvider';
+
 /**
  * Javascript is accurate up to 15 digits.
  * We use 10 digits with our max value of 2^31, so we are safe without rounding.
  */
 const MAX_ID_VALUE = 2 ** 31;
 
-export class SequenceIdProvider {
+/**
+ * Sequence identification number generator.
+ * The lowest number generated is 1, the highest 2**31.
+ */
+export class SequenceIdProvider implements IdProvider {
     private _currentId: number;
 
+    /**
+     * Create a new SequenceIdProvider with a given startId.
+     * If the id is smaller than 0 or larger than 2**31, the next id will be 1.
+     *
+     * @param startId The startId from what the next id will be calculated.
+     */
     constructor(startId: number = 0) {
         this._currentId = startId < 0 || startId >= MAX_ID_VALUE ? 0 : startId;
     }
 
-    public getNextId(): number {
+    /**
+     * @inheritDoc
+     */
+    public next(): number {
         this._currentId++;
 
         if (this._currentId === MAX_ID_VALUE) {

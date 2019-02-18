@@ -1,4 +1,3 @@
-/* tslint:disable:file-name-casing */
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,13 +14,16 @@
  * limitations under the License.
  */
 
-export * from './CrashReportingLevel';
-export * from './DataCollectionLevel';
-export * from './OpenKitBuilder';
-export * from './PlatformConstants';
+import { SingleIdProvider } from '../../../src/core/utils/SingleIdProvider';
 
-export * from './api/OpenKit';
-export * from './api/Session';
-export * from './api/Action';
-export * from './api/http/HttpClient';
-export * from './api/RandomNumberProvider';
+describe('Single Id provider', () => {
+    it('should always return the same id', () => {
+        const provider = new SingleIdProvider(1337);
+
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+    });
+});
