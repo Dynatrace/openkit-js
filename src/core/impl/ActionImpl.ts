@@ -55,6 +55,25 @@ export class ActionImpl implements Action {
         log.debug(`Created action '${name}'`, this);
     }
 
+    public reportValue(name: string, value: number | string): void {
+        if (this.endTime !== -1) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+            return;
+        }
+
+        const type = typeof value;
+        if (type !== 'string' && type !== 'number') {
+            return;
+        }
+
+        log.debug('Report value', value);
+
+        this.beacon.reportValue(this, name, value);
+    }
+
     public leaveAction(): null {
         if (this.endTime !== -1) {
             return null;

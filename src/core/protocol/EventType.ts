@@ -16,7 +16,12 @@
 
 export const enum EventType {
     ManualAction = 1,
+
+    ValueString = 11,
+    ValueDouble = 13,
+
     SessionStart = 18,
     SessionEnd = 19,
+
     IdentifyUser = 60,
 }

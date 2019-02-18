@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import {instance, mock, when} from 'ts-mockito';
+import { instance, mock, when } from 'ts-mockito';
 import { HttpClient, RandomNumberProvider } from '../../../src';
-import {PayloadBuilder} from '../../../src/core/beacon/PayloadBuilder';
-import {parsePayload} from '../../../src/core/beacon/StatusResponse';
-import {Configuration} from '../../../src/core/config/Configuration';
-import {ActionImpl} from '../../../src/core/impl/ActionImpl';
-import {EventType} from '../../../src/core/protocol/EventType';
-import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
-import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
-import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
+import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
+import { parsePayload } from '../../../src/core/beacon/StatusResponse';
+import { Configuration } from '../../../src/core/config/Configuration';
+import { ActionImpl } from '../../../src/core/impl/ActionImpl';
+import { EventType } from '../../../src/core/protocol/EventType';
+import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
+import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
+import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 import arrayContaining = jasmine.arrayContaining;
 
 const parse = (payload: string) => {
@@ -160,6 +160,74 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
             payloadExpect(pairs, PayloadKey.ParentActionId, '0');
             payloadExpect(pairs, PayloadKey.Time0, '60');
+        });
+    });
+
+    describe('reportValue', () => {
+        let action: ActionImpl;
+
+        beforeEach(() => {
+            const actionMock = mock(ActionImpl);
+            when(actionMock.actionId).thenReturn(7);
+
+            action = instance(actionMock);
+        });
+
+        it('should build a correct string-reportValue', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My String Value', 'Some String value', 6, 600, 100);
+
+            const {keys, pairs} = parse(payload);
+
+            expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Value]));
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.KeyName, 'My%20String%20Value');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '7');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
+            payloadExpect(pairs, PayloadKey.Time0, '500');
+            payloadExpect(pairs, PayloadKey.Value, 'Some%20String%20value');
+        });
+
+
+        it('should build a correct double-reportValue', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', 456.321, 6, 600, 100);
+
+            const {keys, pairs} = parse(payload);
+
+            expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Value]));
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueDouble.toString());
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.KeyName, 'My%20int%20value');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '7');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
+            payloadExpect(pairs, PayloadKey.Time0, '500');
+            payloadExpect(pairs, PayloadKey.Value, '456.321');
+        });
+
+        it('should build a correct double-reportValue with +Inf', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', +Infinity, 6, 600, 100);
+
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.Value, 'Infinity');
+        });
+
+        it('should build a correct double-reportValue with -Inf', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', -Infinity, 6, 600, 100);
+
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.Value, '-Infinity');
+        });
+
+        it('should build a correct double-reportValue with NaN', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', NaN, 6, 600, 100);
+
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.Value, 'NaN');
         });
     });
 });

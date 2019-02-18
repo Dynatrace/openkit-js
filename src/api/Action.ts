@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
+/**
+ * Action public interface
+ */
 export interface Action {
+
+    /**
+     * Report a value at the current timestamp to Dynatrace.
+     *
+     * @param name The name of the reported value.
+     * @param value The value to report.
+     */
+    reportValue(name: string, value: number | string): void;
+
+    /**
+     * Leave the action.
+     */
     leaveAction(): null;
 }

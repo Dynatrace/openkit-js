@@ -17,6 +17,10 @@
 import { Action } from '../../api/Action';
 
 export class NullAction implements Action {
+    public reportValue(name: string, value: number | string): void {
+        // stub
+    }
+
     public leaveAction(): null {
         return null;
     }

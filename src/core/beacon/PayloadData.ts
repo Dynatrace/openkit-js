@@ -68,6 +68,16 @@ export class PayloadData {
         this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
     }
 
+    public reportValue(action: ActionImpl, name: string, value: number | string): void {
+        this.addPayload(PayloadBuilder.reportValue(
+            action,
+            name,
+            value,
+            this.createSequenceNumber(),
+            this.timestampProvider.getCurrentTimestamp(),
+            this.sessionStartTime));
+    }
+
     public identifyUser(userTag: string): void {
         this.addPayload(PayloadBuilder.identifyUser(
             userTag,
