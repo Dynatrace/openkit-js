@@ -60,6 +60,12 @@ export class ActionImpl implements Action {
             return;
         }
 
+        // TODO: Check if capture is active. If yes, return early.
+        // We only report values iff DCL = UserBehavior
+        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            return;
+        }
+
         if (typeof name !== 'string' || name.length === 0) {
             return;
         }
