@@ -20,7 +20,7 @@
 export interface Action {
 
     /**
-     * Report a value at the current timestamp to Dynatrace.
+     * Report a value with given name to Dynatrace.
      *
      * @param name The name of the reported value.
      * @param value The value to report.
