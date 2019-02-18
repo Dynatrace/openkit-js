@@ -30,3 +30,5 @@ export const removeElement = <T>(array: T[], element: T): void => {
 
     array.splice(index, 1);
 };
+
+export const truncate = (str: string): string => str.substr(0, 250);

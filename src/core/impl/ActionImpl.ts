@@ -15,6 +15,7 @@
  */
 
 import { Action } from '../../api/Action';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { createLogger } from '../utils/Logger';
 import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
@@ -55,7 +56,7 @@ export class ActionImpl implements Action {
         log.debug(`Created action '${name}'`, this);
     }
 
-    public reportValue(name: string, value: number | string): void {
+    public reportValue(name: string, value: number | string | null | undefined): void {
         if (this.endTime !== -1) {
             return;
         }
@@ -71,7 +72,7 @@ export class ActionImpl implements Action {
         }
 
         const type = typeof value;
-        if (type !== 'string' && type !== 'number') {
+        if (type !== 'string' && type !== 'number' && type !== null && type !== undefined) {
             return;
         }
 

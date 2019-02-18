@@ -68,7 +68,7 @@ export class PayloadData {
         this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
     }
 
-    public reportValue(action: ActionImpl, name: string, value: number | string): void {
+    public reportValue(action: ActionImpl, name: string, value: number | string | null | undefined): void {
         this.addPayload(PayloadBuilder.reportValue(
             action,
             name,

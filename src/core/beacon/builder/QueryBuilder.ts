@@ -16,17 +16,25 @@
 
 import { PayloadKey } from '../../protocol/PayloadKey';
 import { QueryKey } from '../../protocol/QueryKey';
+import { truncate } from '../../utils/Utils';
 
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: Record<string, string> = {};
 
     public add(key: T, value: string | number): this {
-        this.options[key] = value.toString();
+        this.options[key] = truncate(value.toString());
         return this;
     }
 
     public addIfDefined(key: T, value: string | number | undefined): this {
         if (value !== undefined) {
+            this.add(key, value);
+        }
+        return this;
+    }
+
+    public addIfDefinedAndNotNull(key: T, value: string | number | undefined | null): this {
+        if (value !== undefined && value !== null) {
             this.add(key, value);
         }
         return this;

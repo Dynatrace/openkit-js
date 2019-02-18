@@ -36,7 +36,7 @@ const parse = (payload: string) => {
     }
 };
 
-const payloadExpect = (pairs: {[key: string]: string}, key: string, expected: string) => {
+const payloadExpect = (pairs: {[key: string]: string}, key: string, expected: string | undefined) => {
   expect(pairs[key]).toEqual(expected);
 };
 
@@ -165,6 +165,7 @@ describe('PayloadBuilder', () => {
 
     describe('reportValue', () => {
         let action: ActionImpl;
+        const str250 = Array(250 + 1).join('a');
 
         beforeEach(() => {
             const actionMock = mock(ActionImpl);
@@ -228,6 +229,50 @@ describe('PayloadBuilder', () => {
             const {pairs} = parse(payload);
 
             payloadExpect(pairs, PayloadKey.Value, 'NaN');
+        });
+
+        it('should build a correct string-reportValue with empty-string', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', '', 6, 600, 100);
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
+            payloadExpect(pairs, PayloadKey.Value, '');
+        });
+
+        it('should build a correct string-reportValue with null', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', null, 6, 600, 100);
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
+            payloadExpect(pairs, PayloadKey.Value, undefined);
+        });
+
+        it('should build a correct string-reportValue with undefined', () => {
+            const payload = PayloadBuilder.reportValue(action, 'My int value', undefined, 6, 600, 100);
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
+            payloadExpect(pairs, PayloadKey.Value, undefined);
+        });
+
+        it('should truncate a key longer than 250 characters', () => {
+            const str = str250 + 'z'; // 251 characters
+
+            const payload = PayloadBuilder.reportValue(action, str, '', 6, 600, 100);
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
+            payloadExpect(pairs, PayloadKey.KeyName, str250);
+        });
+
+        it('should truncate a value longer than 250 characters', () => {
+            const str = str250 + 'z'; // 251 characters
+
+            const payload = PayloadBuilder.reportValue(action, 'Key', str, 6, 600, 100);
+            const {pairs} = parse(payload);
+
+            payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
+            payloadExpect(pairs, PayloadKey.Value, str250);
         });
     });
 });
