@@ -66,15 +66,15 @@ describe('PayloadQueryBuilder', () => {
 
     describe('addIfDefined', () => {
         it('should return an empty string, if undefined has been passed in the addIfDefined method', () => {
-            builder.addIfDefined(PayloadKey.TimesyncTime, undefined);
+            builder.addIfDefined(PayloadKey.ApplicationId, undefined);
 
             expect(builder.build()).toEqual('');
         });
 
         it('should add the query if the value is defined', () => {
-           builder.addIfDefined(PayloadKey.TimesyncTime, 'yesterday');
+           builder.addIfDefined(PayloadKey.ApplicationId, '1.2.3');
 
-           expect(builder.build()).toEqual('ts=yesterday');
+           expect(builder.build()).toEqual('ap=1.2.3');
         });
 
         it('should add the query with multiple defined values', () => {

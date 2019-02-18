@@ -36,7 +36,6 @@ export const enum PayloadKey {
 
     // timestamp constants
     SessionStartTime = 'tv',
-    TimesyncTime = 'ts',
     TransmissionTime = 'tx',
 
     // Action related
