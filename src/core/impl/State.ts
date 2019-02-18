@@ -79,7 +79,7 @@ export class State {
             this._multiplicity = response.multiplicity >= 0 ? response.multiplicity : 0;
         }
 
-        if (response.captureMode !== undefined && response.captureMode === CaptureMode.Off) {
+        if (response.captureMode === CaptureMode.Off) {
             this.stopCommunication();
         }
     }
