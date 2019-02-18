@@ -79,7 +79,6 @@ export class PayloadBuilder {
         return new PayloadQueryBuilder()
             .add(PayloadKey.SessionStartTime, sessionStartTime)
             .add(PayloadKey.Multiplicity, multiplicity)
-            .add(PayloadKey.TimesyncTime, sessionStartTime)
             .add(PayloadKey.TransmissionTime, transmissionTime)
             .build();
     }

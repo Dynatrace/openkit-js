@@ -138,10 +138,9 @@ describe('PayloadBuilder', () => {
             const payload = PayloadBuilder.mutable(123456, 765, 98765);
 
             const {keys, pairs} = parse(payload);
-            expect(keys).toEqual([PayloadKey.SessionStartTime, PayloadKey.Multiplicity, PayloadKey.TimesyncTime, PayloadKey.TransmissionTime]);
+            expect(keys).toEqual([PayloadKey.SessionStartTime, PayloadKey.Multiplicity, PayloadKey.TransmissionTime]);
             payloadExpect(pairs, PayloadKey.SessionStartTime, '123456');
             payloadExpect(pairs, PayloadKey.Multiplicity, '765');
-            payloadExpect(pairs, PayloadKey.TimesyncTime, '123456');
             payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
         });
     });
