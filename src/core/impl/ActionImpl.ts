@@ -15,6 +15,7 @@
  */
 
 import { Action } from '../../api/Action';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { createLogger } from '../utils/Logger';
 import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
@@ -53,6 +54,31 @@ export class ActionImpl implements Action {
         this.timestampProvider = timestampProvider;
 
         log.debug(`Created action '${name}'`, this);
+    }
+
+    public reportValue(name: string, value: number | string | null | undefined): void {
+        if (this.endTime !== -1) {
+            return;
+        }
+
+        // TODO: Check if capture is active. If yes, return early.
+        // We only report values iff DCL = UserBehavior
+        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+            return;
+        }
+
+        const type = typeof value;
+        if (type !== 'string' && type !== 'number' && type !== null && type !== undefined) {
+            return;
+        }
+
+        log.debug('Report value', value);
+
+        this.beacon.reportValue(this, name, value);
     }
 
     public leaveAction(): null {

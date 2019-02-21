@@ -79,6 +79,25 @@ export class PayloadBuilder {
             .build();
     }
 
+    public static reportValue(
+        action: ActionImpl,
+        name: string,
+        value: number | string | null | undefined,
+        sequenceNumber: number,
+        timestamp: number,
+        sessionStartTime: number,
+    ): string {
+        const eventType = typeof value === 'number' ? EventType.ValueDouble : EventType.ValueString;
+
+        return PayloadBuilder
+            .basicEventData(eventType, name)
+            .add(PayloadKey.ParentActionId, action.actionId)
+            .add(PayloadKey.StartSequenceNumber, sequenceNumber)
+            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .addIfDefinedAndNotNull(PayloadKey.Value, value)
+            .build();
+    }
+
     public static identifyUser(
         userTag: string,
         sequenceNumber: number,
