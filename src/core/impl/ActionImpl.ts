@@ -15,9 +15,10 @@
  */
 
 import { Action } from '../../api/Action';
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
+import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { createLogger } from '../utils/Logger';
-import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
 import { SessionImpl } from './SessionImpl';
 
 const log = createLogger('ActionImpl');
@@ -53,6 +54,34 @@ export class ActionImpl implements Action {
         this.timestampProvider = timestampProvider;
 
         log.debug(`Created action '${name}'`, this);
+    }
+
+    public reportValue(name: string, value: number | string | null | undefined): void {
+        if (this.endTime !== -1) {
+            return;
+        }
+
+        if (this.session.state.multiplicity === 0) {
+            return;
+        }
+
+        // We only report values iff DCL = UserBehavior
+        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+            return;
+        }
+
+        const type = typeof value;
+        if (type !== 'string' && type !== 'number' && value !== null && value !== undefined) {
+            return;
+        }
+
+        log.debug('Report value', value);
+
+        this.beacon.reportValue(this, name, value);
     }
 
     public leaveAction(): null {

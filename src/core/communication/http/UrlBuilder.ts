@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { QueryBuilder } from '../../beacon/builder/QueryBuilder';
+import { QueryKey } from '../../protocol/QueryKey';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
+export class UrlBuilder extends QueryBuilder<QueryKey> {
+    constructor(private readonly url: string) {
+        super();
     }
 
-    public leaveAction(): null {
-        return null;
+    public build(): string {
+        const query = super.build();
+
+        return query.length === 0 ? this.url : `${this.url}?${query}`;
     }
 }
-
-export const defaultNullAction = new NullAction();

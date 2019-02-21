@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { SingleIdProvider } from '../../../src/core/provider/SingleIdProvider';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
-    }
+describe('Single Id provider', () => {
+    it('should always return the same id', () => {
+        const provider = new SingleIdProvider(1337);
 
-    public leaveAction(): null {
-        return null;
-    }
-}
-
-export const defaultNullAction = new NullAction();
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+    });
+});

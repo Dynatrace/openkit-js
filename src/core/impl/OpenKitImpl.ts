@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-import { InitCallback, OpenKit } from '../../api/OpenKit';
+import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
+import { OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { Configuration } from '../config/Configuration';
-import { IdProvider } from '../utils/IdProvider';
+import { IdProvider } from '../provider/IdProvider';
+import { SequenceIdProvider } from '../provider/SequenceIdProvider';
+import { SingleIdProvider } from '../provider/SingleIdProvider';
 import { createLogger } from '../utils/Logger';
-import { SequenceIdProvider } from '../utils/SequenceIdProvider';
-import { SingleIdProvider } from '../utils/SingleIdProvider';
 import { removeElement } from '../utils/Utils';
 import { defaultNullSession } from './NullSession';
-import { OpenKitObject, Status, StatusCallback } from './OpenKitObject';
+import { OpenKitObject, Status } from './OpenKitObject';
 import { SessionImpl } from './SessionImpl';
 import { State } from './State';
+import { StatusRequestImpl } from './StatusRequestImpl';
 
 const log = createLogger('OpenKitImpl');
 
@@ -36,6 +38,7 @@ const log = createLogger('OpenKitImpl');
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
     private readonly openSessions: Session[] = [];
     private readonly sessionIdProvider: IdProvider;
+    private readonly communicationChannel: CommunicationChannel;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
@@ -43,6 +46,8 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      */
     constructor(config: Configuration) {
         super(new State({...config}));
+
+        this.communicationChannel = config.communicationFactory.getCommunicationChannel();
 
         this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
@@ -53,7 +58,9 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * If an invalid response is sent back, we shutdown.
      */
     public async initialize(): Promise<void> {
-        const response = await this.sender.sendStatusRequest();
+
+        const response = await this.communicationChannel.sendStatusRequest(
+            this.state.config.beaconURL, StatusRequestImpl.from(this.state));
 
         this.finishInitialization(response);
     }
@@ -69,22 +76,11 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @inheritDoc
      */
     public shutdown(): void {
+        // close all child-sessions and remove them from the array
         this.openSessions.forEach((session) => session.end());
+        this.openSessions.splice(0, this.openSessions.length);
 
         super.shutdown();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public waitForInit(callback: InitCallback, timeout?: number): void {
-        const proxy = (status: Status) => callback(status === Status.Initialized);
-
-        if (timeout === undefined) {
-            this.registerOnInitializedCallback(proxy);
-        } else {
-            this.waitForInitWithTimeout(proxy, timeout);
-        }
     }
 
     /**
@@ -99,6 +95,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         }
 
         const session = new SessionImpl(this, clientIP, this.sessionIdProvider.next());
+        session.init();
 
         this.openSessions.push(session);
 
@@ -114,26 +111,10 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         removeElement(this.openSessions, session);
     }
 
-    private waitForInitWithTimeout(callback: StatusCallback, timeout: number): void {
-        // TODO: Provide a timeout interface, since we cannot rely that setTimeout and clearTimeout is present.
-        let timeoutId: any = -1;
-
-        const proxy = (status: Status) => {
-            callback(status);
-
-            if (timeoutId !== -1) {
-                // cleanTimeout could be window.clearTimeout or NodeJs.clearTimeout.
-                // Since we do not know, we just pass the object in, since on one platform
-                // there is always just one of the both
-                clearTimeout(timeoutId);
-            }
-        };
-
-        timeoutId = setTimeout(() => {
-            callback(Status.Shutdown);
-            this.unregisterOnInitializedCallback(proxy);
-        }, timeout) as any;
-
-        this.registerOnInitializedCallback(proxy);
+    /**
+     * @inheritDoc
+     */
+    public waitForInit(timeout?: number): Promise<boolean> {
+        return super.waitForInit(timeout);
     }
 }

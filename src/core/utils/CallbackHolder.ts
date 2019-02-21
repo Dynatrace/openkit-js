@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { removeElement } from './Utils';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
+export type SimpleCallback<T> = (value: T) => void;
+
+export class CallbackHolder <T> {
+    private readonly callbacks: Array<SimpleCallback<T>> = [];
+
+    public add(cb: SimpleCallback<T>): void {
+        this.callbacks.push(cb);
     }
 
-    public leaveAction(): null {
-        return null;
+    public remove(cb: SimpleCallback<T>): void {
+        removeElement(this.callbacks, cb);
+    }
+
+    public resolve(value: T): void {
+        this.callbacks.forEach((cb) => cb(value));
+        this.callbacks.splice(0, this.callbacks.length);
     }
 }
-
-export const defaultNullAction = new NullAction();

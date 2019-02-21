@@ -16,8 +16,8 @@
 
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
-import { SequenceIdProvider } from '../utils/SequenceIdProvider';
-import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
+import { SequenceIdProvider } from '../provider/SequenceIdProvider';
+import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { PayloadBuilder } from './PayloadBuilder';
 
 /**
@@ -66,6 +66,24 @@ export class PayloadData {
 
     public addAction(action: ActionImpl): void {
         this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
+    }
+
+    public reportValue(action: ActionImpl, name: string, value: number | string | null | undefined): void {
+        this.addPayload(PayloadBuilder.reportValue(
+            action,
+            name,
+            value,
+            this.createSequenceNumber(),
+            this.timestampProvider.getCurrentTimestamp(),
+            this.sessionStartTime));
+    }
+
+    public identifyUser(userTag: string): void {
+        this.addPayload(PayloadBuilder.identifyUser(
+            userTag,
+            this.createSequenceNumber(),
+            this.timestampProvider.getCurrentTimestamp(),
+            this.sessionStartTime));
     }
 
     public getNextPayload(): string | undefined {

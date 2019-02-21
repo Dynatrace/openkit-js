@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
-    }
+describe('DefaultRandomNumberProvider', () => {
+    const random = new DefaultRandomNumberProvider();
 
-    public leaveAction(): null {
-        return null;
-    }
-}
+    const setupNextRandomValue = (value: number) => {
+        const fn = jest.fn();
+        fn.mockReturnValue(.5);
+        Math.random = fn;
+    };
 
-export const defaultNullAction = new NullAction();
+
+    it('should return the next random Integer', () => {
+        setupNextRandomValue(.5);
+        const next = 1073741824; // .5 * 2 ** 31 + 0;
+
+        expect(random.nextPositiveInteger()).toBe(next);
+    });
+});

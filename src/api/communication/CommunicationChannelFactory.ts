@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { CommunicationChannel } from './CommunicationChannel';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
-    }
-
-    public leaveAction(): null {
-        return null;
-    }
+export interface CommunicationChannelFactory {
+    getCommunicationChannel(): CommunicationChannel;
 }
-
-export const defaultNullAction = new NullAction();

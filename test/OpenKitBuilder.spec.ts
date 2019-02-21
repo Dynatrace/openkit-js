@@ -15,11 +15,38 @@
  */
 
 import { mock } from 'ts-mockito';
-import { DefaultHttpClient } from '../src/core/http/DefaultHttpClient';
-import { DefaultRandomNumberProvider } from '../src/core/utils/DefaultRandomNumberProvider';
-import {CrashReportingLevel} from '../src/CrashReportingLevel';
-import {DataCollectionLevel} from '../src/DataCollectionLevel';
-import {OpenKitBuilder} from '../src/OpenKitBuilder';
+import { CommunicationChannel } from '../src/api/communication/CommunicationChannel';
+import { CommunicationChannelFactory } from '../src/api/communication/CommunicationChannelFactory';
+import { StatusRequest } from '../src/api/communication/StatusRequest';
+import { StatusResponse } from '../src/api/communication/StatusResponse';
+import { HttpCommunicationChannelFactory } from '../src/core/communication/http/HttpCommunicationChannelFactory';
+import { OpenKitImpl } from '../src/core/impl/OpenKitImpl';
+import { DefaultRandomNumberProvider } from '../src/core/provider/DefaultRandomNumberProvider';
+import { CrashReportingLevel } from '../src/CrashReportingLevel';
+import { DataCollectionLevel } from '../src/DataCollectionLevel';
+import { OpenKitBuilder } from '../src/OpenKitBuilder';
+
+class StubCommunicationChannel implements CommunicationChannel {
+    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return Promise.resolve({valid: false});
+    }
+
+    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+        return Promise.resolve({valid: false});
+    }
+
+    public sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return Promise.resolve({valid: false});
+    }
+
+}
+
+class StubCommunicationChannelFactory implements CommunicationChannelFactory {
+    public getCommunicationChannel(): CommunicationChannel {
+        return new StubCommunicationChannel();
+    }
+
+}
 
 describe('OpenKitBuilder', () => {
     let builder: OpenKitBuilder;
@@ -72,12 +99,12 @@ describe('OpenKitBuilder', () => {
         expect(builder.getConfig().screenSize).toEqual({width: 350, height: 500});
     });
 
-    it('should set the http provider', () => {
-        const httpClient = mock(DefaultHttpClient);
+    it('should set the communication factoy', () => {
+        const factory = mock(HttpCommunicationChannelFactory);
 
-        builder.withCustomHttpClient(httpClient);
+        builder.withCommunicationChannelFactory(factory);
 
-        expect(builder.getConfig().httpClient).toBe(httpClient);
+        expect(builder.getConfig().communicationFactory).toBe(factory);
     });
 
     it('should set the random provider', () => {
@@ -105,5 +132,23 @@ describe('OpenKitBuilder', () => {
         expect(config.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
         expect(config.applicationName).toEqual('App Name');
         expect(config.applicationVersion).toEqual('5.6.7');
+    });
+
+    it('should randomize the device id if DCL = Off', () => {
+       builder
+           .withDataCollectionLevel(DataCollectionLevel.Off)
+           .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .build();
+
+       expect(builder.getConfig().deviceId).not.toBe(42);
+    });
+
+    it('returns an openkit instance', () => {
+       const ok =builder
+           .withDataCollectionLevel(DataCollectionLevel.Off)
+           .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .build();
+
+       expect(ok).toBeInstanceOf(OpenKitImpl);
     });
 });

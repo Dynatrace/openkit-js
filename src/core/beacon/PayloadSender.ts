@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { State } from '../impl/State';
-import { BeaconSender } from './BeaconSender';
+import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { PayloadData } from './PayloadData';
 
 /**
@@ -23,14 +24,14 @@ import { PayloadData } from './PayloadData';
  */
 export class PayloadSender {
     private readonly state: State;
-    private readonly sender: BeaconSender;
+    private readonly channel: CommunicationChannel;
     private readonly beacon: PayloadData;
 
     private flushing = false;
 
     constructor(state: State, payloadData: PayloadData) {
         this.state = state;
-        this.sender = new BeaconSender(state);
+        this.channel = state.config.communicationFactory.getCommunicationChannel();
         this.beacon = payloadData;
     }
 
@@ -61,7 +62,8 @@ export class PayloadSender {
             return;
         }
 
-        const response = await this.sender.sendPayload(payload);
+        const response = await this.channel.sendPayloadData(
+            this.state.config.beaconURL, StatusRequestImpl.from(this.state), payload);
 
         if (response.valid) {
             this.state.updateState(response);

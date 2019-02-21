@@ -23,30 +23,26 @@ import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
     public static startSession(sequenceNumber: number): string {
-        return new PayloadQueryBuilder()
-            .add(PayloadKey.EventType, EventType.SessionStart)
+        return PayloadBuilder
+            .basicEventData(EventType.SessionStart)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
             .add(PayloadKey.Time0, 0)
-            .add(PayloadKey.ThreadId, 1)
             .build();
     }
 
     public static endSession(sequenceNumber: number, duration: number): string {
-        return new PayloadQueryBuilder()
-            .add(PayloadKey.EventType, EventType.SessionEnd)
+        return PayloadBuilder
+            .basicEventData(EventType.SessionEnd)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.ThreadId, 1)
             .add(PayloadKey.Time0, duration)
             .build();
     }
 
     public static action(action: ActionImpl, sessionStartTime: number): string {
-        return new PayloadQueryBuilder()
-            .add(PayloadKey.EventType, EventType.ManualAction)
-            .add(PayloadKey.KeyName, action.name)
-            .add(PayloadKey.ThreadId, 1)
+        return PayloadBuilder
+            .basicEventData(EventType.ManualAction, action.name)
             .add(PayloadKey.ActionId, action.actionId)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, action.startSequenceNumber)
@@ -83,5 +79,42 @@ export class PayloadBuilder {
             .build();
     }
 
-    private constructor() {}
+    public static reportValue(
+        action: ActionImpl,
+        name: string,
+        value: number | string | null | undefined,
+        sequenceNumber: number,
+        timestamp: number,
+        sessionStartTime: number,
+    ): string {
+        const eventType = typeof value === 'number' ? EventType.ValueDouble : EventType.ValueString;
+
+        return PayloadBuilder
+            .basicEventData(eventType, name)
+            .add(PayloadKey.ParentActionId, action.actionId)
+            .add(PayloadKey.StartSequenceNumber, sequenceNumber)
+            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .addIfDefinedAndNotNull(PayloadKey.Value, value)
+            .build();
+    }
+
+    public static identifyUser(
+        userTag: string,
+        sequenceNumber: number,
+        timestamp: number,
+        sessionStartTime: number): string {
+        return PayloadBuilder
+            .basicEventData(EventType.IdentifyUser, userTag)
+            .add(PayloadKey.ParentActionId, 0)
+            .add(PayloadKey.StartSequenceNumber, sequenceNumber)
+            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .build();
+    }
+
+    private static basicEventData(eventType: EventType, name?: string): PayloadQueryBuilder {
+        return new PayloadQueryBuilder()
+            .add(PayloadKey.EventType, eventType)
+            .addIfDefined(PayloadKey.KeyName, name)
+            .add(PayloadKey.ThreadId, 1);
+    }
 }

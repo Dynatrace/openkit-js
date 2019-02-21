@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { StatusRequest } from './StatusRequest';
+import { StatusResponse } from './StatusResponse';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
-    }
+export interface CommunicationChannel {
+    sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse>;
 
-    public leaveAction(): null {
-        return null;
-    }
+    sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse>;
+
+    sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse>;
 }
-
-export const defaultNullAction = new NullAction();

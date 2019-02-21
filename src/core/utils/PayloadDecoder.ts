@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+export class PayloadDecoder {
+    private entries: Record<string, string> = {};
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
+    constructor(query: string) {
+        this.decode(query);
     }
 
-    public leaveAction(): null {
-        return null;
+    public getEntries(): Readonly<Record<string, string>> {
+        return this.entries;
+    }
+
+    private decode(query: string): void {
+        query
+            .split('&')
+            .forEach((entry) => this.decodeEntry(entry));
+    }
+
+    private decodeEntry(entry: string): void {
+        const [key, value] = entry.split('=');
+
+        this.entries[key] = decodeURIComponent(value);
     }
 }
-
-export const defaultNullAction = new NullAction();

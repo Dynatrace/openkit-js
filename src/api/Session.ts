@@ -27,6 +27,12 @@ export interface Session {
     enterAction(actionName: string): Action;
 
     /**
+     * Identify a user
+     * @param userTag The tag to identify the user.
+     */
+    identifyUser(userTag: string): void;
+
+    /**
      * Ends the session and sends all remaining data.
      */
     end(): void;

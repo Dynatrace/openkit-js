@@ -17,8 +17,6 @@
 
 import { Session } from './Session';
 
-export type InitCallback = (success: boolean) => void;
-
 /**
  * OpenKit public interface
  */
@@ -42,10 +40,9 @@ export interface OpenKit {
      * initialization has completed, the callback is called with false. Otherwise it behaves the same as
      * {@link waitForInit}.
      *
-     * @param callback The callback which is executed after initialization, or after the timeout runs out.
      * @param timeout The timeout for the initialization
      */
-    waitForInit(callback: InitCallback, timeout?: number): void;
+    waitForInit(timeout?: number): Promise<boolean>;
 
     /**
      * Shutdown OpenKit.

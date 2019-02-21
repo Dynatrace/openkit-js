@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-import { SingleIdProvider } from '../../../src/core/utils/SingleIdProvider';
-
-describe('Single Id provider', () => {
-    it('should always return the same id', () => {
-        const provider = new SingleIdProvider(1337);
-
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-    });
-});
+export interface StatusRequest {
+    readonly type: string;
+    readonly serverId: number;
+    readonly applicationId: string;
+    readonly openKitVersion: string;
+    readonly platformType: number;
+    readonly agentTechnologyType: string;
+}

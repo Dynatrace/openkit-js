@@ -15,6 +15,11 @@
  */
 
 /**
+ * Maximum size of all values passed to Dynatrace.
+ */
+const MAX_VALUE_LENGTH = 250;
+
+/**
  * Removes an element from a given array.
  * If there are multiple elements of the same instance, only the first is removed.
  *
@@ -30,3 +35,5 @@ export const removeElement = <T>(array: T[], element: T): void => {
 
     array.splice(index, 1);
 };
+
+export const truncate = (str: string): string => str.substr(0, MAX_VALUE_LENGTH);

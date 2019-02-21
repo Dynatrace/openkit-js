@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpClient } from '../../api/http/HttpClient';
+import { CommunicationChannelFactory } from '../../api/communication/CommunicationChannelFactory';
 import { RandomNumberProvider } from '../../api/RandomNumberProvider';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
@@ -38,6 +38,6 @@ export interface Configuration {
     dataCollectionLevel: DataCollectionLevel;
     crashReportingLevel: CrashReportingLevel;
 
-    httpClient: HttpClient;
+    communicationFactory: CommunicationChannelFactory;
     random: RandomNumberProvider;
 }

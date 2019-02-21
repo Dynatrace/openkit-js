@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
+import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { defaultNullSession } from '../../../src/core/impl/NullSession';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
-        // stub
-    }
-
-    public leaveAction(): null {
-        return null;
-    }
-}
-
-export const defaultNullAction = new NullAction();
+describe('NullSession', () => {
+    it('should return the defaultNullAction on entering an action', () => {
+        expect(defaultNullSession.enterAction('someActionName'))
+            .toBe(defaultNullAction);
+    })
+});

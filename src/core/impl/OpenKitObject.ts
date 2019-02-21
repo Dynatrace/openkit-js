@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { BeaconSender } from '../beacon/BeaconSender';
-import { StatusResponse } from '../beacon/StatusResponse';
-import { removeElement } from '../utils/Utils';
+import { StatusResponse } from '../../api/communication/StatusResponse';
+import { CallbackHolder } from '../utils/CallbackHolder';
 import { State } from './State';
 
 /**
@@ -29,18 +28,11 @@ export const enum Status {
 }
 
 /**
- * Alias for {@see OpenKitObject} callbacks.
- */
-export type StatusCallback = (status: Status) => void;
-
-/**
  * Common base for all OpenKit-Objects which should be initialized async.
  */
 export abstract class OpenKitObject {
     public readonly state: State;
-    public readonly sender: BeaconSender;
-
-    private _initializationListener: StatusCallback[] = [];
+    private readonly callbackManager = new CallbackHolder<boolean>();
 
     private _status: Status = Status.Idle;
     public get status(): Status {
@@ -49,7 +41,6 @@ export abstract class OpenKitObject {
 
     protected constructor(state: State) {
         this.state = state;
-        this.sender = new BeaconSender(state);
     }
 
     /**
@@ -64,16 +55,15 @@ export abstract class OpenKitObject {
             return;
         }
 
-        if (!response.valid) {
+        if (response.valid === false) {
             this.shutdown();
+            this.callbackManager.resolve(false);
             return;
         }
 
         this.state.updateState(response);
-
         this._status = Status.Initialized;
-
-        this.callInitCallbacks();
+        this.callbackManager.resolve(true);
     }
 
     /**
@@ -82,36 +72,23 @@ export abstract class OpenKitObject {
     public shutdown(): void {
         this._status = Status.Shutdown;
         this.state.stopCommunication();
-        this.callInitCallbacks();
     }
 
-    /**
-     * Register callback which is async after the object initialized, or synchron, if the object is
-     * already initialized.
-     *
-     * @param callback The callback which should be executed after the object initialized.
-     */
-    public registerOnInitializedCallback(callback: StatusCallback): void {
-        if (this._status !== Status.Idle) {
-            callback(this._status);
-        } else {
-            this._initializationListener.push(callback);
+    public waitForInit(timeout?: number): Promise<boolean> {
+        if (this.status !== Status.Idle) {
+            return Promise.resolve(true);
         }
-    }
 
-    /**
-     * Unregister a callback. This is only possible if the callback has not been executed already.
-     * @param callback The callback to unregister
-     */
-    public unregisterOnInitializedCallback(callback: StatusCallback): void {
-        removeElement(this._initializationListener, callback);
-    }
+        return new Promise<boolean>((res) => {
+            if (timeout !== undefined) {
+                const wait = setTimeout(() => {
+                    clearTimeout(wait);
+                    res(false);
+                    this.callbackManager.remove(res);
+                }, timeout);
+            }
 
-    /**
-     * Call all registered callbacks with the current status.
-     */
-    private callInitCallbacks(): void {
-        this._initializationListener.forEach((cb) => cb(this._status));
-        this._initializationListener = [];
+            this.callbackManager.add(res);
+        });
     }
 }

@@ -23,5 +23,4 @@ export * from './PlatformConstants';
 export * from './api/OpenKit';
 export * from './api/Session';
 export * from './api/Action';
-export * from './api/http/HttpClient';
 export * from './api/RandomNumberProvider';
