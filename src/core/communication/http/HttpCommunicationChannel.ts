@@ -35,7 +35,7 @@ export class HttpCommunicationChannel implements CommunicationChannel {
     }
 
     public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
-        const httpResponse = await this.httpClient.post(buildHttpUrl(url, request, true), query);
+        const httpResponse = await this.httpClient.post(buildHttpUrl(url, request, false), query);
 
         return new HttpStatusResponse(httpResponse);
     }

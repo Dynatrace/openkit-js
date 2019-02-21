@@ -51,17 +51,6 @@ export class SessionImpl extends OpenKitObject implements Session {
     }
 
     /**
-     * Flush all remaining data
-     */
-    public flush(): void {
-        this.waitForInit().then(() => {
-            if (this.status === Status.Initialized) {
-                this.payloadSender.flush();
-            }
-        });
-    }
-
-    /**
      * @inheritDoc
      */
     public end(): void {
@@ -90,7 +79,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.payloadData.identifyUser(userTag);
 
         // Send immediately as we can not be sure that the session has a correct 'end'
-        this.flush();
+        this.payloadSender.flush();
     }
 
     public enterAction(actionName: string): Action {
@@ -105,8 +94,9 @@ export class SessionImpl extends OpenKitObject implements Session {
         return action;
     }
 
-    public removeAction(action: Action): void {
+    public endAction(action: Action): void {
         removeElement(this.openActions, action);
+        this.payloadSender.flush();
     }
 
     public async init(): Promise<void> {
@@ -144,14 +134,17 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
+        log.debug('endSession', this);
+
         this.openActions.slice().forEach((action) => action.leaveAction());
 
         if (this.status === Status.Initialized) {
             this.payloadData.endSession();
-            this.flush();
         }
 
-        this.openKit.removeSession(this);
-        this.shutdown();
+        this.payloadSender.flush().then(() => {
+            this.openKit.removeSession(this);
+            this.shutdown();
+        });
     }
 }

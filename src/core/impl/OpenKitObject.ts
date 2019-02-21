@@ -71,7 +71,6 @@ export abstract class OpenKitObject {
      */
     public shutdown(): void {
         this._status = Status.Shutdown;
-        this.state.stopCommunication();
     }
 
     public waitForInit(timeout?: number): Promise<boolean> {

@@ -52,6 +52,7 @@ describe('SessionImpl', () => {
         reset(mockCommunicationChannel);
         reset(mockOpenKitImpl);
 
+        when(mockCommunicationChannel.sendPayloadData(anything(), anything(), anything())).thenResolve({valid: true});
         const communicationChannelInstance = instance(mockCommunicationChannel);
 
         config = {
@@ -113,14 +114,6 @@ describe('SessionImpl', () => {
             const {payloadData} = buildSession();
 
             expect(payloadData.hasPayloadsLeft()).toBe(true);
-        });
-
-        it('should no flush directly after creation', () => {
-            const {session, payloadSenderSpy} = buildSession();
-
-            session.flush();
-
-            verify(payloadSenderSpy.flush()).never();
         });
     });
 
@@ -333,7 +326,7 @@ describe('SessionImpl', () => {
             expect(openActions.indexOf(action)).not.toBe(-1);
 
             // when, then
-            session.removeAction(action);
+            session.endAction(action);
             expect(openActions.indexOf(action)).toBe(-1);
         });
     });
@@ -348,7 +341,6 @@ describe('SessionImpl', () => {
 
             const action1 = session.enterAction('action 1');
             const action2 = session.enterAction('action 2');
-
 
             const action1Spy = spy(action1);
             const action2Spy = spy(action2);

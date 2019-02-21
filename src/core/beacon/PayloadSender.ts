@@ -17,6 +17,7 @@
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { State } from '../impl/State';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
+import { CallbackHolder } from '../utils/CallbackHolder';
 import { PayloadData } from './PayloadData';
 
 /**
@@ -25,39 +26,47 @@ import { PayloadData } from './PayloadData';
 export class PayloadSender {
     private readonly state: State;
     private readonly channel: CommunicationChannel;
-    private readonly beacon: PayloadData;
+    private readonly payloadData: PayloadData;
+    private readonly callbackHolder = new CallbackHolder<void>();
 
     private flushing = false;
 
     constructor(state: State, payloadData: PayloadData) {
         this.state = state;
         this.channel = state.config.communicationFactory.getCommunicationChannel();
-        this.beacon = payloadData;
+        this.payloadData = payloadData;
     }
 
     /**
-     * Flushes all data to the server, with multiplicity in mind
+     * Flushes all data in the payloadData to the server.
+     *
+     * Multiple calls to flush only execute it once, but all resolve at the same time after it finished.
      */
-    public async flush(): Promise<void> {
-        if (this.flushing === true) {
-            return;
-        }
+    public flush(): Promise<void> {
 
-        this.flushing = true;
+        return new Promise<void>((res) => {
+            this.callbackHolder.add(res);
 
-        await this.sendPayloads();
+            if (this.flushing  === true) {
+                return;
+            }
+            this.flushing = true;
 
-        this.flushing = false;
+            this.sendPayloads().then(() => {
+                this.callbackHolder.resolve();
+                this.flushing = false;
+            });
+        });
     }
 
     private async sendPayloads(): Promise<void> {
-        while (this.state.multiplicity !== 0 && this.beacon.hasPayloadsLeft()) {
+        while (this.state.multiplicity !== 0 && this.payloadData.hasPayloadsLeft()) {
             await this.sendPayload();
         }
     }
 
     private async sendPayload(): Promise<void> {
-        const payload = this.beacon.getNextPayload();
+        const payload = this.payloadData.getNextPayload();
         if (payload === undefined) {
             return;
         }

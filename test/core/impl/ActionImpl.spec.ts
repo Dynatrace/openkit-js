@@ -69,8 +69,7 @@ describe('ActionImpl', () => {
         expect(action.endSequenceNumber).toBe(6);
         expect(action.endTime).toBe(2);
 
-        verify(sessionMock.removeAction(action)).once();
-        verify(sessionMock.flush()).once();
+        verify(sessionMock.endAction(action)).once();
         verify(payloadDataMock.addAction(action)).once();
     });
 
@@ -81,8 +80,7 @@ describe('ActionImpl', () => {
         expect(action.endSequenceNumber).toBe(6);
         expect(action.endTime).toBe(2);
 
-        verify(sessionMock.removeAction(action)).once();
-        verify(sessionMock.flush()).once();
+        verify(sessionMock.endAction(action)).once();
         verify(payloadDataMock.addAction(action)).once();
     });
 

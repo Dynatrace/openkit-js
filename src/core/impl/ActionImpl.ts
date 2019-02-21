@@ -94,8 +94,7 @@ export class ActionImpl implements Action {
         this.endSequenceNumber = this.beacon.createSequenceNumber();
         this._endTime = this.timestampProvider.getCurrentTimestamp();
         this.beacon.addAction(this);
-        this.session.removeAction(this);
-        this.session.flush();
+        this.session.endAction(this);
 
         return null;
     }

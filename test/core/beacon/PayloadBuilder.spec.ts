@@ -26,7 +26,6 @@ import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 import arrayContaining = jasmine.arrayContaining;
 
 const parse = (payload: string) => {
-    // We misuse in this test the HttpResponse, for easily checking values
     const pairs = new PayloadDecoder(payload).getEntries();
 
     return {
