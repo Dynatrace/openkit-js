@@ -32,6 +32,9 @@ const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultApplicationName = '';
 
+/**
+ * Builder for an OpenKit instance.
+ */
 export class OpenKitBuilder {
     private readonly config: Configuration;
 
@@ -50,45 +53,115 @@ export class OpenKitBuilder {
         };
     }
 
+    /**
+     * Sets the application name.
+     * Defaults to <code>''</code> <i>(empty string)</i>
+     *
+     * @param appName The application name.
+     * @returns The current OpenKitBuilder
+     */
     public withApplicationName(appName: string): this {
         this.config.applicationName = String(appName);
+
         return this;
     }
 
+    /**
+     * Sets the operating system information.
+     *
+     * @param operatingSystem The operating system
+     * @returns The current OpenKitBuilder
+     */
     public withOperatingSystem(operatingSystem: string): this {
         this.config.operatingSystem = String(operatingSystem);
+
         return this;
     }
 
+    /**
+     * Defines the version of the application.
+     *
+     * @param appVersion The application version
+     * @returns The current OpenKitBuilder
+     */
     public withApplicationVersion(appVersion: string): this {
         this.config.applicationVersion = String(appVersion);
+
         return this;
     }
 
+    /**
+     * Sets the data collection level.
+     *
+     * Depending on the chosen level the amount and granularity of data sent is controlled.
+     * Off (0) - no data collected
+     * Performance (1) - only performance related data is collected
+     * UserBehavior (2) - all available RUM data including performance related data is collected
+     *
+     * Default value is UserBehavior (2)
+     *
+     * @param dataCollectionLevel The data collection level
+     * @returns The current OpenKitBuilder
+     */
     public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
         this.config.dataCollectionLevel = dataCollectionLevel;
+
         return this;
     }
 
+    /**
+     * Sets the flag if crash reporting is enabled
+     *
+     * <p>
+     * Off (0) - No crashes are reported
+     * OptOutCrashes = (1) - No crashes are reported
+     * OptInCrashes = (2) - Crashes are reported
+     * </p>
+     *
+     * @param crashReportingLevel
+     */
     public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
         this.config.crashReportingLevel = crashReportingLevel;
+
         return this;
     }
 
+    /**
+     * Sets the communication channel factory. If the object is null or undefined, it is ignored.
+     *
+     * @param communicationFactory
+     */
     public withCommunicationChannelFactory(communicationFactory: CommunicationChannelFactory): this {
-        this.config.communicationFactory = communicationFactory;
+        if (communicationFactory !== null && communicationFactory !== undefined) {
+            this.config.communicationFactory = communicationFactory;
+        }
+
         return this;
     }
 
+    /**
+     * Sets the random number provider
+     *
+     * @param random
+     */
     public withRandomNumberProvider(random: RandomNumberProvider): this {
         this.config.random = random;
+
         return this;
     }
 
+    /**
+     * Get the current configuration for OpenKit-js
+     */
     public getConfig(): Readonly<Configuration> {
         return this.config;
     }
 
+    /**
+     * Build and initialize an OpenKit instance.
+     *
+     * @returns The OpenKit instance.
+     */
     public build(): OpenKit {
         if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
             // user does not allow data tracking

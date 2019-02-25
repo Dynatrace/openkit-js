@@ -33,7 +33,6 @@ export class HttpStatusResponse implements StatusResponse {
     public captureErrors: CaptureMode | undefined;
     public captureMode: CaptureMode | undefined;
     public maxBeaconSize: number | undefined;
-    public monitorName: string | undefined;
     public multiplicity: number | undefined;
     public serverId: number | undefined;
 
@@ -78,9 +77,6 @@ export class HttpStatusResponse implements StatusResponse {
                 break;
             case ResponseKey.MaxBeaconSize:
                 this.maxBeaconSize = parsePositiveInt(value, 0);
-                break;
-            case ResponseKey.MonitorName:
-                this.monitorName = value;
                 break;
             case ResponseKey.Multiplicity:
                 this.multiplicity = parsePositiveInt(value, 0);
