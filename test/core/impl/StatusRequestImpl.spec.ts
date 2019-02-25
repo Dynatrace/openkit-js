@@ -24,7 +24,7 @@ describe('StatusRequestImpl', () => {
     let request: StatusRequest;
 
     beforeEach(() => {
-        request = new StatusRequestImpl('agentTechnology', 'app-id', 'version', 7, 42, 'type');
+        request = new StatusRequestImpl('agentTechnology', 'app-id', 'version', 7, 42);
     });
 
     it('should return the same agentTechnology as passed in the constructor', () => {
@@ -47,10 +47,6 @@ describe('StatusRequestImpl', () => {
        expect(request.serverId).toEqual(42);
     });
 
-    it('should return the same type as passed in the constructor', () => {
-       expect(request.type).toEqual('type');
-    });
-
     it('should create the request from a state', () => {
        const state = new State({applicationId: '1.2.3'} as Configuration);
        state.updateState({valid: true, serverId: 8});
@@ -62,6 +58,5 @@ describe('StatusRequestImpl', () => {
        expect(request.openKitVersion).toEqual(openKitVersion);
        expect(request.platformType).toEqual(platformTypeOpenKit);
        expect(request.serverId).toBe(8);
-       expect(request.type).toBe('m');
     });
 });

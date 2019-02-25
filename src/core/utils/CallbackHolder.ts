@@ -33,4 +33,8 @@ export class CallbackHolder <T> {
         this.callbacks.forEach((cb) => cb(value));
         this.callbacks.splice(0, this.callbacks.length);
     }
+
+    public contains(cb: SimpleCallback<T>): boolean {
+        return this.callbacks.indexOf(cb) !== -1;
+    }
 }

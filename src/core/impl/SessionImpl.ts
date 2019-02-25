@@ -54,9 +54,9 @@ export class SessionImpl extends OpenKitObject implements Session {
      * @inheritDoc
      */
     public end(): void {
-        this
-            .waitForInit()
-            .then(() => this.endSession());
+        this.waitForInit(() => {
+            this.endSession();
+        });
     }
 
     /**
@@ -99,9 +99,13 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.payloadSender.flush();
     }
 
-    public async init(): Promise<void> {
-        await this.openKit.waitForInit();
+    public init(): void {
+        this.openKit.waitForInit(() => {
+            this.initialize();
+        });
+    }
 
+    private async initialize(): Promise<void> {
         if (this.openKit.status !== Status.Initialized) {
             return;
         }
@@ -114,7 +118,6 @@ export class SessionImpl extends OpenKitObject implements Session {
 
         this.finishInitialization(response);
         this.state.setServerIdLocked();
-
         log.debug('Successfully initialized Session', this);
     }
 

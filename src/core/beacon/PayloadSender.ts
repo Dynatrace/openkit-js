@@ -17,7 +17,6 @@
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { State } from '../impl/State';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
-import { CallbackHolder } from '../utils/CallbackHolder';
 import { PayloadData } from './PayloadData';
 
 /**
@@ -27,9 +26,6 @@ export class PayloadSender {
     private readonly state: State;
     private readonly channel: CommunicationChannel;
     private readonly payloadData: PayloadData;
-    private readonly callbackHolder = new CallbackHolder<void>();
-
-    private flushing = false;
 
     constructor(state: State, payloadData: PayloadData) {
         this.state = state;
@@ -42,21 +38,8 @@ export class PayloadSender {
      *
      * Multiple calls to flush only execute it once, but all resolve at the same time after it finished.
      */
-    public flush(): Promise<void> {
-
-        return new Promise<void>((res) => {
-            this.callbackHolder.add(res);
-
-            if (this.flushing  === true) {
-                return;
-            }
-            this.flushing = true;
-
-            this.sendPayloads().then(() => {
-                this.callbackHolder.resolve();
-                this.flushing = false;
-            });
-        });
+    public async flush(): Promise<void> {
+        await this.sendPayloads();
     }
 
     private async sendPayloads(): Promise<void> {

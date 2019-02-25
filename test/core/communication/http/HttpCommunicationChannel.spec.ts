@@ -31,12 +31,12 @@ const request: StatusRequest = {
 };
 
 class StubHttpClient implements HttpClient {
-    public get(url: string): Promise<HttpResponse> {
-        return Promise.resolve({status: 200, payload: 'type=m'});
+    public async get(url: string): Promise<HttpResponse> {
+        return {status: 200, payload: 'type=m'};
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
-        return Promise.resolve({status: 200, payload: 'type=m'});
+        return {status: 200, payload: 'type=m'};
     }
 }
 

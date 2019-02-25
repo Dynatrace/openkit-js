@@ -27,18 +27,17 @@ import { DataCollectionLevel } from '../src/DataCollectionLevel';
 import { OpenKitBuilder } from '../src/OpenKitBuilder';
 
 class StubCommunicationChannel implements CommunicationChannel {
-    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return Promise.resolve({valid: false});
+    public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return {valid: false};
     }
 
-    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
-        return Promise.resolve({valid: false});
+    public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+        return {valid: false};
     }
 
-    public sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return Promise.resolve({valid: false});
+    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return {valid: false};
     }
-
 }
 
 class StubCommunicationChannelFactory implements CommunicationChannelFactory {

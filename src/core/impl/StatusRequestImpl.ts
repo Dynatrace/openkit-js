@@ -25,8 +25,7 @@ export class StatusRequestImpl implements StatusRequest {
             state.config.applicationId,
             openKitVersion,
             platformTypeOpenKit,
-            state.serverId,
-            'm');
+            state.serverId);
     }
 
     public readonly agentTechnologyType: string;
@@ -34,20 +33,17 @@ export class StatusRequestImpl implements StatusRequest {
     public readonly openKitVersion: string;
     public readonly platformType: number;
     public readonly serverId: number;
-    public readonly type: string;
 
     constructor(agentTechnology: string,
                 applicationId: string,
                 version: string,
                 platformType: number,
-                serverId: number,
-                type: string) {
+                serverId: number) {
 
         this.agentTechnologyType = agentTechnology;
         this.applicationId = applicationId;
         this.openKitVersion = version;
         this.platformType = platformType;
         this.serverId = serverId;
-        this.type = type;
     }
 }

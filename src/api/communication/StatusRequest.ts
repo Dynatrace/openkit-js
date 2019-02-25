@@ -15,7 +15,6 @@
  */
 
 export interface StatusRequest {
-    readonly type: string;
     readonly serverId: number;
     readonly applicationId: string;
     readonly openKitVersion: string;

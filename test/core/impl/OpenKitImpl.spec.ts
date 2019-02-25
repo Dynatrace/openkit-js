@@ -26,14 +26,14 @@ import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 
 class StubCommunicationChannel implements CommunicationChannel {
-    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return Promise.resolve({ valid: false });
+    public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return { valid: false };
     }
-    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
-        return Promise.resolve({ valid: false });
+    public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+        return { valid: false };
     }
-    public sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return Promise.resolve({ valid: false });
+    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return { valid: false };
     }
 }
 
@@ -70,20 +70,21 @@ describe('OpenKitImpl', () => {
     });
 
     describe('waitForInit', () => {
-        it('should timeout if the initialization does not happen and a timeout is set', async () => {
+        it('should timeout if the initialization does not happen and a timeout is set', (done) => {
             const openKit = buildOpenKit();
-            const result = await openKit.waitForInit(100);
+            openKit.waitForInit(tf => {
+                expect(tf).toBe(false);
+                done();
+            }, 100);
 
-            expect(result)
-                .toBe(false);
         });
 
-        it('should not timeout if the initialization does not happen and a timeout is not set', async (done) => {
+        it('should not timeout if the initialization does not happen and a timeout is not set', (done) => {
             jest.setTimeout(5000);
             const openKit = buildOpenKit();
             let result: boolean | undefined = undefined;
 
-            openKit.waitForInit().then(tf => result = tf);
+            openKit.waitForInit(tf => result = tf);
 
             const wait = setTimeout(() => {
                 clearTimeout(wait);
@@ -92,7 +93,7 @@ describe('OpenKitImpl', () => {
             }, 4000);
         });
 
-        it('should return a value after the object got initialized', async() => {
+        it('should return a value after the object got initialized', (done) => {
             // given
            when(mockCommunicationChannel.sendStatusRequest(anything(), anything()))
                .thenResolve({valid: true});
@@ -100,13 +101,15 @@ describe('OpenKitImpl', () => {
            // when
            const openKit = buildOpenKit();
            openKit.initialize();
-           const result = await openKit.waitForInit();
+           openKit.waitForInit(tf => {
+               // then
+               expect(tf).toBe(true);
 
-           // then
-           expect(result).toBe(true);
+               done();
+           })
         });
 
-        it('should return a value after the object got initialized but with an invalid response', async() => {
+        it('should return a value after the object got initialized but with an invalid response', (done) => {
             // given
            when(mockCommunicationChannel.sendStatusRequest(anything(), anything()))
                .thenResolve({valid: false});
@@ -114,13 +117,14 @@ describe('OpenKitImpl', () => {
            // when
            const openKit = buildOpenKit();
            openKit.initialize();
-           const result = await openKit.waitForInit();
-
-           // then
-           expect(result).toBe(false);
+           openKit.waitForInit(tf => {
+               // then
+               expect(tf).toBe(false);
+               done();
+           });
         });
 
-        it('should update the state after the initial request', async() => {
+        it('should update the state after the initial request', (done) => {
             when(mockCommunicationChannel.sendStatusRequest(anything(), anything()))
                 .thenResolve({valid: true, multiplicity: 6});
 
@@ -128,39 +132,47 @@ describe('OpenKitImpl', () => {
             const openKit = buildOpenKit();
             openKit.initialize();
 
-            await openKit.waitForInit();
-
-            // then
-            expect(openKit.state.multiplicity).toBe(6);
+            openKit.waitForInit(() => {
+                // then
+                expect(openKit.state.multiplicity).toBe(6);
+                done();
+            });
         });
 
-        it('should immediately resolve if openKit already initialized', async() => {
+        it('should immediately resolve if openKit already initialized', (done) => {
             // given
             when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenResolve({valid: true});
 
             const openKit = buildOpenKit();
             openKit.initialize();
 
-            await openKit.waitForInit();
-
-            // when
-            const result = await openKit.waitForInit(0); // 0 => force using no timeout
-            expect(result).toBe(true);
+            openKit.waitForInit(() => {
+                // when
+                openKit.waitForInit(tf => {
+                    // then
+                    expect(tf).toBe(true);
+                    done();
+                }, 0); // 0 => force using no timeout
+            });
         });
 
-        it('should immediately resolve if openKit already initialized and shutdown', async() => {
+        it('should immediately resolve if openKit already initialized and shutdown', (done) => {
             // given
             when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenResolve({valid: true});
 
             const openKit = buildOpenKit();
             openKit.initialize();
 
-            await openKit.waitForInit();
-            openKit.shutdown();
+            openKit.waitForInit(() => {
+                openKit.shutdown();
 
-            // when
-            const result = await openKit.waitForInit(0); // 0 => force using no timeout
-            expect(result).toBe(true);
+                // when
+                openKit.waitForInit(tf => {
+                    expect(tf).toBe(true);
+
+                    done();
+                }, 0); // 0 => force using no timeout
+            });
         });
     });
 

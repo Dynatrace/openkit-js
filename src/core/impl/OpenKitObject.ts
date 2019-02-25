@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { InitCallback } from '../..';
 import { StatusResponse } from '../../api/communication/StatusResponse';
 import { CallbackHolder } from '../utils/CallbackHolder';
 import { State } from './State';
@@ -32,7 +33,7 @@ export const enum Status {
  */
 export abstract class OpenKitObject {
     public readonly state: State;
-    private readonly callbackManager = new CallbackHolder<boolean>();
+    private readonly initCallbackHolder = new CallbackHolder<boolean>();
 
     private _status: Status = Status.Idle;
     public get status(): Status {
@@ -57,13 +58,13 @@ export abstract class OpenKitObject {
 
         if (response.valid === false) {
             this.shutdown();
-            this.callbackManager.resolve(false);
+            this.initCallbackHolder.resolve(false);
             return;
         }
 
         this.state.updateState(response);
         this._status = Status.Initialized;
-        this.callbackManager.resolve(true);
+        this.initCallbackHolder.resolve(true);
     }
 
     /**
@@ -73,21 +74,29 @@ export abstract class OpenKitObject {
         this._status = Status.Shutdown;
     }
 
-    public waitForInit(timeout?: number): Promise<boolean> {
+    public waitForInit(callback: InitCallback, timeout?: number): void {
+        // Trivial case: We already initialized and the waitForInit comes after initialization. We can resolve
+        // immediately and synchronous.
         if (this.status !== Status.Idle) {
-            return Promise.resolve(true);
+            callback(true);
+            return;
         }
 
-        return new Promise<boolean>((res) => {
-            if (timeout !== undefined) {
-                const wait = setTimeout(() => {
+        if (timeout !== undefined) {
+            // Init with timeout: We setup a timeout which resolves after X milliseconds. If the callback triggers,
+            // we clear it, and check if the callback is still in the callback holder. If it is, it was not resolved,
+            // so we can execute it, and remove it from the callback holder, so it can't get executed again.
+            const wait = setTimeout(() => {
+                if (this.initCallbackHolder.contains(callback)) {
                     clearTimeout(wait);
-                    res(false);
-                    this.callbackManager.remove(res);
-                }, timeout);
-            }
+                    callback(false);
+                    this.initCallbackHolder.remove(callback);
+                }
+            }, timeout);
+        }
 
-            this.callbackManager.add(res);
-        });
+        // Add the callback to the initCallbackHolder, so it gets resolved once the initialization fails or succeeds,
+        // for both cases with and without timeout.
+        this.initCallbackHolder.add(callback);
     }
 }

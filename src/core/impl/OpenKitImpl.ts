@@ -15,7 +15,7 @@
  */
 
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
-import { OpenKit } from '../../api/OpenKit';
+import { InitCallback, OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { Configuration } from '../config/Configuration';
@@ -114,7 +114,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     /**
      * @inheritDoc
      */
-    public waitForInit(timeout?: number): Promise<boolean> {
-        return super.waitForInit(timeout);
+    public waitForInit(callback: InitCallback, timeout?: number): void {
+        super.waitForInit(callback, timeout);
     }
 }

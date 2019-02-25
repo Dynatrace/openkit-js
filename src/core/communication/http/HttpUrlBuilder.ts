@@ -20,7 +20,7 @@ import { UrlBuilder } from './UrlBuilder';
 
 export const buildHttpUrl = (url: string, statusRequest: StatusRequest, newSession: boolean) => {
     return new UrlBuilder(url)
-        .add(QueryKey.Type, statusRequest.type)
+        .add(QueryKey.Type, 'm')
         .add(QueryKey.ServerId, statusRequest.serverId)
         .add(QueryKey.Application, statusRequest.applicationId)
         .add(QueryKey.Version, statusRequest.openKitVersion)

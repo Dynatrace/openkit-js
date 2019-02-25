@@ -57,16 +57,7 @@ export class ActionImpl implements Action {
     }
 
     public reportValue(name: string, value: number | string | null | undefined): void {
-        if (this.endTime !== -1) {
-            return;
-        }
-
-        if (this.session.state.multiplicity === 0) {
-            return;
-        }
-
-        // We only report values iff DCL = UserBehavior
-        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+        if (!this.mayReportValue()) {
             return;
         }
 
@@ -97,5 +88,22 @@ export class ActionImpl implements Action {
         this.session.endAction(this);
 
         return null;
+    }
+
+    private mayReportValue(): boolean {
+        if (this.endTime !== -1) {
+            return false;
+        }
+
+        if (this.session.state.multiplicity === 0) {
+            return false;
+        }
+
+        // We only report values iff DCL = UserBehavior
+        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            return false;
+        }
+
+        return true;
     }
 }

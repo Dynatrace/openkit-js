@@ -30,14 +30,14 @@ import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
 
 class StubCommunicationChannel implements CommunicationChannel {
-    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return Promise.resolve({ valid: false });
+    public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return { valid: false };
     }
-    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
-        return Promise.resolve({ valid: false });
+    public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+        return { valid: false };
     }
-    public sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return Promise.resolve({ valid: false });
+    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return { valid: false };
     }
 }
 
@@ -118,39 +118,45 @@ describe('SessionImpl', () => {
     });
 
     describe('initialization', () => {
-        it('should have state initialized after successful initialization', async () => {
+        it('should have state initialized after successful initialization', (done) => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
 
             // when
             const {session} = buildSession();
             session.init();
-            const result = await session.waitForInit();
 
-            // then
-            expect(result).toBe(true);
-            expect(session.status).toBe(Status.Initialized);
+            session.waitForInit((tf) => {
+                const result = tf;
+
+                // then
+                expect(result).toBe(true);
+                expect(session.status).toBe(Status.Initialized);
+
+                done();
+            });
         });
 
         it('should have state shutdown after failed initialization and shutdown', async () => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
 
             // when
             const {session} = buildSession();
             session.init();
-            await session.waitForInit();
-            session.shutdown();
+            session.waitForInit(() => {
+                session.shutdown();
 
-            // then
-            expect(session.status).toBe(Status.Shutdown);
+                // then
+                expect(session.status).toBe(Status.Shutdown);
+            });
         });
 
-        it('should not initialize as long as openKit is not initialized', async() => {
+        it('should not initialize as long as openKit is not initialized', (done) => {
             jest.setTimeout(5000);
             // given
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
@@ -160,11 +166,17 @@ describe('SessionImpl', () => {
 
             // when
             session.init();
-            const result = await session.waitForInit(4000);
+            session.waitForInit((tf) => {
+                const result = tf;
 
-            // then
-            expect(result).toBe(false);
-            verify(stateSyp.updateState(anything())).never();
+                // then
+                expect(result).toBe(false);
+                verify(stateSyp.updateState(anything())).never();
+
+                done();
+            }, 4000)
+
+
         });
     });
 
@@ -229,7 +241,7 @@ describe('SessionImpl', () => {
 
         it('should be able to identify a user', () => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => cb(true));
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
 
@@ -283,7 +295,7 @@ describe('SessionImpl', () => {
 
         it('should be able to enter an action', () => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
             const {session, openActions} = buildSession();
@@ -298,7 +310,7 @@ describe('SessionImpl', () => {
 
         it('should be able to enter multiple actions', () => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
             const {session, openActions} = buildSession();
@@ -316,7 +328,7 @@ describe('SessionImpl', () => {
 
         it('should be able to remove an action from the action-children', () => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
             const {session, openActions} = buildSession();
@@ -332,9 +344,9 @@ describe('SessionImpl', () => {
     });
 
     describe('end', () => {
-        it('should close all child-actions', async(done) => {
+        it('should close all child-actions', (done) => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
             const {session} = buildSession();
@@ -346,26 +358,26 @@ describe('SessionImpl', () => {
             const action2Spy = spy(action2);
 
             session.init();
-            await session.waitForInit();
+            session.waitForInit(() => {
+                expect(session.status).toBe(Status.Initialized);
 
-            expect(session.status).toBe(Status.Initialized);
+                // when
+                session.end();
 
-            // when
-            session.end();
+                // then
+                setTimeout(() => {
+                    verify(action1Spy.leaveAction()).once();
+                    verify(action2Spy.leaveAction()).once();
 
-            // then
-            setTimeout(() => {
-                verify(action1Spy.leaveAction()).once();
-                verify(action2Spy.leaveAction()).once();
-
-                done();
-            }, 500);
+                    done();
+                }, 500);
+            });
 
         });
 
         it('should remove a single child from the children-array', () => {
             // given
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
             const {openActions, session} = buildSession();
@@ -383,7 +395,7 @@ describe('SessionImpl', () => {
 
         it('should do nothing if DCL = Off', () => {
             config.dataCollectionLevel = DataCollectionLevel.Off;
-            when(mockOpenKitImpl.waitForInit(anything())).thenResolve(true);
+            when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
             when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
 
