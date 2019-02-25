@@ -22,7 +22,6 @@ import { HttpClient } from '../../../../src/core/communication/http/HttpClient';
 import { HttpCommunicationChannel } from '../../../../src/core/communication/http/HttpCommunicationChannel';
 
 const request: StatusRequest = {
-    type: 'm',
     serverId: 5,
     platformType: 1,
     openKitVersion: '1.0',
