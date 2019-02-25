@@ -51,22 +51,17 @@ export class OpenKitBuilder {
     }
 
     public withApplicationName(appName: string): this {
-        this.config.applicationName = appName;
+        this.config.applicationName = String(appName);
         return this;
     }
 
     public withOperatingSystem(operatingSystem: string): this {
-        this.config.operatingSystem = operatingSystem;
+        this.config.operatingSystem = String(operatingSystem);
         return this;
     }
 
     public withApplicationVersion(appVersion: string): this {
-        this.config.applicationVersion = appVersion;
-        return this;
-    }
-
-    public withScreenSize(width: number, height: number): this {
-        this.config.screenSize = { width, height };
+        this.config.applicationVersion = String(appVersion);
         return this;
     }
 

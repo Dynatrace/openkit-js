@@ -18,7 +18,11 @@ import { anyString, anything, instance, mock, reset, spy, verify, when } from 't
 import { Action, CrashReportingLevel, DataCollectionLevel } from '../../../src';
 import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
 import { StatusRequest } from '../../../src/api/communication/StatusRequest';
-import { CaptureMode, StatusResponse } from '../../../src/api/communication/StatusResponse';
+import {
+    CaptureMode,
+    defaultInvalidStatusResponse,
+    StatusResponse,
+} from '../../../src/api/communication/StatusResponse';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { PayloadSender } from '../../../src/core/beacon/PayloadSender';
 import { Configuration } from '../../../src/core/config/Configuration';
@@ -139,7 +143,7 @@ describe('SessionImpl', () => {
             });
         });
 
-        it('should have state shutdown after failed initialization and shutdown', async () => {
+        it('should have state shutdown after successful initialization and shutdown', async () => {
             // given
             when(mockOpenKitImpl.waitForInit(anything())).thenCall((cb) => { cb(true); });
             when(mockOpenKitImpl.status).thenReturn(Status.Initialized);
@@ -175,8 +179,31 @@ describe('SessionImpl', () => {
 
                 done();
             }, 4000)
+        });
 
+        it('should not initialize if openkit failed to initialize', () => {
+           // given
+            when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenResolve(defaultInvalidStatusResponse);
+            when(mockCommunicationChannel.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
+            const {session} = buildSession();
 
+            // when
+            session.init();
+            session.waitForInit(tf => {
+                expect(tf).toBe(false);
+            });
+        });
+
+        it('should not initialize if the request throws an exception', () => {
+            when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenThrow(new Error('some generic error'));
+            const {session} = buildSession();
+
+            // when
+            session.init();
+            session.waitForInit(tf => {
+                expect(tf)
+                    .toBe(false);
+            });
         });
     });
 
@@ -268,6 +295,7 @@ describe('SessionImpl', () => {
             expect(action).toBe(defaultNullAction);
             verify(payloadDataSpy.addAction(anything())).never();
         });
+
         it('should not be possible to enter an action if we do not capture (multiplicity = 0)', () => {
             // given
             const {session, payloadDataSpy} = buildSession();
@@ -280,6 +308,7 @@ describe('SessionImpl', () => {
             expect(action).toBe(defaultNullAction);
             verify(payloadDataSpy.addAction(anything())).never();
         });
+
         it('should not be possible to enter an action if DCL = Off', () => {
             // given
             config.dataCollectionLevel =  DataCollectionLevel.Off;

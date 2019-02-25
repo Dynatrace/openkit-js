@@ -168,10 +168,26 @@ describe('OpenKitImpl', () => {
 
                 // when
                 openKit.waitForInit(tf => {
-                    expect(tf).toBe(true);
+                    expect(tf).toBe(false);
 
                     done();
                 }, 0); // 0 => force using no timeout
+            });
+        });
+
+        it('should not initialize if the status request throws an error', (done) => {
+            // given
+            when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenThrow(new Error(''));
+
+            // when
+            const openKit = buildOpenKit();
+            openKit.initialize();
+
+            openKit.waitForInit(tf => {
+                // then
+                expect(tf).toBe(false);
+
+                done();
             });
         });
     });
