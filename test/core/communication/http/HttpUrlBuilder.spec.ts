@@ -23,7 +23,6 @@ const request: StatusRequest = {
     openKitVersion: '1.0',
     platformType: 1,
     serverId: 5,
-    type: 'm',
 };
 
 describe('HttpUrlBuilder', () => {

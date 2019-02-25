@@ -15,6 +15,7 @@
  */
 
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
+import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
 import { InitCallback, OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
@@ -58,9 +59,15 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * If an invalid response is sent back, we shutdown.
      */
     public async initialize(): Promise<void> {
+        let response: StatusResponse;
 
-        const response = await this.communicationChannel.sendStatusRequest(
-            this.state.config.beaconURL, StatusRequestImpl.from(this.state));
+        try {
+            response = await this.communicationChannel.sendStatusRequest(
+                this.state.config.beaconURL, StatusRequestImpl.from(this.state));
+        } catch (exception) {
+            log.warn('Failed to initialize with exception', exception);
+            response = defaultInvalidStatusResponse;
+        }
 
         this.finishInitialization(response);
     }

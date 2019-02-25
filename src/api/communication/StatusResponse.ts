@@ -60,3 +60,5 @@ export interface StatusResponse {
      */
     readonly valid: boolean;
 }
+
+export const defaultInvalidStatusResponse: StatusResponse = { valid: false };

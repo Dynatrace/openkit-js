@@ -19,11 +19,6 @@ import { RandomNumberProvider } from '../../api/RandomNumberProvider';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 
-export interface Size {
-    width: number;
-    height: number;
-}
-
 export interface Configuration {
     beaconURL: string;
     applicationId: string;
@@ -32,8 +27,6 @@ export interface Configuration {
     applicationName: string;
     applicationVersion?: string;
     operatingSystem?: string;
-
-    screenSize?: Readonly<Size>;
 
     dataCollectionLevel: DataCollectionLevel;
     crashReportingLevel: CrashReportingLevel;
