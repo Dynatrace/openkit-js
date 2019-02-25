@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { State } from '../impl/State';
-import { BeaconSender } from './BeaconSender';
+import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { PayloadData } from './PayloadData';
 
 /**
@@ -23,45 +24,38 @@ import { PayloadData } from './PayloadData';
  */
 export class PayloadSender {
     private readonly state: State;
-    private readonly sender: BeaconSender;
-    private readonly beacon: PayloadData;
-
-    private flushing = false;
+    private readonly channel: CommunicationChannel;
+    private readonly payloadData: PayloadData;
 
     constructor(state: State, payloadData: PayloadData) {
         this.state = state;
-        this.sender = new BeaconSender(state);
-        this.beacon = payloadData;
+        this.channel = state.config.communicationFactory.getCommunicationChannel();
+        this.payloadData = payloadData;
     }
 
     /**
-     * Flushes all data to the server, with multiplicity in mind
+     * Flushes all data in the payloadData to the server.
+     *
+     * Multiple calls to flush only execute it once, but all resolve at the same time after it finished.
      */
     public async flush(): Promise<void> {
-        if (this.flushing === true) {
-            return;
-        }
-
-        this.flushing = true;
-
         await this.sendPayloads();
-
-        this.flushing = false;
     }
 
     private async sendPayloads(): Promise<void> {
-        while (this.state.multiplicity !== 0 && this.beacon.hasPayloadsLeft()) {
+        while (this.state.multiplicity !== 0 && this.payloadData.hasPayloadsLeft()) {
             await this.sendPayload();
         }
     }
 
     private async sendPayload(): Promise<void> {
-        const payload = this.beacon.getNextPayload();
+        const payload = this.payloadData.getNextPayload();
         if (payload === undefined) {
             return;
         }
 
-        const response = await this.sender.sendPayload(payload);
+        const response = await this.channel.sendPayloadData(
+            this.state.config.beaconURL, StatusRequestImpl.from(this.state), payload);
 
         if (response.valid) {
             this.state.updateState(response);

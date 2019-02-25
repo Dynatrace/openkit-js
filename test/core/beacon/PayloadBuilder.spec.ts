@@ -15,20 +15,18 @@
  */
 
 import { instance, mock, when } from 'ts-mockito';
-import { HttpClient, RandomNumberProvider } from '../../../src';
 import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
-import { parsePayload } from '../../../src/core/beacon/StatusResponse';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { EventType } from '../../../src/core/protocol/EventType';
 import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
+import { PayloadDecoder } from '../../../src/core/utils/PayloadDecoder';
 import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 import arrayContaining = jasmine.arrayContaining;
 
 const parse = (payload: string) => {
-    // We misuse in this test the HttpResponse, for easily checking values
-    const pairs = parsePayload(payload);
+    const pairs = new PayloadDecoder(payload).getEntries();
 
     return {
         keys: Object.keys(pairs),
@@ -103,16 +101,16 @@ describe('PayloadBuilder', () => {
         let config: Configuration;
 
         beforeEach(() => {
-            config = {
+            const partialConfig = {
                 applicationName: 'appName',
                 dataCollectionLevel: DataCollectionLevel.UserBehavior,
                 crashReportingLevel: CrashReportingLevel.OptOutCrashes,
                 deviceId: '654',
                 applicationId: 'app-id',
                 beaconURL: 'https://example.com',
-                httpClient: {} as HttpClient,
-                random: {} as RandomNumberProvider,
             };
+
+            config = partialConfig as Configuration;
         });
 
         it('should build the correct payload', () => {
@@ -155,7 +153,7 @@ describe('PayloadBuilder', () => {
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.IdentifyUser.toString());
             payloadExpect(pairs, PayloadKey.ThreadId, '1');
-            payloadExpect(pairs, PayloadKey.KeyName, 'Dynatrace%20Power%20User');
+            payloadExpect(pairs, PayloadKey.KeyName, 'Dynatrace Power User');
             payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
             payloadExpect(pairs, PayloadKey.ParentActionId, '0');
             payloadExpect(pairs, PayloadKey.Time0, '60');
@@ -182,11 +180,11 @@ describe('PayloadBuilder', () => {
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
             payloadExpect(pairs, PayloadKey.ThreadId, '1');
-            payloadExpect(pairs, PayloadKey.KeyName, 'My%20String%20Value');
+            payloadExpect(pairs, PayloadKey.KeyName, 'My String Value');
             payloadExpect(pairs, PayloadKey.ParentActionId, '7');
             payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
             payloadExpect(pairs, PayloadKey.Time0, '500');
-            payloadExpect(pairs, PayloadKey.Value, 'Some%20String%20value');
+            payloadExpect(pairs, PayloadKey.Value, 'Some String value');
         });
 
 
@@ -199,7 +197,7 @@ describe('PayloadBuilder', () => {
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueDouble.toString());
             payloadExpect(pairs, PayloadKey.ThreadId, '1');
-            payloadExpect(pairs, PayloadKey.KeyName, 'My%20int%20value');
+            payloadExpect(pairs, PayloadKey.KeyName, 'My int value');
             payloadExpect(pairs, PayloadKey.ParentActionId, '7');
             payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
             payloadExpect(pairs, PayloadKey.Time0, '500');

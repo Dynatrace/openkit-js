@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { StatusRequest } from './StatusRequest';
+import { StatusResponse } from './StatusResponse';
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
-    });
-});
+export interface CommunicationChannel {
+    sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse>;
+
+    sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse>;
+
+    sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse>;
+}

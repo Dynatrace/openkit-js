@@ -15,6 +15,7 @@
  */
 
 import { Action } from '../../api/Action';
+import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
@@ -25,44 +26,35 @@ import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './NullAction';
 import { OpenKitImpl } from './OpenKitImpl';
 import { OpenKitObject, Status } from './OpenKitObject';
+import { StatusRequestImpl } from './StatusRequestImpl';
 
 const log = createLogger('SessionImpl');
 
 export class SessionImpl extends OpenKitObject implements Session {
-
     public readonly payloadData: PayloadData;
+
     private readonly openKit: OpenKitImpl;
     private readonly openActions: Action[] = [];
     private readonly payloadSender: PayloadSender;
+    private readonly communicationChannel: CommunicationChannel;
 
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
         super(openKit.state.clone());
 
         this.openKit = openKit;
+        this.communicationChannel = this.state.config.communicationFactory.getCommunicationChannel();
+
         this.payloadData = new PayloadData(this.state, clientIp, sessionId);
         this.payloadSender = new PayloadSender(this.state, this.payloadData);
 
         this.payloadData.startSession();
-
-        openKit.registerOnInitializedCallback((status) => {
-           if (status === Status.Initialized) {
-               this.init();
-           }
-        });
-    }
-
-    /**
-     * Flush all remaining data
-     */
-    public flush(): void {
-        this.registerOnInitializedCallback(() => this.payloadSender.flush());
     }
 
     /**
      * @inheritDoc
      */
     public end(): void {
-        this.registerOnInitializedCallback(() => {
+        this.waitForInit(() => {
             this.endSession();
         });
     }
@@ -87,7 +79,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.payloadData.identifyUser(userTag);
 
         // Send immediately as we can not be sure that the session has a correct 'end'
-        this.flush();
+        this.payloadSender.flush();
     }
 
     public enterAction(actionName: string): Action {
@@ -102,8 +94,31 @@ export class SessionImpl extends OpenKitObject implements Session {
         return action;
     }
 
-    public removeAction(action: Action): void {
+    public endAction(action: Action): void {
         removeElement(this.openActions, action);
+        this.payloadSender.flush();
+    }
+
+    public init(): void {
+        this.openKit.waitForInit(() => {
+            this.initialize();
+        });
+    }
+
+    private async initialize(): Promise<void> {
+        if (this.openKit.status !== Status.Initialized) {
+            return;
+        }
+
+        // our state may be outdated, update it
+        this.state.updateState(this.openKit.state);
+
+        const response = await this.communicationChannel.sendNewSessionRequest(
+            this.state.config.beaconURL, StatusRequestImpl.from(this.state));
+
+        this.finishInitialization(response);
+        this.state.setServerIdLocked();
+        log.debug('Successfully initialized Session', this);
     }
 
     private mayEnterAction(): boolean {
@@ -122,23 +137,17 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        this.openActions.forEach((action) => action.leaveAction());
+        log.debug('endSession', this);
+
+        this.openActions.slice().forEach((action) => action.leaveAction());
 
         if (this.status === Status.Initialized) {
             this.payloadData.endSession();
-            this.flush();
         }
 
-        this.openKit.removeSession(this);
-        this.shutdown();
-    }
-
-    private async init(): Promise<void> {
-        const response = await this.sender.sendNewSessionRequest();
-
-        this.finishInitialization(response);
-        this.state.setServerIdLocked();
-
-        log.debug('Successfully initialized Session', this);
+        this.payloadSender.flush().then(() => {
+            this.openKit.removeSession(this);
+            this.shutdown();
+        });
     }
 }

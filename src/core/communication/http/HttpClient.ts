@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from './QueryBuilder';
+import { HttpResponse } from './AxiosHttpClient';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
-    }
-
-    public build(): string {
-        const query = super.build();
-
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
-    }
+export interface HttpClient {
+    get(url: string): Promise<HttpResponse>;
+    post(url: string, payload: string): Promise<HttpResponse>;
 }

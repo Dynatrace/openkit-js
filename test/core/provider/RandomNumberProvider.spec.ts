@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
+describe('DefaultRandomNumberProvider', () => {
+    const random = new DefaultRandomNumberProvider();
+
+    const setupNextRandomValue = (value: number) => {
+        const fn = jest.fn();
+        fn.mockReturnValue(.5);
+        Math.random = fn;
+    };
+
+
+    it('should return the next random Integer', () => {
+        setupNextRandomValue(.5);
+        const next = 1073741824; // .5 * 2 ** 31 + 0;
+
+        expect(random.nextPositiveInteger()).toBe(next);
     });
 });

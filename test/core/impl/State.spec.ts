@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import {instance, mock, when} from 'ts-mockito';
-import { HttpClient, RandomNumberProvider } from '../../../src';
-import {HttpStatus, StatusResponse} from '../../../src/core/beacon/StatusResponse';
+import { RandomNumberProvider } from '../../../src';
+import { CommunicationChannelFactory } from '../../../src/api/communication/CommunicationChannelFactory';
 import {Configuration} from '../../../src/core/config/Configuration';
 import {State} from '../../../src/core/impl/State';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
@@ -29,18 +28,9 @@ const config: Readonly<Configuration> = {
     applicationId: 'app-id',
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
-    httpClient: {} as HttpClient,
+
+    communicationFactory: {} as CommunicationChannelFactory,
     random: {} as RandomNumberProvider,
-};
-
-const mockStatusResponse = (status: HttpStatus, values: { id?: number, size?: number, multiplicity?: number }) => {
-    const statusResponse = mock(StatusResponse);
-    when(statusResponse.status).thenReturn(status);
-    when(statusResponse.serverID).thenReturn(values.id);
-    when(statusResponse.maxBeaconSize).thenReturn(values.size);
-    when(statusResponse.multiplicity).thenReturn(values.multiplicity);
-
-    return instance(statusResponse);
 };
 
 describe('State', () => {
@@ -68,30 +58,85 @@ describe('State', () => {
         });
     });
 
-    describe('updateState', () => {
+    describe('updateState with a status request', () => {
         it('should update the serverId', () => {
-            state.updateState(mockStatusResponse(HttpStatus.OK, {id: 7}));
+            state.updateState({ valid: true, serverId: 7});
             expect(state.serverId).toBe(7);
         });
 
         it('should update maxBeaconSize with the multiplier of 1024', () => {
-            state.updateState(mockStatusResponse(HttpStatus.OK, {size: 10}));
+            state.updateState({ valid: true, maxBeaconSize: 10});
             expect(state.maxBeaconSize).toBe(10240);
         });
 
         it('should update multiplicity', () => {
-            state.updateState(mockStatusResponse(HttpStatus.OK, {multiplicity: 7}));
+            state.updateState({ valid: true, multiplicity: 7});
             expect(state.multiplicity).toBe(7);
         });
 
         it('should not update any values, if the status is not 200', () => {
-           state.updateState(mockStatusResponse(HttpStatus.OK, {id: 5, size: 5, multiplicity: 5}));
-           state.updateState(mockStatusResponse(HttpStatus.UNKNOWN,  {id: 1, size: 1, multiplicity: 1}));
+           state.updateState({ valid: true, serverId: 5, maxBeaconSize: 5, multiplicity: 5});
+           state.updateState({ valid: false, serverId: 1, maxBeaconSize: 1, multiplicity: 1});
 
            expect(state.multiplicity).toBe(5);
            expect(state.maxBeaconSize).toBe(5120);
            expect(state.serverId).toBe(5);
         });
+    });
+
+    describe('updateState with another state', () => {
+        const otherState = new State({} as Configuration);
+
+        it('should update the server-id', () => {
+            // given
+            state.updateState({valid: true, serverId: 4});
+            otherState.updateState({valid: true, serverId: 8});
+
+            // when
+            state.updateState(otherState);
+
+            // then
+            expect(state.serverId).toBe(8);
+        });
+
+        it('should not update the server-id if it is locked', () => {
+            // given
+            state.updateState({valid: true, serverId: 4});
+            state.setServerIdLocked();
+            otherState.updateState({valid: true, serverId: 8});
+
+            // when
+            state.updateState(otherState);
+
+            // then
+            expect(state.serverId).toBe(4);
+        });
+
+        it('should update the multiplicity', () => {
+            // given
+            state.updateState({valid: true, multiplicity: 4});
+            otherState.updateState({valid: true, multiplicity: 8});
+
+            // when
+            state.updateState(otherState);
+
+            // then
+            expect(state.serverId).toBe(8);
+        });
+
+        it('should update the maxBeaconSize', () => {
+            // given
+            state.updateState({valid: true, maxBeaconSize: 4});
+            otherState.updateState({valid: true, maxBeaconSize: 8});
+
+            // when
+            state.updateState(otherState);
+
+            // then
+            expect(state.serverId).toBe(8);
+        });
+
+
     });
 
     describe('switches', () => {
@@ -101,9 +146,9 @@ describe('State', () => {
         });
 
         it('should make the serverId unmodifiable, after setServerIdLocked is called', () => {
-            state.updateState(mockStatusResponse(HttpStatus.OK, {id: 4}));
+            state.updateState({ valid: true, serverId: 4});
             state.setServerIdLocked();
-            state.updateState(mockStatusResponse(HttpStatus.OK, {id: 7}));
+            state.updateState({ valid: true, serverId: 7});
 
             expect(state.serverId).toBe(4);
         });
@@ -111,7 +156,7 @@ describe('State', () => {
 
     describe('clone', () => {
         it('should return an object with equal values', () => {
-            state.updateState(mockStatusResponse(HttpStatus.OK, {id: 5, size: 5, multiplicity: 5}));
+            state.updateState({ valid: true, serverId: 5, multiplicity: 5, maxBeaconSize: 5});
             const newState = state.clone();
 
             expect(newState.multiplicity).toBe(5);
@@ -120,12 +165,12 @@ describe('State', () => {
         });
 
         it('should not copy the server-id lock', () => {
-            state.updateState(mockStatusResponse(HttpStatus.OK, {id: 5}));
+            state.updateState({ valid: true, serverId: 5});
             state.setServerIdLocked();
             const newState = state.clone();
-            newState.updateState(mockStatusResponse(HttpStatus.OK, {id: 7}));
+            newState.updateState({ valid: true, serverId: 7});
 
             expect(newState.serverId).toBe(7);
-        })
+        });
     });
 });

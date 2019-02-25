@@ -16,8 +16,8 @@
 
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
-import { SequenceIdProvider } from '../utils/SequenceIdProvider';
-import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
+import { SequenceIdProvider } from '../provider/SequenceIdProvider';
+import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { PayloadBuilder } from './PayloadBuilder';
 
 /**

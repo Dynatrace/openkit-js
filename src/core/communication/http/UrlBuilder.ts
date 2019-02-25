@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { QueryBuilder } from '../../beacon/builder/QueryBuilder';
+import { QueryKey } from '../../protocol/QueryKey';
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
-    });
-});
+export class UrlBuilder extends QueryBuilder<QueryKey> {
+    constructor(private readonly url: string) {
+        super();
+    }
+
+    public build(): string {
+        const query = super.build();
+
+        return query.length === 0 ? this.url : `${this.url}?${query}`;
+    }
+}

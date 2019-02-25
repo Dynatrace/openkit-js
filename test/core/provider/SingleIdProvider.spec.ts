@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { SingleIdProvider } from '../../../src/core/provider/SingleIdProvider';
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
+describe('Single Id provider', () => {
+    it('should always return the same id', () => {
+        const provider = new SingleIdProvider(1337);
+
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
+       expect(provider.next()).toBe(1337);
     });
 });

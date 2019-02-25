@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+export enum CaptureMode {
+    On, Off,
+}
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
-    });
-});
+export interface StatusResponse {
+    readonly captureMode?: CaptureMode;
+    readonly monitorName?: string;
+    readonly serverId?: number;
+    readonly maxBeaconSize?: number;
+    readonly captureErrors?: CaptureMode;
+    readonly captureCrashes?: CaptureMode;
+    readonly multiplicity?: number;
+    readonly valid: boolean;
+}

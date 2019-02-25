@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+export class PayloadDecoder {
+    private entries: Record<string, string> = {};
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
-    });
-});
+    constructor(query: string) {
+        this.decode(query);
+    }
+
+    public getEntries(): Readonly<Record<string, string>> {
+        return this.entries;
+    }
+
+    private decode(query: string): void {
+        query
+            .split('&')
+            .forEach((entry) => this.decodeEntry(entry));
+    }
+
+    private decodeEntry(entry: string): void {
+        const [key, value] = entry.split('=');
+
+        this.entries[key] = decodeURIComponent(value);
+    }
+}

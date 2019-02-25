@@ -15,30 +15,33 @@
  */
 
 import Axios, { AxiosResponse } from 'axios';
-import { HttpClient, HttpResponse } from '../../api/http/HttpClient';
-import { createLogger } from '../utils/Logger';
+import { createLogger } from '../../utils/Logger';
+import { HttpClient } from './HttpClient';
 
-const log = createLogger('HttpClient');
+export interface HttpResponse {
+    status: number;
+    payload: string;
+}
 
-export class DefaultHttpClient implements HttpClient {
+const log = createLogger('AxiosHttpClient');
 
-    public async sendStatusRequest(url: string): Promise<HttpResponse> {
-        log.debug('Sending status request', url);
+export class AxiosHttpClient implements HttpClient {
+    public async get(url: string): Promise<HttpResponse> {
+        log.debug('GET', url);
         const response = await Axios.get<string>(url);
 
         return this.parseAxiosResponse(response);
     }
 
-    public async sendPayloadData(url: string, payload: string): Promise<HttpResponse> {
-        log.debug('Sending payload data', {url, payload});
-
+    public async post(url: string, payload: string): Promise<HttpResponse> {
+        log.debug('POST', url, payload);
         const response = await Axios.post<string>(url, payload);
 
         return this.parseAxiosResponse(response);
     }
 
     private parseAxiosResponse(response: AxiosResponse<string>): HttpResponse {
-        log.debug('Finished request', response);
+        log.debug('RESPONSE', {status: response.status, payload: response.data});
 
         return {
             status: response.status,

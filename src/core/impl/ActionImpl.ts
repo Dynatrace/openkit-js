@@ -17,8 +17,8 @@
 import { Action } from '../../api/Action';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
+import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { createLogger } from '../utils/Logger';
-import { defaultTimestampProvider, TimestampProvider } from '../utils/TimestampProvider';
 import { SessionImpl } from './SessionImpl';
 
 const log = createLogger('ActionImpl');
@@ -57,13 +57,7 @@ export class ActionImpl implements Action {
     }
 
     public reportValue(name: string, value: number | string | null | undefined): void {
-        if (this.endTime !== -1) {
-            return;
-        }
-
-        // TODO: Check if capture is active. If yes, return early.
-        // We only report values iff DCL = UserBehavior
-        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+        if (!this.mayReportValue()) {
             return;
         }
 
@@ -72,7 +66,7 @@ export class ActionImpl implements Action {
         }
 
         const type = typeof value;
-        if (type !== 'string' && type !== 'number' && type !== null && type !== undefined) {
+        if (type !== 'string' && type !== 'number' && value !== null && value !== undefined) {
             return;
         }
 
@@ -91,9 +85,25 @@ export class ActionImpl implements Action {
         this.endSequenceNumber = this.beacon.createSequenceNumber();
         this._endTime = this.timestampProvider.getCurrentTimestamp();
         this.beacon.addAction(this);
-        this.session.removeAction(this);
-        this.session.flush();
+        this.session.endAction(this);
 
         return null;
+    }
+
+    private mayReportValue(): boolean {
+        if (this.endTime !== -1) {
+            return false;
+        }
+
+        if (this.session.state.multiplicity === 0) {
+            return false;
+        }
+
+        // We only report values iff DCL = UserBehavior
+        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            return false;
+        }
+
+        return true;
     }
 }

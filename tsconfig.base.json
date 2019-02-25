@@ -5,7 +5,12 @@
     "declaration": true,
     "declarationDir": "dist/types",
     "declarationMap": true,
-    "strict": true
+    "strict": true,
+    "target": "es5",
+    "lib": [
+      "es5",
+      "es2015.promise"
+    ]
   },
   "exclude": [
     "node_modules",

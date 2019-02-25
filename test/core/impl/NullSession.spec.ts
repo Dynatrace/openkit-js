@@ -15,9 +15,11 @@
  */
 
 import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { defaultNullSession } from '../../../src/core/impl/NullSession';
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
-    });
+describe('NullSession', () => {
+    it('should return the defaultNullAction on entering an action', () => {
+        expect(defaultNullSession.enterAction('someActionName'))
+            .toBe(defaultNullAction);
+    })
 });

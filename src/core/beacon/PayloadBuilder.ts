@@ -117,6 +117,4 @@ export class PayloadBuilder {
             .addIfDefined(PayloadKey.KeyName, name)
             .add(PayloadKey.ThreadId, 1);
     }
-
-    private constructor() {}
 }

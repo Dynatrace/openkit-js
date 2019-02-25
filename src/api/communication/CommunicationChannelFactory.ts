@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { CommunicationChannel } from './CommunicationChannel';
 
-describe('NullAction', () => {
-    it('should return null on leaveAction', () => {
-        expect(defaultNullAction.leaveAction()).toBeNull();
-    });
-});
+export interface CommunicationChannelFactory {
+    getCommunicationChannel(): CommunicationChannel;
+}

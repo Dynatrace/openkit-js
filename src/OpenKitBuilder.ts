@@ -15,13 +15,13 @@
  *
  */
 
-import { HttpClient } from './api/http/HttpClient';
+import { CommunicationChannelFactory } from './api/communication/CommunicationChannelFactory';
 import { OpenKit } from './api/OpenKit';
 import { RandomNumberProvider } from './api/RandomNumberProvider';
+import { HttpCommunicationChannelFactory } from './core/communication/http/HttpCommunicationChannelFactory';
 import { Configuration } from './core/config/Configuration';
-import { DefaultHttpClient } from './core/http/DefaultHttpClient';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
-import { DefaultRandomNumberProvider } from './core/utils/DefaultRandomNumberProvider';
+import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
 
@@ -45,7 +45,7 @@ export class OpenKitBuilder {
             crashReportingLevel: defaultCrashReportingLevel,
             dataCollectionLevel: defaultDataCollectionLevel,
 
-            httpClient: new DefaultHttpClient(),
+            communicationFactory: new HttpCommunicationChannelFactory(),
             random: new DefaultRandomNumberProvider(),
         };
     }
@@ -80,8 +80,8 @@ export class OpenKitBuilder {
         return this;
     }
 
-    public withCustomHttpClient(httpClient: HttpClient): this {
-        this.config.httpClient = httpClient;
+    public withCommunicationChannelFactory(communicationFactory: CommunicationChannelFactory): this {
+        this.config.communicationFactory = communicationFactory;
         return this;
     }
 

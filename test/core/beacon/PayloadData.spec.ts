@@ -15,14 +15,14 @@
  */
 
 import {instance, mock, when} from 'ts-mockito';
-import { HttpClient, RandomNumberProvider } from '../../../src';
+import { RandomNumberProvider } from '../../../src';
+import { CommunicationChannelFactory } from '../../../src/api/communication/CommunicationChannelFactory';
+import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
 import {PayloadData} from '../../../src/core/beacon/PayloadData';
-import {parsePayload} from '../../../src/core/beacon/StatusResponse';
 import {Configuration} from '../../../src/core/config/Configuration';
 import {ActionImpl} from '../../../src/core/impl/ActionImpl';
 import {State} from '../../../src/core/impl/State';
-import {EventType} from '../../../src/core/protocol/EventType';
-import {defaultTimestampProvider} from '../../../src/core/utils/TimestampProvider';
+import {defaultTimestampProvider} from '../../../src/core/provider/TimestampProvider';
 import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
 import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
 
@@ -33,7 +33,8 @@ const baseConfiguration: Readonly<Configuration> = {
     applicationId: 'app-id',
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
-    httpClient: {} as HttpClient,
+
+    communicationFactory: {} as CommunicationChannelFactory,
     random: {} as RandomNumberProvider,
 };
 
@@ -50,70 +51,156 @@ describe('PayloadData', () => {
     let state: State;
 
     beforeEach(() => {
-       state = new State(baseConfiguration);
+        state = new State(baseConfiguration);
     });
 
     it('should create', () => {
         expect(new PayloadData(state, '', 5, defaultTimestampProvider)).toBeTruthy();
     });
 
+    it('should create the prefix after creation', () => {
+        const prefixSpy = jest.spyOn(PayloadBuilder, 'prefix');
+        new PayloadData(state, '', 5, defaultTimestampProvider);
+
+        expect(prefixSpy).toHaveBeenCalledTimes(1);
+    });
+
     it('should fetch the payload after a created session', () => {
         // given
         const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
+        const startSessionSpy = jest.spyOn(PayloadBuilder, 'startSession');
 
         // when
         payloadData.startSession();
 
         // then
         expect(spiedPayloads.length).toBe(1);
-
-        const payload = payloadData.getNextPayload();
-        expect(payload).toBeDefined();
-
-        const parsedPayload = parsePayload(payload!);
-        expect(parsedPayload).toEqual(expect.objectContaining({ vv: '3', tx: expect.any(String), et: EventType.SessionStart.toString()}));
+        expect(startSessionSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should fetch the payload after a ending a session', () => {
         // given
         const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
+        const endSessionSpy = jest.spyOn(PayloadBuilder, 'endSession');
 
         // when
         payloadData.endSession();
 
         // then
         expect(spiedPayloads.length).toBe(1);
-
-        const payload = payloadData.getNextPayload();
-        expect(payload).toBeDefined();
-
-        const parsedPayload = parsePayload(payload!);
-        expect(parsedPayload).toEqual(expect.objectContaining({ vv: '3', tx: expect.any(String), et: EventType.SessionEnd.toString()}));
+        expect(endSessionSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should fetch the payload after adding an action', () => {
         // given
         const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
+        const addActionSpy = jest.spyOn(PayloadBuilder, 'action');
 
         // when
         payloadData.addAction(actionInstance);
 
         // then
         expect(spiedPayloads.length).toBe(1);
+        expect(addActionSpy).toHaveBeenCalledTimes(1);
+    });
 
-        const payload = payloadData.getNextPayload();
-        expect(payload).toBeDefined();
+    it('should fetch the payload after identifying a user', () => {
+        // given
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const spiedPayloads = (payloadData as any).payloadQueue;
+        const identifyUserSpy = jest.spyOn(PayloadBuilder, 'identifyUser');
 
-        const parsedPayload = parsePayload(payload!);
-        expect(parsedPayload).toEqual(expect.objectContaining({ vv: '3', tx: expect.any(String), et: EventType.ManualAction.toString()}));
+        // when
+        payloadData.identifyUser('userTag');
+
+        // then
+        expect(spiedPayloads.length).toBe(1);
+        expect(identifyUserSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should fetch the payload after reporting a value', () => {
+        // given
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const spiedPayloads = (payloadData as any).payloadQueue;
+        const reportValueSpy = jest.spyOn(PayloadBuilder, 'reportValue');
+
+        // when
+        payloadData.reportValue(actionInstance, 'name', 'value');
+
+        // then
+        expect(spiedPayloads.length).toBe(1);
+        expect(reportValueSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should return undefined if getNextPayload is called without any payloads', () => {
         const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
 
         expect(payloadData.getNextPayload()).toBeUndefined();
+    });
+
+    it('should not have payloads left if queue is empty', () => {
+        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+
+        expect(payloadData.hasPayloadsLeft()).toBeFalsy();
+    });
+
+    describe('getNextPayload', () => {
+
+        it('should return undefined if queue is empty', () => {
+            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+
+            expect(payloadData.getNextPayload()).toBeUndefined();
+        });
+
+        it('should return a payload', () => {
+            // given
+            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            payloadData.startSession();
+
+            // when
+            const payload = payloadData.getNextPayload();
+
+            // then
+            expect(payload).toBeDefined();
+            expect(payloadData.hasPayloadsLeft()).toBe(false);
+        });
+
+        it('should have created the prefix with mutable part', () => {
+            // given
+            const mutableSpy = jest.spyOn(PayloadBuilder, 'mutable');
+            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            payloadData.startSession();
+
+            // when
+            const payload = payloadData.getNextPayload();
+
+            // then
+            expect(payload).toBeDefined();
+            expect(mutableSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it('should split up payloads in multiple if maxBeaconSize is to small', () => {
+            // given
+            state.updateState({ valid: true, maxBeaconSize: 0 });
+            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            payloadData.startSession();
+            payloadData.identifyUser('userTag');
+
+
+            // when
+            const payload1 = payloadData.getNextPayload();
+            expect(payloadData.hasPayloadsLeft()).toBe(true);
+            const payload2 = payloadData.getNextPayload();
+            expect(payloadData.hasPayloadsLeft()).toBe(false);
+            const payload3 = payloadData.getNextPayload();
+
+            // then
+            expect(payload1).toBeDefined();
+            expect(payload2).toBeDefined();
+            expect(payload3).toBeUndefined();
+        });
     });
 });

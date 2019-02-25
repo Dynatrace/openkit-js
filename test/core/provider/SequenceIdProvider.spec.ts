@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {SequenceIdProvider} from '../../../src/core/utils/SequenceIdProvider';
+import {SequenceIdProvider} from '../../../src/core/provider/SequenceIdProvider';
 
 describe('SequenceIdProvider', () => {
     it('the first default id is 1', () => {

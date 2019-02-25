@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CaptureMode, HttpStatus, StatusResponse } from '../beacon/StatusResponse';
+import { CaptureMode, StatusResponse } from '../../api/communication/StatusResponse';
 import { Configuration } from '../config/Configuration';
 
 const defaultServerId = 1;
@@ -60,14 +60,32 @@ export class State {
         this._multiplicity = 0;
     }
 
-    public updateState(response: StatusResponse): void {
+    public updateState(newState: StatusResponse | State): void {
+        if (newState instanceof State) {
+            this.updateWithState(newState);
+        } else {
+            this.updateWithResponse(newState);
+        }
+    }
 
-        if (response.status !== HttpStatus.OK) {
+    public clone(): State {
+        const clonedState = new State(this._config);
+
+        clonedState._maxBeaconSize = this._maxBeaconSize;
+        clonedState._serverId = this._serverId;
+        clonedState._multiplicity = this._multiplicity;
+
+        return clonedState;
+    }
+
+    private updateWithResponse(response: StatusResponse): void {
+
+        if (response.valid === false) {
             return;
         }
 
-        if (response.serverID !== undefined && this._serverIdLocked === false) {
-            this._serverId = response.serverID >= 0 ? response.serverID : defaultServerId;
+        if (response.serverId !== undefined && this._serverIdLocked === false) {
+            this._serverId = response.serverId >= 0 ? response.serverId : defaultServerId;
         }
 
         if (response.maxBeaconSize !== undefined) {
@@ -84,13 +102,12 @@ export class State {
         }
     }
 
-    public clone(): State {
-        const clonedState = new State(this._config);
+    private updateWithState(state: State): void {
+        if (this._serverIdLocked === false) {
+            this._serverId = state.serverId;
+        }
 
-        clonedState._maxBeaconSize = this._maxBeaconSize;
-        clonedState._serverId = this._serverId;
-        clonedState._multiplicity = this._multiplicity;
-
-        return clonedState;
+        this._multiplicity = state.multiplicity;
+        this._maxBeaconSize = state.maxBeaconSize;
     }
 }
