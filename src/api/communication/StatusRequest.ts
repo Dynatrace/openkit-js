@@ -24,7 +24,7 @@ export interface StatusRequest {
     readonly serverId: number;
 
     /**
-     * The application id of the current custom application.
+     * The id of the current custom application
      */
     readonly applicationId: string;
 

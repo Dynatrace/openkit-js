@@ -62,6 +62,7 @@ export class OpenKitBuilder {
      */
     public withApplicationName(appName: string): this {
         this.config.applicationName = String(appName);
+
         return this;
     }
 
@@ -73,6 +74,7 @@ export class OpenKitBuilder {
      */
     public withOperatingSystem(operatingSystem: string): this {
         this.config.operatingSystem = String(operatingSystem);
+
         return this;
     }
 
@@ -84,26 +86,26 @@ export class OpenKitBuilder {
      */
     public withApplicationVersion(appVersion: string): this {
         this.config.applicationVersion = String(appVersion);
+
         return this;
     }
 
     /**
-     * Sets the data collection logLevel.
+     * Sets the data collection level.
      *
-     * <p>
-     * Depending on the chosen logLevel the amount and granularity of data sent is controlled.
+     * Depending on the chosen level the amount and granularity of data sent is controlled.
      * Off (0) - no data collected
      * Performance (1) - only performance related data is collected
-     * UserBehaviour (2) - all available RUM data including performance related data is collected
-     * default value is OFF(0)
-     * </p>
+     * UserBehavior (2) - all available RUM data including performance related data is collected
      *
+     * Default value is UserBehavior (2)
      *
      * @param dataCollectionLevel The data collection level
      * @returns The current OpenKitBuilder
      */
     public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
         this.config.dataCollectionLevel = dataCollectionLevel;
+
         return this;
     }
 
@@ -120,16 +122,20 @@ export class OpenKitBuilder {
      */
     public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
         this.config.crashReportingLevel = crashReportingLevel;
+
         return this;
     }
 
     /**
-     * Sets the communication channel factory.
+     * Sets the communication channel factory. If the object is null or undefined, it is ignored.
      *
      * @param communicationFactory
      */
     public withCommunicationChannelFactory(communicationFactory: CommunicationChannelFactory): this {
-        this.config.communicationFactory = communicationFactory;
+        if (communicationFactory !== null && communicationFactory !== undefined) {
+            this.config.communicationFactory = communicationFactory;
+        }
+
         return this;
     }
 
@@ -140,6 +146,7 @@ export class OpenKitBuilder {
      */
     public withRandomNumberProvider(random: RandomNumberProvider): this {
         this.config.random = random;
+
         return this;
     }
 
@@ -153,7 +160,7 @@ export class OpenKitBuilder {
     /**
      * Build and initialize an OpenKit instance.
      *
-     * @returns The OpenKit-instance.
+     * @returns The OpenKit instance.
      */
     public build(): OpenKit {
         if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
