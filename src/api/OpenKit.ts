@@ -38,9 +38,10 @@ export interface OpenKit {
     createSession(clientIp?: string): Session;
 
     /**
-     * The same as {@link waitForInit}, but with a timeout in milliseconds. If the time runs out before the
-     * initialization has completed, the callback is called with false. Otherwise it behaves the same as
-     * {@link waitForInit}.
+     * Waits for the initialization of OpenKit and calls the callback after it finished, or the timeout runs out.
+     * If not timeout is passed, it runs until the initialization finished.<br>
+     * If OpenKit already initialized, the callback runs synchronously.<br>
+     * The callback is called with {@code true} iff OpenKit initialized successfully and is not Shutdown.
      *
      * @param callback The callback which is executed after initialization, or after the timeout runs out.
      * @param timeout The timeout for the initialization

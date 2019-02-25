@@ -16,6 +16,7 @@
 
 import { Action } from '../../api/Action';
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
+import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
@@ -79,7 +80,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.payloadData.identifyUser(userTag);
 
         // Send immediately as we can not be sure that the session has a correct 'end'
-        this.payloadSender.flush();
+        this.flush();
     }
 
     public enterAction(actionName: string): Action {
@@ -96,12 +97,22 @@ export class SessionImpl extends OpenKitObject implements Session {
 
     public endAction(action: Action): void {
         removeElement(this.openActions, action);
-        this.payloadSender.flush();
+        this.flush();
     }
 
     public init(): void {
         this.openKit.waitForInit(() => {
-            this.initialize();
+            if (this.openKit.status === Status.Initialized) {
+                this.initialize();
+            }
+        });
+    }
+
+    public flush(): void {
+        this.waitForInit(() => {
+            if (this.status === Status.Initialized) {
+                this.payloadSender.flush();
+            }
         });
     }
 
@@ -113,11 +124,16 @@ export class SessionImpl extends OpenKitObject implements Session {
         // our state may be outdated, update it
         this.state.updateState(this.openKit.state);
 
-        const response = await this.communicationChannel.sendNewSessionRequest(
-            this.state.config.beaconURL, StatusRequestImpl.from(this.state));
+        let response: StatusResponse;
+        try {
+            response = await this.communicationChannel.sendNewSessionRequest(
+                this.state.config.beaconURL, StatusRequestImpl.from(this.state));
+        } catch (exception) {
+            response = defaultInvalidStatusResponse;
+            log.warn('Initialization failed with exception', exception);
+        }
 
         this.finishInitialization(response);
-        this.state.setServerIdLocked();
         log.debug('Successfully initialized Session', this);
     }
 
@@ -145,9 +161,7 @@ export class SessionImpl extends OpenKitObject implements Session {
             this.payloadData.endSession();
         }
 
-        this.payloadSender.flush().then(() => {
-            this.openKit.removeSession(this);
-            this.shutdown();
-        });
+        this.openKit.removeSession(this);
+        this.shutdown();
     }
 }

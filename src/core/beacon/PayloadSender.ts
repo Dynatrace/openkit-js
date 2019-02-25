@@ -15,9 +15,13 @@
  */
 
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
+import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
 import { State } from '../impl/State';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
+import { createLogger } from '../utils/Logger';
 import { PayloadData } from './PayloadData';
+
+const log = createLogger('PayloadSender');
 
 /**
  * Responsible for building and sending payloads to the beacon.
@@ -54,8 +58,15 @@ export class PayloadSender {
             return;
         }
 
-        const response = await this.channel.sendPayloadData(
-            this.state.config.beaconURL, StatusRequestImpl.from(this.state), payload);
+        let response: StatusResponse;
+
+        try {
+            response = await this.channel.sendPayloadData(
+                this.state.config.beaconURL, StatusRequestImpl.from(this.state), payload);
+        } catch (exception) {
+            response = defaultInvalidStatusResponse;
+            log.warn('Failed to send payload data with exception', exception);
+        }
 
         if (response.valid) {
             this.state.updateState(response);

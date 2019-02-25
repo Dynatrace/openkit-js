@@ -28,3 +28,5 @@ export interface StatusResponse {
     readonly multiplicity?: number;
     readonly valid: boolean;
 }
+
+export const defaultInvalidStatusResponse: StatusResponse = { valid: false };

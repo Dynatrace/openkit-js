@@ -63,6 +63,7 @@ export abstract class OpenKitObject {
         }
 
         this.state.updateState(response);
+        this.state.setServerIdLocked();
         this._status = Status.Initialized;
         this.initCallbackHolder.resolve(true);
     }
@@ -78,7 +79,7 @@ export abstract class OpenKitObject {
         // Trivial case: We already initialized and the waitForInit comes after initialization. We can resolve
         // immediately and synchronous.
         if (this.status !== Status.Idle) {
-            callback(true);
+            callback(this.status === Status.Initialized);
             return;
         }
 
