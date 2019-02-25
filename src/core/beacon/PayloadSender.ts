@@ -64,8 +64,8 @@ export class PayloadSender {
             response = await this.channel.sendPayloadData(
                 this.state.config.beaconURL, StatusRequestImpl.from(this.state), payload);
         } catch (exception) {
-            response = defaultInvalidStatusResponse;
             log.warn('Failed to send payload data with exception', exception);
+            response = defaultInvalidStatusResponse;
         }
 
         if (response.valid) {

@@ -129,8 +129,8 @@ export class SessionImpl extends OpenKitObject implements Session {
             response = await this.communicationChannel.sendNewSessionRequest(
                 this.state.config.beaconURL, StatusRequestImpl.from(this.state));
         } catch (exception) {
-            response = defaultInvalidStatusResponse;
             log.warn('Initialization failed with exception', exception);
+            response = defaultInvalidStatusResponse;
         }
 
         this.finishInitialization(response);
