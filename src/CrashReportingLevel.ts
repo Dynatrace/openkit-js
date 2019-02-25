@@ -18,7 +18,18 @@
  * Protocol constants for the crash reporting level.
  */
 export const enum CrashReportingLevel {
+    /**
+     * Do not send crashes
+     */
     Off = 0,
+
+    /**
+     * Do not send crashes
+     */
     OptOutCrashes = 1,
+
+    /**
+     * Do send crashes.
+     */
     OptInCrashes = 2,
 }

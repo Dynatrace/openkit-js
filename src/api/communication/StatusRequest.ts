@@ -14,10 +14,32 @@
  * limitations under the License.
  */
 
+/**
+ * Represents a status request which should be send to the server.
+ */
 export interface StatusRequest {
+    /**
+     * The server id where the request should be send to.
+     */
     readonly serverId: number;
+
+    /**
+     * The application id of the current custom application.
+     */
     readonly applicationId: string;
+
+    /**
+     * The current OpenKit version.
+     */
     readonly openKitVersion: string;
+
+    /**
+     * The platformType.
+     */
     readonly platformType: number;
+
+    /**
+     * The agent technology type.
+     */
     readonly agentTechnologyType: string;
 }

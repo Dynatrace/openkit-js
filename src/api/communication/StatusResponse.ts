@@ -14,17 +14,49 @@
  * limitations under the License.
  */
 
+/**
+ * Flag to check if capturing for certain parts is enabled or not.
+ */
 export enum CaptureMode {
     On, Off,
 }
 
+/**
+ * Represents a status repsponse from dynatrace which will update the state of the current OpenKit application.
+ */
 export interface StatusResponse {
+    /**
+     * If captureMode = Off, all communication should be stopped and no further communication is allowed.
+     */
     readonly captureMode?: CaptureMode;
-    readonly monitorName?: string;
+
+    /**
+     * The server id where the next request should be send to.
+     */
     readonly serverId?: number;
+
+    /**
+     * The maximum beacon size in megabyte.
+     */
     readonly maxBeaconSize?: number;
+
+    /**
+     * Flag if errors should be captured.
+     */
     readonly captureErrors?: CaptureMode;
+
+    /**
+     * Flag if crashes should be captured.
+     */
     readonly captureCrashes?: CaptureMode;
+
+    /**
+     * The multiplicity which should be send back to the server.
+     */
     readonly multiplicity?: number;
+
+    /**
+     * Flag if the response is valid. If it is not, all communication stops immediately for the current session.
+     */
     readonly valid: boolean;
 }

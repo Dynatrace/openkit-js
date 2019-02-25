@@ -18,7 +18,18 @@
  * Protocol constants for the data collection level.
  */
 export const enum DataCollectionLevel {
+    /**
+     * Sends only anonymous data about new sessions.
+     */
     Off = 0,
+
+    /**
+     * Sends only anonymous data about the timing of sessions and actions, but no further data.
+     */
     Performance = 1,
+
+    /**
+     * Sends everything.
+     */
     UserBehavior = 2,
 }

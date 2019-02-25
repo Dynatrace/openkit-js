@@ -21,6 +21,7 @@ export interface Action {
 
     /**
      * Report a value with given name to Dynatrace.
+     * If the name or value is longer than 250 characters, it is truncated to this value.
      *
      * @param name The name of the reported value.
      * @param value The value to report.

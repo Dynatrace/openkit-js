@@ -16,6 +16,12 @@
 
 import { CommunicationChannel } from './CommunicationChannel';
 
+/**
+ * Interface for creating CommunicationChannels.
+ */
 export interface CommunicationChannelFactory {
+    /**
+     * Get a communication channel.
+     */
     getCommunicationChannel(): CommunicationChannel;
 }

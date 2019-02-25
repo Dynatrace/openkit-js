@@ -91,13 +91,6 @@ describe('HttpStatusResponse', () => {
             });
         });
 
-        describe('MonitorName', () => {
-            it('should be the values passed in', () => {
-                const response = new HttpStatusResponse({status: 200, payload: 'type=m&bn=Hello%20World'});
-                expect(response.monitorName).toBe('Hello World');
-            });
-        });
-
         describe('Mulitplicity', () => {
             it('should be 0 if the value is smaller or equal to 0', () => {
                 const response = new HttpStatusResponse({status: 200, payload: 'type=m&mp=-5'});
