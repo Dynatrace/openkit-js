@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import {instance, mock, when} from 'ts-mockito';
+import { instance, mock, when } from 'ts-mockito';
 import { RandomNumberProvider } from '../../../src';
 import { CommunicationChannelFactory } from '../../../src/api/communication/CommunicationChannelFactory';
 import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
-import {PayloadData} from '../../../src/core/beacon/PayloadData';
-import {Configuration} from '../../../src/core/config/Configuration';
-import {ActionImpl} from '../../../src/core/impl/ActionImpl';
-import {State} from '../../../src/core/impl/State';
-import {defaultTimestampProvider} from '../../../src/core/provider/TimestampProvider';
-import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
-import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
+import { PayloadData } from '../../../src/core/beacon/PayloadData';
+import { Configuration } from '../../../src/core/config/Configuration';
+import { ActionImpl } from '../../../src/core/impl/ActionImpl';
+import { State } from '../../../src/core/impl/State';
+import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { defaultTimestampProvider } from '../../../src/core/provider/TimestampProvider';
+import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
+import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 
 const baseConfiguration: Readonly<Configuration> = {
     beaconURL: 'https://example.com',
@@ -51,7 +52,7 @@ describe('PayloadData', () => {
     let state: State;
 
     beforeEach(() => {
-        state = new State(baseConfiguration);
+        state = new StateImpl(baseConfiguration);
     });
 
     it('should create', () => {
@@ -184,7 +185,7 @@ describe('PayloadData', () => {
 
         it('should split up payloads in multiple if maxBeaconSize is to small', () => {
             // given
-            state.updateState({ valid: true, maxBeaconSize: 0 });
+            state.updateFromResponse({ valid: true, maxBeaconSize: 0 });
             const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
             payloadData.startSession();
             payloadData.identifyUser('userTag');

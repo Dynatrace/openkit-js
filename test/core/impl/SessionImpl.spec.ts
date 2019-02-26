@@ -32,6 +32,7 @@ import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
+import { StateImpl } from '../../../src/core/impl/StateImpl';
 
 class StubCommunicationChannel implements CommunicationChannel {
     public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
@@ -73,7 +74,7 @@ describe('SessionImpl', () => {
             },
         };
 
-        state = new State(config as Configuration);
+        state = new StateImpl(config as Configuration);
 
         when(mockOpenKitImpl.state).thenReturn(state);
     });
@@ -100,7 +101,7 @@ describe('SessionImpl', () => {
 
     describe('creation', () => {
         it('should clone the state from openKitImpl', () => {
-            state.updateState({ valid: true, multiplicity: 2, serverId: 2, maxBeaconSize: 3 });
+            state.updateFromResponse({ valid: true, multiplicity: 2, serverId: 2, maxBeaconSize: 3 });
             const {session} = buildSession();
             const sessionState = session.state;
 
@@ -175,7 +176,7 @@ describe('SessionImpl', () => {
 
                 // then
                 expect(result).toBe(false);
-                verify(stateSyp.updateState(anything())).never();
+                verify(stateSyp.updateFromState(anything())).never();
 
                 done();
             }, 4000)
@@ -299,7 +300,7 @@ describe('SessionImpl', () => {
         it('should not be possible to enter an action if we do not capture (multiplicity = 0)', () => {
             // given
             const {session, payloadDataSpy} = buildSession();
-            session.state.updateState({valid: true, captureMode: CaptureMode.Off });
+            session.state.updateFromResponse({valid: true, captureMode: CaptureMode.Off });
 
             // when
             const action = session.enterAction('action');

@@ -28,7 +28,7 @@ import { removeElement } from '../utils/Utils';
 import { defaultNullSession } from './NullSession';
 import { OpenKitObject, Status } from './OpenKitObject';
 import { SessionImpl } from './SessionImpl';
-import { State } from './State';
+import { StateImpl } from './StateImpl';
 import { StatusRequestImpl } from './StatusRequestImpl';
 
 const log = createLogger('OpenKitImpl');
@@ -46,7 +46,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @param config The app configuration.
      */
     constructor(config: Configuration) {
-        super(new State({...config}));
+        super(new StateImpl({...config}));
 
         this.communicationChannel = config.communicationFactory.getCommunicationChannel();
 
@@ -97,7 +97,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         // We always send the createSession-request to the server, even when DataCollectionLevel = Off, but no user
         // activity is recorded.
 
-        if (this.status === Status.Shutdown || this.state.multiplicity === 0) {
+        if (this.status === Status.Shutdown || this.state.isCaptureDisabled()) {
             return defaultNullSession;
         }
 

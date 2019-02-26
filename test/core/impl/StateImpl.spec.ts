@@ -16,10 +16,11 @@
 
 import { RandomNumberProvider } from '../../../src';
 import { CommunicationChannelFactory } from '../../../src/api/communication/CommunicationChannelFactory';
-import {Configuration} from '../../../src/core/config/Configuration';
-import {State} from '../../../src/core/impl/State';
-import {CrashReportingLevel} from '../../../src/CrashReportingLevel';
-import {DataCollectionLevel} from '../../../src/DataCollectionLevel';
+import { Configuration } from '../../../src/core/config/Configuration';
+import { State } from '../../../src/core/impl/State';
+import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
+import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 
 const config: Readonly<Configuration> = {
     beaconURL: 'https://example.com',
@@ -33,11 +34,11 @@ const config: Readonly<Configuration> = {
     random: {} as RandomNumberProvider,
 };
 
-describe('State', () => {
+describe('StateImpl', () => {
     let state: State;
 
     beforeEach(() => {
-       state = new State(config);
+       state = new StateImpl(config);
     });
 
     it('should contain default configuration', () => {
@@ -60,23 +61,23 @@ describe('State', () => {
 
     describe('updateState with a status request', () => {
         it('should update the serverId', () => {
-            state.updateState({ valid: true, serverId: 7});
+            state.updateFromResponse({ valid: true, serverId: 7});
             expect(state.serverId).toBe(7);
         });
 
         it('should update maxBeaconSize with the multiplier of 1024', () => {
-            state.updateState({ valid: true, maxBeaconSize: 10});
+            state.updateFromResponse({ valid: true, maxBeaconSize: 10});
             expect(state.maxBeaconSize).toBe(10240);
         });
 
         it('should update multiplicity', () => {
-            state.updateState({ valid: true, multiplicity: 7});
+            state.updateFromResponse({ valid: true, multiplicity: 7});
             expect(state.multiplicity).toBe(7);
         });
 
         it('should not update any values, if the status is not 200', () => {
-           state.updateState({ valid: true, serverId: 5, maxBeaconSize: 5, multiplicity: 5});
-           state.updateState({ valid: false, serverId: 1, maxBeaconSize: 1, multiplicity: 1});
+           state.updateFromResponse({ valid: true, serverId: 5, maxBeaconSize: 5, multiplicity: 5});
+           state.updateFromResponse({ valid: false, serverId: 1, maxBeaconSize: 1, multiplicity: 1});
 
            expect(state.multiplicity).toBe(5);
            expect(state.maxBeaconSize).toBe(5120);
@@ -85,15 +86,15 @@ describe('State', () => {
     });
 
     describe('updateState with another state', () => {
-        const otherState = new State({} as Configuration);
+        const otherState = new StateImpl({} as Configuration);
 
         it('should update the server-id', () => {
             // given
-            state.updateState({valid: true, serverId: 4});
-            otherState.updateState({valid: true, serverId: 8});
+            state.updateFromResponse({valid: true, serverId: 4});
+            otherState.updateFromResponse({valid: true, serverId: 8});
 
             // when
-            state.updateState(otherState);
+            state.updateFromState(otherState);
 
             // then
             expect(state.serverId).toBe(8);
@@ -101,12 +102,12 @@ describe('State', () => {
 
         it('should not update the server-id if it is locked', () => {
             // given
-            state.updateState({valid: true, serverId: 4});
+            state.updateFromResponse({valid: true, serverId: 4});
             state.setServerIdLocked();
-            otherState.updateState({valid: true, serverId: 8});
+            otherState.updateFromResponse({valid: true, serverId: 8});
 
             // when
-            state.updateState(otherState);
+            state.updateFromState(otherState);
 
             // then
             expect(state.serverId).toBe(4);
@@ -114,11 +115,11 @@ describe('State', () => {
 
         it('should update the multiplicity', () => {
             // given
-            state.updateState({valid: true, multiplicity: 4});
-            otherState.updateState({valid: true, multiplicity: 8});
+            state.updateFromResponse({valid: true, multiplicity: 4});
+            otherState.updateFromResponse({valid: true, multiplicity: 8});
 
             // when
-            state.updateState(otherState);
+            state.updateFromState(otherState);
 
             // then
             expect(state.serverId).toBe(8);
@@ -126,11 +127,11 @@ describe('State', () => {
 
         it('should update the maxBeaconSize', () => {
             // given
-            state.updateState({valid: true, maxBeaconSize: 4});
-            otherState.updateState({valid: true, maxBeaconSize: 8});
+            state.updateFromResponse({valid: true, maxBeaconSize: 4});
+            otherState.updateFromResponse({valid: true, maxBeaconSize: 8});
 
             // when
-            state.updateState(otherState);
+            state.updateFromState(otherState);
 
             // then
             expect(state.serverId).toBe(8);
@@ -140,15 +141,15 @@ describe('State', () => {
     });
 
     describe('switches', () => {
-        it('should set multiplicity to 0, after stopCommunication is called', () => {
-            state.stopCommunication();
-            expect(state.multiplicity).toBe(0);
+        it('should disable capturing after disableCapture has been called', () => {
+            state.disableCapture();
+            expect(state.isCaptureDisabled()).toBe(true);
         });
 
         it('should make the serverId unmodifiable, after setServerIdLocked is called', () => {
-            state.updateState({ valid: true, serverId: 4});
+            state.updateFromResponse({ valid: true, serverId: 4});
             state.setServerIdLocked();
-            state.updateState({ valid: true, serverId: 7});
+            state.updateFromResponse({ valid: true, serverId: 7});
 
             expect(state.serverId).toBe(4);
         });
@@ -156,7 +157,7 @@ describe('State', () => {
 
     describe('clone', () => {
         it('should return an object with equal values', () => {
-            state.updateState({ valid: true, serverId: 5, multiplicity: 5, maxBeaconSize: 5});
+            state.updateFromResponse({ valid: true, serverId: 5, multiplicity: 5, maxBeaconSize: 5});
             const newState = state.clone();
 
             expect(newState.multiplicity).toBe(5);
@@ -165,10 +166,10 @@ describe('State', () => {
         });
 
         it('should not copy the server-id lock', () => {
-            state.updateState({ valid: true, serverId: 5});
+            state.updateFromResponse({ valid: true, serverId: 5});
             state.setServerIdLocked();
             const newState = state.clone();
-            newState.updateState({ valid: true, serverId: 7});
+            newState.updateFromResponse({ valid: true, serverId: 7});
 
             expect(newState.serverId).toBe(7);
         });

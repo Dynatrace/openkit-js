@@ -47,7 +47,7 @@ export class PayloadSender {
     }
 
     private async sendPayloads(): Promise<void> {
-        while (this.state.multiplicity !== 0 && this.payloadData.hasPayloadsLeft()) {
+        while (this.state.isCaptureDisabled() === false && this.payloadData.hasPayloadsLeft()) {
             await this.sendPayload();
         }
     }
@@ -69,9 +69,9 @@ export class PayloadSender {
         }
 
         if (response.valid) {
-            this.state.updateState(response);
+            this.state.updateFromResponse(response);
         } else {
-            this.state.stopCommunication();
+            this.state.disableCapture();
         }
     }
 }

@@ -17,7 +17,7 @@
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src';
 import { StatusRequest } from '../../../src/api/communication/StatusRequest';
 import { Configuration } from '../../../src/core/config/Configuration';
-import { State } from '../../../src/core/impl/State';
+import { StateImpl } from '../../../src/core/impl/StateImpl';
 import { StatusRequestImpl } from '../../../src/core/impl/StatusRequestImpl';
 
 describe('StatusRequestImpl', () => {
@@ -48,8 +48,8 @@ describe('StatusRequestImpl', () => {
     });
 
     it('should create the request from a state', () => {
-       const state = new State({applicationId: '1.2.3'} as Configuration);
-       state.updateState({valid: true, serverId: 8});
+       const state = new StateImpl({applicationId: '1.2.3'} as Configuration);
+       state.updateFromResponse({valid: true, serverId: 8});
 
        const request = StatusRequestImpl.from(state);
 
