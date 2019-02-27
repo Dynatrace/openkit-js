@@ -22,7 +22,9 @@ import { defaultInvalidHttpResponse, HttpClient, HttpResponse } from './HttpClie
  */
 export class RetryHttpClientProxy implements HttpClient {
     /**
-     * Creates a new RetryHttpClientProxy
+     * Creates a new RetryHttpClientProxy.
+     * Note: The accuracy of the timout depends on the setTimeout implementation. The usual setTimeout implementation
+     * ensures waiting at least the time passed, but may wait longer.
      *
      * @param proxy The httpClient which should be proxied. The methods might be called multiple times.
      * @param timeouts The timeouts in milliseconds which should be used if a request failed.
