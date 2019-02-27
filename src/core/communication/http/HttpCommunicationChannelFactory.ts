@@ -19,11 +19,12 @@ import { CommunicationChannelFactory } from '../../../api/communication/Communic
 import { AxiosHttpClient } from './AxiosHttpClient';
 import { HttpClient } from './HttpClient';
 import { HttpCommunicationChannel } from './HttpCommunicationChannel';
+import { RetryHttpClientProxy } from './RetryHttpClientProxy';
 
 export class HttpCommunicationChannelFactory implements CommunicationChannelFactory {
     private readonly channel: HttpCommunicationChannel;
 
-    constructor(client: HttpClient = new AxiosHttpClient()) {
+    constructor(client: HttpClient = new RetryHttpClientProxy(new AxiosHttpClient())) {
         this.channel = new HttpCommunicationChannel(client);
     }
 

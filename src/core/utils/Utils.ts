@@ -37,3 +37,9 @@ export const removeElement = <T>(array: T[], element: T): void => {
 };
 
 export const truncate = (str: string): string => str.substr(0, MAX_VALUE_LENGTH);
+
+export const timeout = (milliseconds: number): Promise<void> => {
+   return new Promise<void>((res) => {
+       setTimeout(res, milliseconds);
+   });
+};

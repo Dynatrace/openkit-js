@@ -16,12 +16,7 @@
 
 import Axios, { AxiosResponse } from 'axios';
 import { createLogger } from '../../utils/Logger';
-import { HttpClient } from './HttpClient';
-
-export interface HttpResponse {
-    status: number;
-    payload: string;
-}
+import { HttpClient, HttpResponse } from './HttpClient';
 
 const log = createLogger('AxiosHttpClient');
 
