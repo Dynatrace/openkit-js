@@ -36,21 +36,24 @@ const defaultApplicationName = '';
  * Builder for an OpenKit instance.
  */
 export class OpenKitBuilder {
-    private readonly config: Configuration;
+    private readonly beaconUrl: string;
+    private readonly applicationId: string;
+    private readonly deviceId: string;
+
+    private applicationName = defaultApplicationName;
+    private operatingSystem?: string;
+    private applicationVersion?: string;
+
+    private crashReportingLevel = defaultCrashReportingLevel;
+    private dataCollectionLevel = defaultDataCollectionLevel;
+
+    private communicationFactory?: CommunicationChannelFactory;
+    private randomNumberProvider?: RandomNumberProvider;
 
     constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
-        this.config = {
-            beaconURL,
-            applicationId,
-            deviceId,
-
-            applicationName: defaultApplicationName,
-            crashReportingLevel: defaultCrashReportingLevel,
-            dataCollectionLevel: defaultDataCollectionLevel,
-
-            communicationFactory: new HttpCommunicationChannelFactory(),
-            random: new DefaultRandomNumberProvider(),
-        };
+        this.beaconUrl = beaconURL;
+        this.applicationId = applicationId;
+        this.deviceId = String(deviceId);
     }
 
     /**
@@ -61,7 +64,7 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withApplicationName(appName: string): this {
-        this.config.applicationName = String(appName);
+        this.applicationName = String(appName);
 
         return this;
     }
@@ -73,7 +76,7 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withOperatingSystem(operatingSystem: string): this {
-        this.config.operatingSystem = String(operatingSystem);
+        this.operatingSystem = String(operatingSystem);
 
         return this;
     }
@@ -85,7 +88,7 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withApplicationVersion(appVersion: string): this {
-        this.config.applicationVersion = String(appVersion);
+        this.applicationVersion = String(appVersion);
 
         return this;
     }
@@ -104,7 +107,7 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
-        this.config.dataCollectionLevel = dataCollectionLevel;
+        this.dataCollectionLevel = dataCollectionLevel;
 
         return this;
     }
@@ -121,7 +124,7 @@ export class OpenKitBuilder {
      * @param crashReportingLevel
      */
     public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
-        this.config.crashReportingLevel = crashReportingLevel;
+        this.crashReportingLevel = crashReportingLevel;
 
         return this;
     }
@@ -133,28 +136,32 @@ export class OpenKitBuilder {
      */
     public withCommunicationChannelFactory(communicationFactory: CommunicationChannelFactory): this {
         if (communicationFactory !== null && communicationFactory !== undefined) {
-            this.config.communicationFactory = communicationFactory;
+            this.communicationFactory = communicationFactory;
         }
 
         return this;
     }
 
     /**
-     * Sets the random number provider
+     * Sets the random number provider. If the object is null or undefined, it is ignored.
      *
-     * @param random
+     * @param random The random number provider.
      */
     public withRandomNumberProvider(random: RandomNumberProvider): this {
-        this.config.random = random;
+        if (random !== null && random !== undefined) {
+           this.randomNumberProvider = random;
+        }
 
         return this;
     }
 
     /**
-     * Get the current configuration for OpenKit-js
+     * Builds and gets the current configuration.
+     *
+     * @returns the current configuration
      */
     public getConfig(): Readonly<Configuration> {
-        return this.config;
+        return this.buildConfig();
     }
 
     /**
@@ -163,14 +170,39 @@ export class OpenKitBuilder {
      * @returns The OpenKit instance.
      */
     public build(): OpenKit {
-        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
-            // user does not allow data tracking
-            this.config.deviceId = this.config.random.nextPositiveInteger();
-        }
+        const config = this.buildConfig();
 
-        const openKit = new OpenKitImpl(this.config);
+        const openKit = new OpenKitImpl(config);
         openKit.initialize();
 
         return openKit;
+    }
+
+    private buildConfig(): Readonly<Configuration> {
+        const communicationFactory = this.communicationFactory ?
+            this.communicationFactory : new HttpCommunicationChannelFactory();
+
+        const random = this.randomNumberProvider ?
+            this.randomNumberProvider : new DefaultRandomNumberProvider();
+
+        // user does not allow data tracking
+        const deviceId = this.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
+            this.deviceId : String(random.nextPositiveInteger());
+
+        return {
+            beaconURL: this.beaconUrl,
+            deviceId,
+            applicationId: this.applicationId,
+
+            applicationName: this.applicationName,
+            applicationVersion: this.applicationVersion,
+            operatingSystem: this.operatingSystem,
+
+            dataCollectionLevel: this.dataCollectionLevel,
+            crashReportingLevel: this.crashReportingLevel,
+
+            communicationFactory,
+            random,
+        };
     }
 }
