@@ -18,7 +18,7 @@ import { CaptureMode, StatusResponse } from '../../../api/communication/StatusRe
 import { ResponseKey } from '../../protocol/ResponseKey';
 import { createLogger } from '../../utils/Logger';
 import { PayloadDecoder } from '../../utils/PayloadDecoder';
-import { HttpResponse } from './AxiosHttpClient';
+import { HttpResponse } from './HttpClient';
 
 const parsePositiveInt = (str: string, defaultValue: number): number => {
     const parsed = parseInt(str, 10);
@@ -67,20 +67,25 @@ export class HttpStatusResponse implements StatusResponse {
                 // 1 is on, 0 is off. If another value is passed, we disable it to be on the safe side.
                 this.captureMode = value === '1' ? CaptureMode.On : CaptureMode.Off;
                 break;
+
             case ResponseKey.CaptureCrashes:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
                 this.captureCrashes = value === '1' ? CaptureMode.On : CaptureMode.Off;
                 break;
+
             case ResponseKey.CaptureErrors:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
                 this.captureErrors = value === '1' ? CaptureMode.On : CaptureMode.Off;
                 break;
+
             case ResponseKey.MaxBeaconSize:
                 this.maxBeaconSizeInKb = parsePositiveInt(value, 0);
                 break;
+
             case ResponseKey.Multiplicity:
                 this.multiplicity = parsePositiveInt(value, 0);
                 break;
+
             case ResponseKey.ServerId:
                 this.serverId = parsePositiveInt(value, 1);
                 break;

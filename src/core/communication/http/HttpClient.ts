@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-import { HttpResponse } from './AxiosHttpClient';
+export interface HttpResponse {
+    status: number;
+    payload: string;
+}
 
 export interface HttpClient {
     get(url: string): Promise<HttpResponse>;
     post(url: string, payload: string): Promise<HttpResponse>;
 }
+
+export const defaultInvalidHttpResponse: HttpResponse = { status: -1, payload: ''};
