@@ -66,7 +66,7 @@ describe('StateImpl', () => {
         });
 
         it('should update maxBeaconSize with the multiplier of 1024', () => {
-            state.updateFromResponse({ valid: true, maxBeaconSize: 10});
+            state.updateFromResponse({ valid: true, maxBeaconSizeInKb: 10});
             expect(state.maxBeaconSize).toBe(10240);
         });
 
@@ -76,8 +76,8 @@ describe('StateImpl', () => {
         });
 
         it('should not update any values, if the status is not 200', () => {
-           state.updateFromResponse({ valid: true, serverId: 5, maxBeaconSize: 5, multiplicity: 5});
-           state.updateFromResponse({ valid: false, serverId: 1, maxBeaconSize: 1, multiplicity: 1});
+           state.updateFromResponse({ valid: true, serverId: 5, maxBeaconSizeInKb: 5, multiplicity: 5});
+           state.updateFromResponse({ valid: false, serverId: 1, maxBeaconSizeInKb: 1, multiplicity: 1});
 
            expect(state.multiplicity).toBe(5);
            expect(state.maxBeaconSize).toBe(5120);
@@ -127,8 +127,8 @@ describe('StateImpl', () => {
 
         it('should update the maxBeaconSize', () => {
             // given
-            state.updateFromResponse({valid: true, maxBeaconSize: 4});
-            otherState.updateFromResponse({valid: true, maxBeaconSize: 8});
+            state.updateFromResponse({valid: true, maxBeaconSizeInKb: 4});
+            otherState.updateFromResponse({valid: true, maxBeaconSizeInKb: 8});
 
             // when
             state.updateFromState(otherState);
@@ -157,7 +157,7 @@ describe('StateImpl', () => {
 
     describe('clone', () => {
         it('should return an object with equal values', () => {
-            state.updateFromResponse({ valid: true, serverId: 5, multiplicity: 5, maxBeaconSize: 5});
+            state.updateFromResponse({ valid: true, serverId: 5, multiplicity: 5, maxBeaconSizeInKb: 5});
             const newState = state.clone();
 
             expect(newState.multiplicity).toBe(5);

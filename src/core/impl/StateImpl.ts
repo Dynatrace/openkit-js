@@ -79,8 +79,8 @@ export class StateImpl implements State {
         }
 
         // Max beacon size
-        if (response.maxBeaconSize !== undefined) {
-            this.maxBeaconSize = response.maxBeaconSize >= 0 ? response.maxBeaconSize * 1024 : defaultMaxBeaconSize;
+        if (response.maxBeaconSizeInKb !== undefined) {
+            this.maxBeaconSize = response.maxBeaconSizeInKb >= 0 ? response.maxBeaconSizeInKb * 1024 : defaultMaxBeaconSize;
         }
     }
 

@@ -101,7 +101,7 @@ describe('SessionImpl', () => {
 
     describe('creation', () => {
         it('should clone the state from openKitImpl', () => {
-            state.updateFromResponse({ valid: true, multiplicity: 2, serverId: 2, maxBeaconSize: 3 });
+            state.updateFromResponse({ valid: true, multiplicity: 2, serverId: 2, maxBeaconSizeInKb: 3 });
             const {session} = buildSession();
             const sessionState = session.state;
 

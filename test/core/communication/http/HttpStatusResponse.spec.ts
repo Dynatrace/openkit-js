@@ -82,12 +82,12 @@ describe('HttpStatusResponse', () => {
         describe('MaxBeaconSize', () => {
             it('should be the value passed in', () => {
                 const response = new HttpStatusResponse({status: 200, payload: 'type=m&bl=6'});
-                expect(response.maxBeaconSize).toBe(6);
+                expect(response.maxBeaconSizeInKb).toBe(6);
             });
 
             it('should be 0 if a value smaller 0 passed in', () => {
                 const response = new HttpStatusResponse({status: 200, payload: 'type=m&bl=-14'});
-                expect(response.maxBeaconSize).toBe(0);
+                expect(response.maxBeaconSizeInKb).toBe(0);
             });
         });
 

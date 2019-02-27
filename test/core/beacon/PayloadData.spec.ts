@@ -185,7 +185,7 @@ describe('PayloadData', () => {
 
         it('should split up payloads in multiple if maxBeaconSize is to small', () => {
             // given
-            state.updateFromResponse({ valid: true, maxBeaconSize: 0 });
+            state.updateFromResponse({ valid: true, maxBeaconSizeInKb: 0 });
             const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
             payloadData.startSession();
             payloadData.identifyUser('userTag');
