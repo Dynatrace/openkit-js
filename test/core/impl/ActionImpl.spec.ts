@@ -23,6 +23,7 @@ import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 
 describe('ActionImpl', () => {
@@ -36,6 +37,7 @@ describe('ActionImpl', () => {
 
     beforeEach(() => {
         config = {
+            loggerFactory: defaultNullLoggerFactory,
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
         };
 

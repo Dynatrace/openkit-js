@@ -33,6 +33,7 @@ import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
 class StubCommunicationChannel implements CommunicationChannel {
     public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
@@ -63,10 +64,11 @@ describe('SessionImpl', () => {
         config = {
             applicationId: 'app-id',
             applicationName: '',
-            deviceId: 4,
+            deviceId: '4',
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
             crashReportingLevel: CrashReportingLevel.OptOutCrashes,
 
+            loggerFactory: defaultNullLoggerFactory,
             communicationFactory: {
                 getCommunicationChannel(): CommunicationChannel {
                     return communicationChannelInstance;

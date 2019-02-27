@@ -24,6 +24,7 @@ import { defaultNullSession } from '../../../src/core/impl/NullSession';
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
+import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
 class StubCommunicationChannel implements CommunicationChannel {
     public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
@@ -48,10 +49,11 @@ describe('OpenKitImpl', () => {
         config = {
             applicationId: 'app-id',
             applicationName: '',
-            deviceId: 4,
+            deviceId: '4',
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
             crashReportingLevel: CrashReportingLevel.OptOutCrashes,
 
+            loggerFactory: defaultNullLoggerFactory,
             communicationFactory: {
                 getCommunicationChannel(): CommunicationChannel {
                     return communicationChannelInstance;

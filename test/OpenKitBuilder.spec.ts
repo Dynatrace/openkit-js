@@ -19,8 +19,12 @@ import { CommunicationChannel } from '../src/api/communication/CommunicationChan
 import { CommunicationChannelFactory } from '../src/api/communication/CommunicationChannelFactory';
 import { StatusRequest } from '../src/api/communication/StatusRequest';
 import { StatusResponse } from '../src/api/communication/StatusResponse';
+import { Logger } from '../src/api/logging/Logger';
+import { LoggerFactory } from '../src/api/logging/LoggerFactory';
 import { HttpCommunicationChannelFactory } from '../src/core/communication/http/HttpCommunicationChannelFactory';
 import { OpenKitImpl } from '../src/core/impl/OpenKitImpl';
+import { ConsoleLoggerFactory } from '../src/core/logging/ConsoleLoggerFactory';
+import { defaultNullLogger } from '../src/core/logging/NullLogger';
 import { DefaultRandomNumberProvider } from '../src/core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from '../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../src/DataCollectionLevel';
@@ -43,6 +47,12 @@ class StubCommunicationChannel implements CommunicationChannel {
 class StubCommunicationChannelFactory implements CommunicationChannelFactory {
     public getCommunicationChannel(): CommunicationChannel {
         return new StubCommunicationChannel();
+    }
+}
+
+class StubLoggerFactory implements LoggerFactory {
+    public createLogger(name: string): Logger {
+        return defaultNullLogger;
     }
 }
 
@@ -105,6 +115,18 @@ describe('OpenKitBuilder', () => {
         builder.withRandomNumberProvider(random);
 
         expect(builder.getConfig().random).toBe(random);
+    });
+
+    it('should set the logging factory', () => {
+        const loggerFactory = new StubLoggerFactory();
+
+        builder.withLoggerFactory(loggerFactory);
+
+        expect(builder.getConfig().loggerFactory).toBe(loggerFactory);
+    });
+
+    it('should set a default logging factory if none is configured', () => {
+        expect(builder.getConfig().loggerFactory).toBeInstanceOf(ConsoleLoggerFactory);
     });
 
     it('should set multiple values at once', () => {

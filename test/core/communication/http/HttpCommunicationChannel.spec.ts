@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { anyString, instance, mock, spy, verify } from 'ts-mockito';
+import { anyString, spy, verify } from 'ts-mockito';
 import { CommunicationChannel } from '../../../../src/api/communication/CommunicationChannel';
 import { StatusRequest } from '../../../../src/api/communication/StatusRequest';
 import { HttpResponse } from '../../../../src/core/communication/http/AxiosHttpClient';
 import { HttpClient } from '../../../../src/core/communication/http/HttpClient';
 import { HttpCommunicationChannel } from '../../../../src/core/communication/http/HttpCommunicationChannel';
+import { defaultNullLoggerFactory } from '../../../../src/core/logging/NullLoggerFactory';
 
 const request: StatusRequest = {
     serverId: 5,
@@ -46,7 +47,7 @@ describe('HttpCommunicationChannel', () => {
     beforeEach(() => {
         const client = new StubHttpClient();
         clientSpy = spy(client);
-        channel = new HttpCommunicationChannel(client);
+        channel = new HttpCommunicationChannel(client, defaultNullLoggerFactory);
     });
 
     describe('sendPayloadData', () => {
