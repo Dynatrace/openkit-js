@@ -15,13 +15,11 @@
  */
 
 import { Action } from '../../api/Action';
+import { Logger } from '../../api/logging/Logger';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
-import { createLogger } from '../utils/Logger';
 import { SessionImpl } from './SessionImpl';
-
-const log = createLogger('ActionImpl');
 
 export class ActionImpl implements Action {
     public readonly name: string;
@@ -34,6 +32,8 @@ export class ActionImpl implements Action {
     private readonly beacon: PayloadData;
     private readonly timestampProvider: TimestampProvider;
 
+    private readonly logger: Logger;
+
     private _endTime = -1;
     public get endTime(): number {
         return this._endTime;
@@ -45,6 +45,8 @@ export class ActionImpl implements Action {
         beacon: PayloadData,
         timestampProvider: TimestampProvider = defaultTimestampProvider) {
 
+        this.logger = session.state.config.loggerFactory.createLogger('ActionImpl');
+
         this.session = session;
         this.name = name;
         this.beacon = beacon;
@@ -53,7 +55,7 @@ export class ActionImpl implements Action {
         this.actionId = this.beacon.createId();
         this.timestampProvider = timestampProvider;
 
-        log.debug(`Created action '${name}'`, this);
+        this.logger.debug(`Created action '${name}'`, this);
     }
 
     public reportValue(name: string, value: number | string | null | undefined): void {
@@ -70,7 +72,7 @@ export class ActionImpl implements Action {
             return;
         }
 
-        log.debug('Report value', value);
+        this.logger.debug('Report value', value);
 
         this.beacon.reportValue(this, name, value);
     }
@@ -80,7 +82,7 @@ export class ActionImpl implements Action {
             return null;
         }
 
-        log.debug(`Leaving action '${this.name}'`);
+        this.logger.debug(`Leaving action '${this.name}'`);
 
         this.endSequenceNumber = this.beacon.createSequenceNumber();
         this._endTime = this.timestampProvider.getCurrentTimestamp();

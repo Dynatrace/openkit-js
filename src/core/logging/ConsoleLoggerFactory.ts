@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-import { LoggerFactory } from '../logging/LoggerFactory';
-import { CommunicationChannel } from './CommunicationChannel';
+import { Logger } from '../../api/logging/Logger';
+import { LoggerFactory } from '../../api/logging/LoggerFactory';
+import { LogLevel } from '../../api/logging/LogLevel';
+import { ConsoleLogger } from './ConsoleLogger';
 
-/**
- * Interface for creating CommunicationChannels.
- */
-export interface CommunicationChannelFactory {
-    /**
-     * Get a communication channel.
-     */
-    getCommunicationChannel(loggerFactory: LoggerFactory): CommunicationChannel;
+export class ConsoleLoggerFactory implements LoggerFactory {
+    private readonly logLevel: LogLevel;
+
+    constructor(logLevel: LogLevel) {
+        this.logLevel = logLevel;
+    }
+
+    public createLogger(name: string): Logger {
+        return new ConsoleLogger(name, this.logLevel);
+    }
 }

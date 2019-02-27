@@ -17,19 +17,17 @@
 import { Action } from '../../api/Action';
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
+import { Logger } from '../../api/logging/Logger';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { PayloadSender } from '../beacon/PayloadSender';
-import { createLogger } from '../utils/Logger';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './NullAction';
 import { OpenKitImpl } from './OpenKitImpl';
 import { OpenKitObject, Status } from './OpenKitObject';
 import { StatusRequestImpl } from './StatusRequestImpl';
-
-const log = createLogger('SessionImpl');
 
 export class SessionImpl extends OpenKitObject implements Session {
     public readonly payloadData: PayloadData;
@@ -39,11 +37,17 @@ export class SessionImpl extends OpenKitObject implements Session {
     private readonly payloadSender: PayloadSender;
     private readonly communicationChannel: CommunicationChannel;
 
+    private readonly logger: Logger;
+
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
         super(openKit.state.clone());
 
+        this.logger = openKit.state.config.loggerFactory.createLogger('SessionImpl');
+
         this.openKit = openKit;
-        this.communicationChannel = this.state.config.communicationFactory.getCommunicationChannel();
+        this.communicationChannel = this.state.config.communicationFactory.getCommunicationChannel(
+            this.state.config.loggerFactory,
+        );
 
         this.payloadData = new PayloadData(this.state, clientIp, sessionId);
         this.payloadSender = new PayloadSender(this.state, this.payloadData);
@@ -76,7 +80,7 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        log.debug('Identify User', userTag);
+        this.logger.debug('Identify User', userTag);
         this.payloadData.identifyUser(userTag);
 
         // Send immediately as we can not be sure that the session has a correct 'end'
@@ -129,12 +133,12 @@ export class SessionImpl extends OpenKitObject implements Session {
             response = await this.communicationChannel.sendNewSessionRequest(
                 this.state.config.beaconURL, StatusRequestImpl.from(this.state));
         } catch (exception) {
-            log.warn('Initialization failed with exception', exception);
+            this.logger.warn('Initialization failed with exception', exception);
             response = defaultInvalidStatusResponse;
         }
 
         this.finishInitialization(response);
-        log.debug('Successfully initialized Session', this);
+        this.logger.debug('Successfully initialized Session', this);
     }
 
     private mayEnterAction(): boolean {
@@ -153,7 +157,7 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        log.debug('endSession', this);
+        this.logger.debug('endSession', this);
 
         this.openActions.slice().forEach((action) => action.leaveAction());
 

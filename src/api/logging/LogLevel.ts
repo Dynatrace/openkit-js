@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-import { LoggerFactory } from '../logging/LoggerFactory';
-import { CommunicationChannel } from './CommunicationChannel';
-
-/**
- * Interface for creating CommunicationChannels.
- */
-export interface CommunicationChannelFactory {
-    /**
-     * Get a communication channel.
-     */
-    getCommunicationChannel(loggerFactory: LoggerFactory): CommunicationChannel;
+export enum LogLevel {
+    Debug = 10,
+    Info = 20,
+    Warn = 30,
 }

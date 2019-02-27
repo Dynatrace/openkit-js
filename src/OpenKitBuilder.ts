@@ -16,11 +16,14 @@
  */
 
 import { CommunicationChannelFactory } from './api/communication/CommunicationChannelFactory';
+import { LoggerFactory } from './api/logging/LoggerFactory';
+import { LogLevel } from './api/logging/LogLevel';
 import { OpenKit } from './api/OpenKit';
 import { RandomNumberProvider } from './api/RandomNumberProvider';
 import { HttpCommunicationChannelFactory } from './core/communication/http/HttpCommunicationChannelFactory';
 import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
+import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
@@ -49,6 +52,9 @@ export class OpenKitBuilder {
 
     private communicationFactory?: CommunicationChannelFactory;
     private randomNumberProvider?: RandomNumberProvider;
+
+    private logLevel = LogLevel.Warn;
+    private loggerFactory?: LoggerFactory;
 
     constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
         this.beaconUrl = beaconURL;
@@ -156,6 +162,31 @@ export class OpenKitBuilder {
     }
 
     /**
+     * Sets the logger factory.
+     * If the argument is null or undefined, it is ignored.
+     *
+     * @param loggerFactory
+     */
+    public withLoggerFactory(loggerFactory: LoggerFactory): this {
+        if (loggerFactory !== null && loggerFactory !== undefined) {
+            this.loggerFactory = loggerFactory;
+        }
+
+        return this;
+    }
+
+    /**
+     * Sets the default log level if the default logger factory is used.
+     *
+     * @param logLevel The loglevel for the default logger factory.
+     */
+    public withLogLevel(logLevel: LogLevel): this {
+        this.logLevel = Number(logLevel);
+
+        return this;
+    }
+
+    /**
      * Builds and gets the current configuration.
      *
      * @returns the current configuration
@@ -179,8 +210,10 @@ export class OpenKitBuilder {
     }
 
     private buildConfig(): Readonly<Configuration> {
+        const loggerFactory = this.loggerFactory ? this.loggerFactory : new ConsoleLoggerFactory(this.logLevel);
+
         const communicationFactory = this.communicationFactory ?
-            this.communicationFactory : new HttpCommunicationChannelFactory();
+            this.communicationFactory : new HttpCommunicationChannelFactory(loggerFactory);
 
         const random = this.randomNumberProvider ?
             this.randomNumberProvider : new DefaultRandomNumberProvider();
@@ -203,6 +236,7 @@ export class OpenKitBuilder {
 
             communicationFactory,
             random,
+            loggerFactory,
         };
     }
 }

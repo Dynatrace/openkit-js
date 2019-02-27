@@ -17,32 +17,35 @@
 import { CommunicationChannel } from '../../../api/communication/CommunicationChannel';
 import { StatusRequest } from '../../../api/communication/StatusRequest';
 import { StatusResponse } from '../../../api/communication/StatusResponse';
+import { LoggerFactory } from '../../../api/logging/LoggerFactory';
 import { HttpClient } from './HttpClient';
 import { HttpStatusResponse } from './HttpStatusResponse';
 import { buildHttpUrl } from './HttpUrlBuilder';
 
 export class HttpCommunicationChannel implements CommunicationChannel {
+    private readonly loggerFactory: LoggerFactory;
     private readonly httpClient: HttpClient;
 
-    constructor(httpClient: HttpClient) {
+    constructor(httpClient: HttpClient, loggerFactory: LoggerFactory) {
         this.httpClient = httpClient;
+        this.loggerFactory = loggerFactory;
     }
 
     public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
         const httpResponse = await this.httpClient.get(buildHttpUrl(url, request, true));
 
-        return new HttpStatusResponse(httpResponse);
+        return new HttpStatusResponse(httpResponse, this.loggerFactory);
     }
 
     public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
         const httpResponse = await this.httpClient.post(buildHttpUrl(url, request, false), query);
 
-        return new HttpStatusResponse(httpResponse);
+        return new HttpStatusResponse(httpResponse, this.loggerFactory);
     }
 
     public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
         const httpResponse = await this.httpClient.get(buildHttpUrl(url, request, false));
 
-        return new HttpStatusResponse(httpResponse);
+        return new HttpStatusResponse(httpResponse, this.loggerFactory);
     }
 }

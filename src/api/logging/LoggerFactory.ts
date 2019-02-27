@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-export class Logger {
-    constructor(private readonly name: string) {}
+import { Logger } from './Logger';
 
-    public debug(...msg: any[]): void {
-        // tslint:disable-next-line:no-console
-        console.debug(`[${this.name}]`, ...msg);
-    }
-
-    public error(...msg: any[]): void {
-        // tslint:disable-next-line:no-console
-        console.error(`[${this.name}]`, ...msg);
-    }
-
-    public warn(...msg: any[]): void {
-        // tslint:disable-next-line:no-console
-        console.warn(`[${this.name}]`, ...msg);
-    }
+export interface LoggerFactory {
+    createLogger(name: string): Logger;
 }
-
-export const createLogger = (name: string): Logger => new Logger(name);

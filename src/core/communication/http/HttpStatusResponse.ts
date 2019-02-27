@@ -15,8 +15,9 @@
  */
 
 import { CaptureMode, StatusResponse } from '../../../api/communication/StatusResponse';
+import { Logger } from '../../../api/logging/Logger';
+import { LoggerFactory } from '../../../api/logging/LoggerFactory';
 import { ResponseKey } from '../../protocol/ResponseKey';
-import { createLogger } from '../../utils/Logger';
 import { PayloadDecoder } from '../../utils/PayloadDecoder';
 import { HttpResponse } from './HttpClient';
 
@@ -25,8 +26,6 @@ const parsePositiveInt = (str: string, defaultValue: number): number => {
 
     return parsed >= 0 ? parsed : defaultValue;
 };
-
-const log = createLogger('HttpStatusResponse');
 
 export class HttpStatusResponse implements StatusResponse {
     public captureCrashes: CaptureMode | undefined;
@@ -38,10 +37,14 @@ export class HttpStatusResponse implements StatusResponse {
 
     public valid = true;
 
-    constructor(response: HttpResponse) {
+    private readonly logger: Logger;
+
+    constructor(response: HttpResponse, loggerFactory: LoggerFactory) {
+        this.logger = loggerFactory.createLogger('HttpStatusResponse');
+
         if (response.status !== 200) {
             this.valid = false;
-            log.debug('Invalid response:', response.status);
+            this.logger.debug('Invalid response status:', response.status);
 
             return;
         }
@@ -49,7 +52,7 @@ export class HttpStatusResponse implements StatusResponse {
         const entries = new PayloadDecoder(response.payload).getEntries();
         if (entries.type !== 'm') {
             this.valid = false;
-            log.debug('Invalid type:', entries.type);
+            this.logger.debug('Invalid response type:', entries.type);
 
             return;
         }
