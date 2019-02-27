@@ -203,7 +203,7 @@ describe('OpenKitImpl', () => {
        it('should not create if multiplicity = 0', () => {
           const openKit = buildOpenKit();
 
-          openKit.state.updateState({valid: true, multiplicity: 0});
+          openKit.state.updateFromResponse({valid: true, multiplicity: 0});
 
           expect(openKit.createSession()).toBe(defaultNullSession);
        });
@@ -211,7 +211,7 @@ describe('OpenKitImpl', () => {
        it('should not create if capture is off', () => {
           const openKit = buildOpenKit();
 
-          openKit.state.updateState({valid: true, captureMode: CaptureMode.Off});
+          openKit.state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
 
           expect(openKit.createSession()).toBe(defaultNullSession);
        });

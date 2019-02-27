@@ -22,6 +22,7 @@ import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
+import { StateImpl } from '../../../src/core/impl/StateImpl';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 
 describe('ActionImpl', () => {
@@ -38,7 +39,7 @@ describe('ActionImpl', () => {
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
         };
 
-        state = new State(config as Configuration);
+        state = new StateImpl(config as Configuration);
 
         reset(sessionMock);
         reset(payloadDataMock);
@@ -135,7 +136,7 @@ describe('ActionImpl', () => {
             });
 
             it('should not report a value if the multiplicity = 0', () => {
-                state.updateState({valid: true, captureMode: CaptureMode.Off});
+                state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
                 action.reportValue('Name',  'Value');
                 verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
             });

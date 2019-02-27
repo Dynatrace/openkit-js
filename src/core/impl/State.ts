@@ -14,100 +14,64 @@
  * limitations under the License.
  */
 
-import { CaptureMode, StatusResponse } from '../../api/communication/StatusResponse';
+import { StatusResponse } from '../../api/communication/StatusResponse';
 import { Configuration } from '../config/Configuration';
 
-const defaultServerId = 1;
-const defaultMaxBeaconSize = 30720; // 30 * 1024
-const defaultMultiplicity = 1;
-
 /**
- * State received from the server, which can be updated with every response.
- *
- * If multiplicity is set to 0, no data for this session will be send to the server anymore.
+ * Represents the state of the current OpenKit Object.
  */
-export class State {
-    private readonly _config: Readonly<Configuration>;
-    public get config(): Readonly<Configuration> {
-        return this._config;
-    }
+export interface State {
+    /**
+     * Readonly reference to the OpenKit configuration
+     */
+    readonly config: Readonly<Configuration>;
 
-    private _serverIdLocked = false;
-    private _serverId: number = defaultServerId;
-    public get serverId(): number {
-        return this._serverId;
-    }
+    /**
+     * The server id which should be used for the next request.
+     */
+    readonly serverId: number;
 
-    private _maxBeaconSize: number = defaultMaxBeaconSize;
-    public get maxBeaconSize(): number {
-        return this._maxBeaconSize;
-    }
+    /**
+     * The maximum beacon size in bytes.
+     */
+    readonly maxBeaconSize: number;
 
-    private _multiplicity: number = defaultMultiplicity;
-    public get multiplicity(): number {
-        return this._multiplicity;
-    }
+    /**
+     * The multiplicity which should be send to the server.
+     */
+    readonly multiplicity: number;
 
-    constructor(config: Readonly<Configuration>) {
-        this._config = config;
-    }
+    /**
+     * Locks the server id so it can't change.
+     */
+    setServerIdLocked(): void;
 
-    public setServerIdLocked(): void {
-        this._serverIdLocked = true;
-    }
+    /**
+     * Update the state with the values from another state.
+     *
+     * @param state The state which properties should be copied.
+     */
+    updateFromState(state: State): void;
 
-    public stopCommunication(): void {
-        this._multiplicity = 0;
-    }
+    /**
+     * Update the state with a status response.
+     *
+     * @param response The status response
+     */
+    updateFromResponse(response: StatusResponse): void;
 
-    public updateState(newState: StatusResponse | State): void {
-        if (newState instanceof State) {
-            this.updateWithState(newState);
-        } else {
-            this.updateWithResponse(newState);
-        }
-    }
+    /**
+     * Disables all capturing of data.
+     */
+    disableCapture(): void;
 
-    public clone(): State {
-        const clonedState = new State(this._config);
+    /**
+     * Checks if capturing is enabled
+     */
+    isCaptureDisabled(): boolean;
 
-        clonedState._maxBeaconSize = this._maxBeaconSize;
-        clonedState._serverId = this._serverId;
-        clonedState._multiplicity = this._multiplicity;
-
-        return clonedState;
-    }
-
-    private updateWithResponse(response: StatusResponse): void {
-
-        if (response.valid === false) {
-            return;
-        }
-
-        if (response.serverId !== undefined && this._serverIdLocked === false) {
-            this._serverId = response.serverId >= 0 ? response.serverId : defaultServerId;
-        }
-
-        if (response.maxBeaconSize !== undefined) {
-            this._maxBeaconSize = response.maxBeaconSize >= 0 ? response.maxBeaconSize * 1024 : defaultMaxBeaconSize;
-        }
-
-        if (response.multiplicity !== undefined) {
-            // if multiplicity is invalid, we disable it completely
-            this._multiplicity = response.multiplicity >= 0 ? response.multiplicity : 0;
-        }
-
-        if (response.captureMode === CaptureMode.Off) {
-            this.stopCommunication();
-        }
-    }
-
-    private updateWithState(state: State): void {
-        if (this._serverIdLocked === false) {
-            this._serverId = state.serverId;
-        }
-
-        this._multiplicity = state.multiplicity;
-        this._maxBeaconSize = state.maxBeaconSize;
-    }
+    /**
+     * Clones the object. Does not clone whether the server id is locked or not, or if capturing is disabled.
+     */
+    clone(): State;
 }

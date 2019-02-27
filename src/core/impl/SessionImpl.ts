@@ -122,7 +122,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         }
 
         // our state may be outdated, update it
-        this.state.updateState(this.openKit.state);
+        this.state.updateFromState(this.openKit.state);
 
         let response: StatusResponse;
         try {
@@ -139,7 +139,7 @@ export class SessionImpl extends OpenKitObject implements Session {
 
     private mayEnterAction(): boolean {
         return this.status !== Status.Shutdown &&
-            this.state.multiplicity !== 0 &&
+            this.state.isCaptureDisabled() === false &&
             this.state.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 

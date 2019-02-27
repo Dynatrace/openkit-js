@@ -95,7 +95,7 @@ export class ActionImpl implements Action {
             return false;
         }
 
-        if (this.session.state.multiplicity === 0) {
+        if (this.session.state.isCaptureDisabled()) {
             return false;
         }
 

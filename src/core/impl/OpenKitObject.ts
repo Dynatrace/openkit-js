@@ -62,7 +62,7 @@ export abstract class OpenKitObject {
             return;
         }
 
-        this.state.updateState(response);
+        this.state.updateFromResponse(response);
         this.state.setServerIdLocked();
         this._status = Status.Initialized;
         this.initCallbackHolder.resolve(true);

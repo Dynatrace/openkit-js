@@ -44,7 +44,6 @@ class StubCommunicationChannelFactory implements CommunicationChannelFactory {
     public getCommunicationChannel(): CommunicationChannel {
         return new StubCommunicationChannel();
     }
-
 }
 
 describe('OpenKitBuilder', () => {
@@ -92,12 +91,6 @@ describe('OpenKitBuilder', () => {
         expect(builder.getConfig().operatingSystem).toEqual('Arch');
     });
 
-    it('should set the screen size', () => {
-        builder.withScreenSize(350, 500);
-
-        expect(builder.getConfig().screenSize).toEqual({width: 350, height: 500});
-    });
-
     it('should set the communication factoy', () => {
         const factory = mock(HttpCommunicationChannelFactory);
 
@@ -116,7 +109,6 @@ describe('OpenKitBuilder', () => {
 
     it('should set multiple values at once', () => {
         const config = builder
-            .withScreenSize(400, 700)
             .withOperatingSystem('Arch')
             .withDataCollectionLevel(DataCollectionLevel.UserBehavior)
             .withCrashReportingLevel(CrashReportingLevel.OptOutCrashes)
@@ -126,7 +118,6 @@ describe('OpenKitBuilder', () => {
 
         expect(config.deviceId).toEqual('42');
         expect(config.operatingSystem).toEqual('Arch');
-        expect(config.screenSize).toEqual({width: 400, height: 700});
         expect(config.dataCollectionLevel).toEqual(DataCollectionLevel.UserBehavior);
         expect(config.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
         expect(config.applicationName).toEqual('App Name');

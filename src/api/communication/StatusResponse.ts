@@ -36,9 +36,9 @@ export interface StatusResponse {
     readonly serverId?: number;
 
     /**
-     * The maximum beacon size in megabyte.
+     * The maximum beacon size in kilobyte.
      */
-    readonly maxBeaconSize?: number;
+    readonly maxBeaconSizeInKb?: number;
 
     /**
      * Flag if errors should be captured.
