@@ -6,7 +6,7 @@
     "test": "jest",
     "lint": "tslint --project ./tsconfig.base.json -c tslint.json",
     "lint:spec": "tslint --project ./tsconfig.base.json -c tslint.spec.json",
-    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --theme markdown",
+    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --theme markdown --tsconfig tsconfig.base.json",
     "build": "yarn build:browser && yarn build:node",
     "build:node": "tsc -p tsconfig.node.json",
     "build:browser": "webpack --mode production",

@@ -19,6 +19,11 @@ import { LoggerFactory } from '../../api/logging/LoggerFactory';
 import { LogLevel } from '../../api/logging/LogLevel';
 import { ConsoleLogger } from './ConsoleLogger';
 
+/**
+ * Logger factory for generating Loggers which wrap the `console` object.
+ *
+ * @see {@link ConsoleLogger}
+ */
 export class ConsoleLoggerFactory implements LoggerFactory {
     private readonly logLevel: LogLevel;
 
@@ -26,6 +31,9 @@ export class ConsoleLoggerFactory implements LoggerFactory {
         this.logLevel = logLevel;
     }
 
+    /**
+     * @inheritDoc
+     */
     public createLogger(name: string): Logger {
         return new ConsoleLogger(name, this.logLevel);
     }

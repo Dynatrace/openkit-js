@@ -14,8 +14,31 @@
  * limitations under the License.
  */
 
+/**
+ * Interface for a Logger.
+ *
+ * @see {@link ConsoleLogger}
+ * @see {@link NullLogger}
+ */
 export interface Logger {
+    /**
+     * Creates a new debug message and logs it.
+     *
+     * @param msg The message to log.
+     */
     debug(...msg: any[]): void;
+
+    /**
+     * Creates a new info message and logs it.
+     *
+     * @param msg The message to log.
+     */
     info(...msg: any[]): void;
+
+    /**
+     * Creates a new warning message and logs it.
+     *
+     * @param msg The message to log.
+     */
     warn(...msg: any[]): void;
 }

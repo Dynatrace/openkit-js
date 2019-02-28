@@ -16,6 +16,11 @@
 
 import { Logger } from '../../api/logging/Logger';
 
+/**
+ * Logger implementation to discard all messages.
+ *
+ * @see {@link defaultNullLogger}
+ */
 export class NullLogger implements Logger {
     public debug(...msg: any[]): void {
         // Stub

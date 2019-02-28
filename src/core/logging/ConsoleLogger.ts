@@ -18,6 +18,11 @@ import { Logger } from '../../api/logging/Logger';
 import { LogLevel } from '../../api/logging/LogLevel';
 
 // tslint:disable:no-console
+/**
+ * Logger to log messages to the `console` object.
+ *
+ * @see {@link ConsoleLoggerFactory}
+ */
 export class ConsoleLogger implements Logger {
     private readonly name: string;
     private readonly level: LogLevel;

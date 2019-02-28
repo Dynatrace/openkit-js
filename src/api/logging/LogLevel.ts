@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/**
+ * The log level to describe which messages should be logged in the ConsoleLoggerFactory.
+ *
+ * @see {@link ConsoleLoggerFactory}
+ */
 export enum LogLevel {
     Debug = 10,
     Info = 20,

@@ -18,6 +18,11 @@ import { Logger } from '../../api/logging/Logger';
 import { LoggerFactory } from '../../api/logging/LoggerFactory';
 import { defaultNullLogger } from './NullLogger';
 
+/**
+ * LoggerFactory implementation to create loggers which discard all messages.
+ *
+ * @see {@link defaultNullLoggerFactory}
+ */
 export class NullLoggerFactory implements LoggerFactory {
     public createLogger(name: string): Logger {
         return defaultNullLogger;
