@@ -18,6 +18,7 @@ import { CommunicationChannel } from '../../../api/communication/CommunicationCh
 import { CommunicationChannelFactory } from '../../../api/communication/CommunicationChannelFactory';
 import { LoggerFactory } from '../../../api/logging/LoggerFactory';
 import { AxiosHttpClient } from './AxiosHttpClient';
+import { Http429ClientProxy } from './Http429ClientProxy';
 import { HttpClient } from './HttpClient';
 import { HttpCommunicationChannel } from './HttpCommunicationChannel';
 import { RetryHttpClientProxy } from './RetryHttpClientProxy';
@@ -25,7 +26,10 @@ import { RetryHttpClientProxy } from './RetryHttpClientProxy';
 export class HttpCommunicationChannelFactory implements CommunicationChannelFactory {
     private readonly channel: HttpCommunicationChannel;
 
-    constructor(loggerFactory: LoggerFactory, client: HttpClient = new RetryHttpClientProxy(new AxiosHttpClient(loggerFactory))) {
+    constructor(
+        loggerFactory: LoggerFactory,
+        client: HttpClient = new RetryHttpClientProxy(new Http429ClientProxy(new AxiosHttpClient(loggerFactory))),
+    ) {
         this.channel = new HttpCommunicationChannel(client, loggerFactory);
     }
 

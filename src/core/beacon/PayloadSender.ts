@@ -30,6 +30,8 @@ export class PayloadSender {
     private readonly channel: CommunicationChannel;
     private readonly payloadData: PayloadData;
 
+    private flushing = false;
+
     constructor(state: State, payloadData: PayloadData) {
         this.logger = state.config.loggerFactory.createLogger('PayloadSender');
         this.state = state;
@@ -38,12 +40,19 @@ export class PayloadSender {
     }
 
     /**
-     * Flushes all data in the payloadData to the server.
+     * Triggers flushing all data in the payload queue.
      *
-     * Multiple calls to flush only execute it once, but all resolve at the same time after it finished.
+     * Multiple calls trigger it only once at a time and return immediately.
      */
-    public async flush(): Promise<void> {
-        await this.sendPayloads();
+    public flush(): void {
+        if (this.flushing) {
+            return;
+        }
+        this.flushing = true;
+
+        this.sendPayloads().then(
+            () => this.flushing = false,
+        );
     }
 
     private async sendPayloads(): Promise<void> {
