@@ -157,7 +157,7 @@ describe('OpenKitBuilder', () => {
        expect(builder.getConfig().deviceId).not.toBe('-42');
     });
 
-    it('returns an openkit instance', () => {
+    it('should return an openkit instance', () => {
        const ok = builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
            .withCommunicationChannelFactory(new StubCommunicationChannelFactory())

@@ -218,13 +218,11 @@ export class OpenKitBuilder {
     }
 
     private buildConfig(): Readonly<Configuration> {
-        const loggerFactory = this.loggerFactory ? this.loggerFactory : new ConsoleLoggerFactory(this.logLevel);
+        const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
 
-        const communicationFactory = this.communicationFactory ?
-            this.communicationFactory : new HttpCommunicationChannelFactory(loggerFactory);
+        const communicationFactory = this.communicationFactory || new HttpCommunicationChannelFactory(loggerFactory);
 
-        const random = this.randomNumberProvider ?
-            this.randomNumberProvider : new DefaultRandomNumberProvider();
+        const random = this.randomNumberProvider || new DefaultRandomNumberProvider();
 
         // user does not allow data tracking
         const deviceId = this.dataCollectionLevel === DataCollectionLevel.UserBehavior ?

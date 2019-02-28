@@ -23,10 +23,10 @@ import { HttpStatusResponse } from './HttpStatusResponse';
 import { buildHttpUrl } from './HttpUrlBuilder';
 
 export class HttpCommunicationChannel implements CommunicationChannel {
-    private readonly loggerFactory: LoggerFactory;
-    private readonly httpClient: HttpClient;
 
-    constructor(httpClient: HttpClient, loggerFactory: LoggerFactory) {
+    constructor(
+        private readonly httpClient: HttpClient,
+        private readonly loggerFactory: LoggerFactory) {
         this.httpClient = httpClient;
         this.loggerFactory = loggerFactory;
     }
