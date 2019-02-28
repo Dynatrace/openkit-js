@@ -34,6 +34,7 @@ export const enum Status {
  */
 export abstract class OpenKitObject {
     public readonly state: State;
+    protected readonly logger: Logger;
     private readonly initCallbackHolder = new CallbackHolder<boolean>();
 
     private _status: Status = Status.Idle;
@@ -41,8 +42,9 @@ export abstract class OpenKitObject {
         return this._status;
     }
 
-    protected constructor(state: State) {
+    protected constructor(state: State, logger: Logger) {
         this.state = state;
+        this.logger = logger;
     }
 
     /**
@@ -54,7 +56,7 @@ export abstract class OpenKitObject {
      */
     public finishInitialization(response: StatusResponse): void {
         if (this._status !== Status.Idle) {
-            this.getLogger().debug(`Can't initialize because state is ${this._status}`);
+            this.logger.debug(`Can't initialize because state is ${this._status}`);
 
             return;
         }
@@ -63,7 +65,7 @@ export abstract class OpenKitObject {
             this.shutdown();
             this.initCallbackHolder.resolve(false);
 
-            this.getLogger().warn('Failed to initialize, because response was invalid', response);
+            this.logger.warn('Failed to initialize, because response was invalid', response);
 
             return;
         }
@@ -78,7 +80,7 @@ export abstract class OpenKitObject {
      * Set the status to shutdown, and call all registered callbacks that the object did not initialize.
      */
     public shutdown(): void {
-        this.getLogger().debug('Shutting down');
+        this.logger.debug('Shutting down');
 
         this._status = Status.Shutdown;
     }
@@ -108,6 +110,4 @@ export abstract class OpenKitObject {
         // for both cases with and without timeout.
         this.initCallbackHolder.add(callback);
     }
-
-    protected abstract getLogger(): Logger;
 }

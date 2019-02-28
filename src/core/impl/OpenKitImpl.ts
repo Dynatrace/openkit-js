@@ -16,7 +16,6 @@
 
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
-import { Logger } from '../../api/logging/Logger';
 import { InitCallback, OpenKit } from '../../api/OpenKit';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
@@ -35,7 +34,6 @@ import { StatusRequestImpl } from './StatusRequestImpl';
  * Implementation of the {@link OpenKit} interface.
  */
 export class OpenKitImpl extends OpenKitObject implements OpenKit {
-    private readonly logger: Logger;
     private readonly openSessions: Session[] = [];
     private readonly sessionIdProvider: IdProvider;
     private readonly communicationChannel: CommunicationChannel;
@@ -45,8 +43,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @param config The app configuration.
      */
     constructor(config: Configuration) {
-        super(new StateImpl({...config}));
-        this.logger = config.loggerFactory.createLogger('OpenKitImpl');
+        super(new StateImpl({...config}), config.loggerFactory.createLogger('OpenKitImpl'));
 
         this.communicationChannel = config.communicationFactory.getCommunicationChannel(config.loggerFactory);
 
@@ -121,9 +118,5 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      */
     public waitForInit(callback: InitCallback, timeout?: number): void {
         super.waitForInit(callback, timeout);
-    }
-
-    protected getLogger(): Logger {
-        return this.logger;
     }
 }

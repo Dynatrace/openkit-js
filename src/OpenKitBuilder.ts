@@ -33,6 +33,7 @@ import 'es6-promise/auto';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
+const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
 
 /**
@@ -44,7 +45,7 @@ export class OpenKitBuilder {
     private readonly deviceId: string;
 
     private applicationName = defaultApplicationName;
-    private operatingSystem?: string;
+    private operatingSystem = defaultOperatingSystem;
     private applicationVersion?: string;
 
     private crashReportingLevel = defaultCrashReportingLevel;
@@ -76,7 +77,7 @@ export class OpenKitBuilder {
     }
 
     /**
-     * Sets the operating system information.
+     * Sets the operating system information. Defaults to 'OpenKit'.
      *
      * @param operatingSystem The operating system
      * @returns The current OpenKitBuilder
@@ -105,7 +106,9 @@ export class OpenKitBuilder {
      * Depending on the chosen level the amount and granularity of data sent is controlled.
      * Off (0) - no data collected
      * Performance (1) - only performance related data is collected
-     * UserBehavior (2) - all available RUM data including performance related data is collected
+     * UserBehavior (2) - all available RUM data including performance related data is collected..
+     *
+     * If an invalid value is passed, it is ignored.
      *
      * Default value is UserBehavior (2)
      *
@@ -113,8 +116,9 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
-        this.dataCollectionLevel = dataCollectionLevel;
-
+        if (typeof dataCollectionLevel === 'number' && dataCollectionLevel >= 0 && dataCollectionLevel <= 2) {
+            this.dataCollectionLevel = dataCollectionLevel;
+        }
         return this;
     }
 
@@ -127,10 +131,14 @@ export class OpenKitBuilder {
      * OptInCrashes = (2) - Crashes are reported
      * </p>
      *
+     * If an invalid value is passed, it is ignored.
+     *
      * @param crashReportingLevel
      */
     public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
-        this.crashReportingLevel = crashReportingLevel;
+        if (typeof crashReportingLevel === 'number' && crashReportingLevel >= 0 && crashReportingLevel <= 2) {
+            this.crashReportingLevel = crashReportingLevel;
+        }
 
         return this;
     }

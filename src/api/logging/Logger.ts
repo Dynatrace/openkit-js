@@ -41,4 +41,11 @@ export interface Logger {
      * @param msg The message to log.
      */
     warn(...msg: any[]): void;
+
+    /**
+     * Creates a new error message and logs it.
+     *
+     * @param msg The message to log.
+     */
+    error(...msg: any[]): void;
 }

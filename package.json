@@ -2,20 +2,31 @@
   "name": "@dynatrace/openkit-js",
   "version": "0.0.1",
   "description": "OpenKit-JavaScript reference implementation",
+  "author": "Dynatrace",
+  "types": "dist/types/index.d.ts",
+  "main": "dist/node/index.js",
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dynatrace/openkit-js"
+  },
   "scripts": {
     "test": "jest",
     "lint": "tslint --project ./tsconfig.base.json -c tslint.json",
     "lint:spec": "tslint --project ./tsconfig.base.json -c tslint.spec.json",
-    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --theme markdown --tsconfig tsconfig.base.json",
+    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --tsconfig tsconfig.base.json",
+    "docs:markdown": "yarn docs --theme markdown",
     "build": "yarn build:browser && yarn build:node",
     "build:node": "tsc -p tsconfig.node.json",
     "build:browser": "webpack --mode production",
     "build:browser:dev": "webpack"
   },
-  "author": "Dynatrace",
-  "types": "dist/types/index.d.ts",
-  "main": "dist/node/index.js",
-  "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "@types/jest": "^24.0.6",
     "@types/promise-polyfill": "^6.0.1",

@@ -50,6 +50,12 @@ export class ConsoleLogger implements Logger {
         }
     }
 
+    public error(...msg: any[]): void {
+        if (this.isEnabled(LogLevel.Error)) {
+            console.error(this.name, ...msg);
+        }
+    }
+
     private isEnabled(level: LogLevel): boolean {
         return this.level <= level;
     }

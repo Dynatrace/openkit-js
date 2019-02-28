@@ -25,6 +25,7 @@ import { HttpCommunicationChannelFactory } from '../src/core/communication/http/
 import { OpenKitImpl } from '../src/core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from '../src/core/logging/ConsoleLoggerFactory';
 import { defaultNullLogger } from '../src/core/logging/NullLogger';
+import { defaultNullLoggerFactory } from '../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../src/core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from '../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../src/DataCollectionLevel';
@@ -150,6 +151,7 @@ describe('OpenKitBuilder', () => {
        builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
            .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
        expect(builder.getConfig().deviceId).not.toBe(42);
@@ -159,6 +161,7 @@ describe('OpenKitBuilder', () => {
        const ok =builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
            .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
        expect(ok).toBeInstanceOf(OpenKitImpl);
