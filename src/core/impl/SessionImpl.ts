@@ -31,6 +31,7 @@ import { StatusRequestImpl } from './StatusRequestImpl';
 
 export class SessionImpl extends OpenKitObject implements Session {
     public readonly payloadData: PayloadData;
+    public readonly sessionId: number;
 
     private readonly openKit: OpenKitImpl;
     private readonly openActions: Action[] = [];
@@ -42,8 +43,9 @@ export class SessionImpl extends OpenKitObject implements Session {
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
         super(openKit.state.clone());
 
-        this.logger = openKit.state.config.loggerFactory.createLogger('SessionImpl');
+        this.logger = openKit.state.config.loggerFactory.createLogger(`SessionImpl`);
 
+        this.sessionId = sessionId;
         this.openKit = openKit;
         this.communicationChannel = this.state.config.communicationFactory.getCommunicationChannel(
             this.state.config.loggerFactory,
@@ -53,6 +55,8 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.payloadSender = new PayloadSender(this.state, this.payloadData);
 
         this.payloadData.startSession();
+
+        this.logger.debug(`Created Session id=${sessionId} with ip=${clientIp}`);
     }
 
     /**
@@ -80,7 +84,7 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        this.logger.debug('Identify User', userTag);
+        this.logger.debug(`Identify User ${userTag} in session`, this.sessionId);
         this.payloadData.identifyUser(userTag);
 
         // Send immediately as we can not be sure that the session has a correct 'end'
@@ -120,6 +124,10 @@ export class SessionImpl extends OpenKitObject implements Session {
         });
     }
 
+    protected getLogger(): Logger {
+        return this.logger;
+    }
+
     private async initialize(): Promise<void> {
         if (this.openKit.status !== Status.Initialized) {
             return;
@@ -138,7 +146,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         }
 
         this.finishInitialization(response);
-        this.logger.debug('Successfully initialized Session', this);
+        this.logger.debug('Successfully initialized Session', this.sessionId);
     }
 
     private mayEnterAction(): boolean {
@@ -157,7 +165,7 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        this.logger.debug('endSession', this);
+        this.logger.debug(`Ending Session (${this.sessionId}`);
 
         this.openActions.slice().forEach((action) => action.leaveAction());
 

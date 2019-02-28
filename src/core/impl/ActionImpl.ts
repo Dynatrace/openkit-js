@@ -55,7 +55,7 @@ export class ActionImpl implements Action {
         this.actionId = this.beacon.createId();
         this.timestampProvider = timestampProvider;
 
-        this.logger.debug(`Created action '${name}'`, this);
+        this.logger.debug(`Created action id=${this.actionId} with name='${name}' in session=${session.sessionId}`);
     }
 
     public reportValue(name: string, value: number | string | null | undefined): void {
@@ -72,7 +72,7 @@ export class ActionImpl implements Action {
             return;
         }
 
-        this.logger.debug('Report value', value);
+        this.logger.debug(`Report value in action id=${this.actionId} with name=${name} and value=${value}`);
 
         this.beacon.reportValue(this, name, value);
     }
@@ -82,7 +82,7 @@ export class ActionImpl implements Action {
             return null;
         }
 
-        this.logger.debug(`Leaving action '${this.name}'`);
+        this.logger.debug(`Leaving action id=${this.actionId}`);
 
         this.endSequenceNumber = this.beacon.createSequenceNumber();
         this._endTime = this.timestampProvider.getCurrentTimestamp();

@@ -106,8 +106,6 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
 
         this.openSessions.push(session);
 
-        this.logger.debug(`Created session with ip='${clientIP}'`);
-
         return session;
     }
 
@@ -123,5 +121,9 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      */
     public waitForInit(callback: InitCallback, timeout?: number): void {
         super.waitForInit(callback, timeout);
+    }
+
+    protected getLogger(): Logger {
+        return this.logger;
     }
 }

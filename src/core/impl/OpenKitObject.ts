@@ -16,6 +16,7 @@
 
 import { InitCallback } from '../..';
 import { StatusResponse } from '../../api/communication/StatusResponse';
+import { Logger } from '../../api/logging/Logger';
 import { CallbackHolder } from '../utils/CallbackHolder';
 import { State } from './State';
 
@@ -53,12 +54,17 @@ export abstract class OpenKitObject {
      */
     public finishInitialization(response: StatusResponse): void {
         if (this._status !== Status.Idle) {
+            this.getLogger().debug(`Can't initialize because state is ${this._status}`);
+
             return;
         }
 
         if (response.valid === false) {
             this.shutdown();
             this.initCallbackHolder.resolve(false);
+
+            this.getLogger().warn('Failed to initialize, because response was invalid', response);
+
             return;
         }
 
@@ -72,6 +78,8 @@ export abstract class OpenKitObject {
      * Set the status to shutdown, and call all registered callbacks that the object did not initialize.
      */
     public shutdown(): void {
+        this.getLogger().debug('Shutting down');
+
         this._status = Status.Shutdown;
     }
 
@@ -100,4 +108,6 @@ export abstract class OpenKitObject {
         // for both cases with and without timeout.
         this.initCallbackHolder.add(callback);
     }
+
+    protected abstract getLogger(): Logger;
 }
