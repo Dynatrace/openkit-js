@@ -59,6 +59,7 @@ export class PayloadBuilder {
             .add(PayloadKey.ApplicationId, config.applicationId)
             .add(PayloadKey.ApplicationName, config.applicationName)
             .addIfDefined(PayloadKey.ApplicationVersion, config.applicationVersion)
+            .addIfDefined(PayloadKey.DeviceOs, config.operatingSystem)
             .add(PayloadKey.PlatformType, platformTypeOpenKit)
             .add(PayloadKey.AgentTechnologyType, agentTechnologyType)
 

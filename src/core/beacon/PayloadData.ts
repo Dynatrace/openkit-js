@@ -56,7 +56,7 @@ export class PayloadData {
     }
 
     public startSession(): void {
-        this.addPayload(PayloadBuilder.startSession(this.createId()));
+        this.addPayload(PayloadBuilder.startSession(this.createSequenceNumber()));
     }
 
     public endSession(): void {
