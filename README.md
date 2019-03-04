@@ -20,6 +20,8 @@ This repository contains the reference implementation in pure TypeScript. Other 
 
 ## What you can do with the OpenKit-JavaScript
 * Create Sessions and User Actions
+* Identify users on sessions
+* Report values on actions
 * Use it together with Dynatrace
 
 ## What you cannot do with the OpenKit
@@ -61,14 +63,25 @@ yarn install
 
 ## Building the .js library
 ```sh
-yarn build:prod # Build project in production mode
-yarn build      # Build project in development mode
+yarn build                  # Build browser and node.js library
+yarn build:node             # Build the node.js library
+yarn build:browser          # Build the browser library
+yarn build:browser:dev      # Build the browser library in dev mode
+yarn build:browser:dev -w   # Build and watch the browser library in dev mode
+```
+
+## Building the documentation
+```sh
+yarn docs           # Build the docs in html format
+yarn docs:markdown  # Build the docs in markdown format
 ```
 
 ### Generated files
-* `build/lib` the es3 JavaScript library.
-* `build/types` the definition files for usage with TypeScript.
-* `build/coverage` the generated coverage from the tests. 
+* `dist/browser` the library for the browser in a `bundle.js`
+* `dist/node` the library for Node.JS
+* `dist/types` the definition files for usage with TypeScript.
+* `build/coverage` the coverage information of the tests
+* `docs` the generated tsdocs in markdown or html
 
 ### Other commands
 | Command               | Description               |
@@ -76,4 +89,3 @@ yarn build      # Build project in development mode
 | `yarn lint`           | Run tslint                |
 | `yarn lint:spec`      | Run tslint                |
 | `yarn test`           | Run tests with coverage   |
-| `yarn precommit`      | Run linting and tests     |

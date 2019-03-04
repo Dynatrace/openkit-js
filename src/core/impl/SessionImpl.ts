@@ -17,7 +17,6 @@
 import { Action } from '../../api/Action';
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
-import { Logger } from '../../api/logging/Logger';
 import { Session } from '../../api/Session';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
@@ -38,12 +37,8 @@ export class SessionImpl extends OpenKitObject implements Session {
     private readonly payloadSender: PayloadSender;
     private readonly communicationChannel: CommunicationChannel;
 
-    private readonly logger: Logger;
-
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
-        super(openKit.state.clone());
-
-        this.logger = openKit.state.config.loggerFactory.createLogger(`SessionImpl`);
+        super(openKit.state.clone(), openKit.state.config.loggerFactory.createLogger(`SessionImpl`));
 
         this.sessionId = sessionId;
         this.openKit = openKit;
@@ -122,10 +117,6 @@ export class SessionImpl extends OpenKitObject implements Session {
                 this.payloadSender.flush();
             }
         });
-    }
-
-    protected getLogger(): Logger {
-        return this.logger;
     }
 
     private async initialize(): Promise<void> {

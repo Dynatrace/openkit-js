@@ -33,6 +33,10 @@ export class NullLogger implements Logger {
     public warn(...msg: any[]): void {
         // Stub
     }
+
+    public error(...msg: any[]): void {
+        // Stub
+    }
 }
 
 export const defaultNullLogger = new NullLogger();
