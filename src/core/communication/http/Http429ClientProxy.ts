@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-import { defaultTimestampProvider, TimestampProvider } from '../../provider/TimestampProvider';
 import { timeout } from '../../utils/Utils';
 import { HttpClient, HttpResponse } from './HttpClient';
 
 const httpTooManyRequests = 429;
 const headerKeyRetryAfter = 'retry-after';
-const defaultRetryAfterInMilliseconds = 600000; // 10 * 60 * 1000;
+const defaultRetryAfterInMilliseconds = 600000; // 10 * 60 * 1000ms = 10m
 
 export class Http429ClientProxy implements HttpClient {
-    private timeoutUntil: number = -1;
-
     constructor(
         private readonly proxy: HttpClient,
-        private readonly timestampProvider: TimestampProvider = defaultTimestampProvider,
     ) {}
 
     public get(url: string): Promise<HttpResponse> {
@@ -39,33 +35,17 @@ export class Http429ClientProxy implements HttpClient {
     }
 
     private async execute(callback: () => Promise<HttpResponse>): Promise<HttpResponse> {
-        if (this.timeoutUntil === -1) {
-            const response = await callback();
+        const response = await callback();
 
-            if (response.status === httpTooManyRequests) {
-                const retryTimeout = this.parseRetryHeader(response.headers);
+        if (response.status === httpTooManyRequests) {
+            const retryTimeout = this.parseRetryHeader(response.headers);
 
-                this.timeoutUntil = this.timestampProvider.getCurrentTimestamp() + retryTimeout;
+            await timeout(retryTimeout);
 
-                return this.retry(() => this.execute(callback));
-            }
-
-            return response;
+            return this.execute(callback);
         }
 
-        return this.retry(() => this.execute(callback));
-    }
-
-    private getTimeoutLeft(): number {
-        return this.timeoutUntil - this.timestampProvider.getCurrentTimestamp();
-    }
-
-    private async retry(callback: () => Promise<HttpResponse>): Promise<HttpResponse> {
-        await timeout(this.getTimeoutLeft());
-
-        this.timeoutUntil = -1;
-
-        return callback();
+        return response;
     }
 
     private parseRetryHeader(headers: Record<string, string>): number {

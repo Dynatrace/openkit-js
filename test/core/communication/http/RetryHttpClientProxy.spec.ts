@@ -18,18 +18,18 @@ import { anyString, anything, instance, mock, reset, verify, when } from 'ts-moc
 import { HttpClient, HttpResponse } from '../../../../src/core/communication/http/HttpClient';
 import { RetryHttpClientProxy } from '../../../../src/core/communication/http/RetryHttpClientProxy';
 
+const invalidHttpResponse: HttpResponse = { status: 400, payload: '', headers: {} };
+const validHttpResponse: HttpResponse = { status: 200, payload: '', headers: {} };
+
 class HttpClientStub implements HttpClient {
     public async get(url: string): Promise<HttpResponse> {
-        return {status: 200, payload: ''};
+        return validHttpResponse;
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
-        return {status: 200, payload: ''};
+        return validHttpResponse;
     }
 }
-
-const invalidHttpResponse: HttpResponse = { status: 400, payload: '' };
-const validHttpResponse: HttpResponse = { status: 200, payload: '' };
 
 describe('RetryHttpClientProxy', () => {
     let httpClientMock: HttpClient = mock(HttpClientStub);
@@ -89,7 +89,7 @@ describe('RetryHttpClientProxy', () => {
 
         it('should return an invalid response, after all retries failed', async() => {
             // given
-            when(httpClientMock.get(anything())).thenResolve({status: 404, payload: ''});
+            when(httpClientMock.get(anything())).thenResolve({status: 404, payload: '', headers: {}});
             const client = instance(httpClientMock);
             const retryClient: HttpClient = new RetryHttpClientProxy(client, [0, 0]);
 
@@ -125,7 +125,7 @@ describe('RetryHttpClientProxy', () => {
     describe('POST', () => {
         it('should not retry if a valid response is returned', async() => {
             // given
-            when(httpClientMock.post(anything(), anything())).thenResolve(validHttpResponse)
+            when(httpClientMock.post(anything(), anything())).thenResolve(validHttpResponse);
             const client = instance(httpClientMock);
             const retryClient: HttpClient = new RetryHttpClientProxy(client, [0, 0]);
 
@@ -173,7 +173,7 @@ describe('RetryHttpClientProxy', () => {
 
         it('should return an invalid response, after all retries failed', async() => {
             // given
-            when(httpClientMock.post(anything(), anything())).thenResolve({status: 404, payload: ''});
+            when(httpClientMock.post(anything(), anything())).thenResolve({status: 404, payload: '', headers: {}});
             const client = instance(httpClientMock);
             const retryClient: HttpClient = new RetryHttpClientProxy(client, [0, 0]);
 
