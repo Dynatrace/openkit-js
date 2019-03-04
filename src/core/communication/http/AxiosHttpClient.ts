@@ -15,28 +15,38 @@
  */
 
 import Axios, { AxiosResponse } from 'axios';
-import { createLogger } from '../../utils/Logger';
-import { HttpClient, HttpResponse } from './HttpClient';
+import { LoggerFactory } from '../../../api/logging/LoggerFactory';
+import { Logger } from './../../../api/logging/Logger';
+import { HttpClient } from './HttpClient';
 
-const log = createLogger('AxiosHttpClient');
+export interface HttpResponse {
+    status: number;
+    payload: string;
+}
 
 export class AxiosHttpClient implements HttpClient {
+    private readonly logger: Logger;
+
+    constructor(loggerFactory: LoggerFactory) {
+        this.logger = loggerFactory.createLogger('AxiosHttpClient');
+    }
+
     public async get(url: string): Promise<HttpResponse> {
-        log.debug('GET', url);
+        this.logger.debug('GET', url);
         const response = await Axios.get<string>(url);
 
         return this.parseAxiosResponse(response);
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
-        log.debug('POST', url, payload);
+        this.logger.debug('POST', url, payload);
         const response = await Axios.post<string>(url, payload);
 
         return this.parseAxiosResponse(response);
     }
 
     private parseAxiosResponse(response: AxiosResponse<string>): HttpResponse {
-        log.debug('RESPONSE', {status: response.status, payload: response.data});
+        this.logger.debug('RESPONSE', {status: response.status, payload: response.data});
 
         return {
             status: response.status,

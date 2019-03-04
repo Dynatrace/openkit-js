@@ -23,15 +23,12 @@ import { Configuration } from '../config/Configuration';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
-import { createLogger } from '../utils/Logger';
 import { removeElement } from '../utils/Utils';
 import { defaultNullSession } from './NullSession';
 import { OpenKitObject, Status } from './OpenKitObject';
 import { SessionImpl } from './SessionImpl';
 import { StateImpl } from './StateImpl';
 import { StatusRequestImpl } from './StatusRequestImpl';
-
-const log = createLogger('OpenKitImpl');
 
 /**
  * Implementation of the {@link OpenKit} interface.
@@ -46,9 +43,9 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * @param config The app configuration.
      */
     constructor(config: Configuration) {
-        super(new StateImpl({...config}));
+        super(new StateImpl({...config}), config.loggerFactory.createLogger('OpenKitImpl'));
 
-        this.communicationChannel = config.communicationFactory.getCommunicationChannel();
+        this.communicationChannel = config.communicationFactory.getCommunicationChannel(config.loggerFactory);
 
         this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
@@ -65,7 +62,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
             response = await this.communicationChannel.sendStatusRequest(
                 this.state.config.beaconURL, StatusRequestImpl.from(this.state));
         } catch (exception) {
-            log.warn('Failed to initialize with exception', exception);
+            this.logger.warn('Failed to initialize with exception', exception);
             response = defaultInvalidStatusResponse;
         }
 
@@ -105,8 +102,6 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         session.init();
 
         this.openSessions.push(session);
-
-        log.debug(`Created session with ip='${clientIP}'`);
 
         return session;
     }

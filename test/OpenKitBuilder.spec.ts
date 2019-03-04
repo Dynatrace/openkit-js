@@ -19,8 +19,13 @@ import { CommunicationChannel } from '../src/api/communication/CommunicationChan
 import { CommunicationChannelFactory } from '../src/api/communication/CommunicationChannelFactory';
 import { StatusRequest } from '../src/api/communication/StatusRequest';
 import { StatusResponse } from '../src/api/communication/StatusResponse';
+import { Logger } from '../src/api/logging/Logger';
+import { LoggerFactory } from '../src/api/logging/LoggerFactory';
 import { HttpCommunicationChannelFactory } from '../src/core/communication/http/HttpCommunicationChannelFactory';
 import { OpenKitImpl } from '../src/core/impl/OpenKitImpl';
+import { ConsoleLoggerFactory } from '../src/core/logging/ConsoleLoggerFactory';
+import { defaultNullLogger } from '../src/core/logging/NullLogger';
+import { defaultNullLoggerFactory } from '../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../src/core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from '../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../src/DataCollectionLevel';
@@ -46,17 +51,23 @@ class StubCommunicationChannelFactory implements CommunicationChannelFactory {
     }
 }
 
+class StubLoggerFactory implements LoggerFactory {
+    public createLogger(name: string): Logger {
+        return defaultNullLogger;
+    }
+}
+
 describe('OpenKitBuilder', () => {
     let builder: OpenKitBuilder;
 
     beforeEach(() => {
-        builder = new OpenKitBuilder('https://example.com', 'app-id', '42');
+        builder = new OpenKitBuilder('https://example.com', 'app-id', -42);
     });
 
     it('should return equal values in the config as set in the constructor', () => {
         const config = builder.getConfig();
 
-        expect(config.deviceId).toEqual('42');
+        expect(config.deviceId).toEqual('-42');
         expect(config.applicationId).toEqual('app-id');
         expect(config.beaconURL).toEqual('https://example.com');
     });
@@ -107,6 +118,18 @@ describe('OpenKitBuilder', () => {
         expect(builder.getConfig().random).toBe(random);
     });
 
+    it('should set the logging factory', () => {
+        const loggerFactory = new StubLoggerFactory();
+
+        builder.withLoggerFactory(loggerFactory);
+
+        expect(builder.getConfig().loggerFactory).toBe(loggerFactory);
+    });
+
+    it('should set a default logging factory if none is configured', () => {
+        expect(builder.getConfig().loggerFactory).toBeInstanceOf(ConsoleLoggerFactory);
+    });
+
     it('should set multiple values at once', () => {
         const config = builder
             .withOperatingSystem('Arch')
@@ -116,7 +139,7 @@ describe('OpenKitBuilder', () => {
             .withApplicationVersion('5.6.7')
             .getConfig();
 
-        expect(config.deviceId).toEqual('42');
+        expect(config.deviceId).toEqual('-42');
         expect(config.operatingSystem).toEqual('Arch');
         expect(config.dataCollectionLevel).toEqual(DataCollectionLevel.UserBehavior);
         expect(config.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
@@ -128,15 +151,17 @@ describe('OpenKitBuilder', () => {
        builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
            .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
-       expect(builder.getConfig().deviceId).not.toBe(42);
+       expect(builder.getConfig().deviceId).not.toBe('-42');
     });
 
-    it('returns an openkit instance', () => {
-       const ok =builder
+    it('should return an openkit instance', () => {
+       const ok = builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
            .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
        expect(ok).toBeInstanceOf(OpenKitImpl);

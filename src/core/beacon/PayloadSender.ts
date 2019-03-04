@@ -16,24 +16,24 @@
 
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
+import { Logger } from '../../api/logging/Logger';
 import { State } from '../impl/State';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
-import { createLogger } from '../utils/Logger';
 import { PayloadData } from './PayloadData';
-
-const log = createLogger('PayloadSender');
 
 /**
  * Responsible for building and sending payloads to the beacon.
  */
 export class PayloadSender {
+    private readonly logger: Logger;
     private readonly state: State;
     private readonly channel: CommunicationChannel;
     private readonly payloadData: PayloadData;
 
     constructor(state: State, payloadData: PayloadData) {
+        this.logger = state.config.loggerFactory.createLogger('PayloadSender');
         this.state = state;
-        this.channel = state.config.communicationFactory.getCommunicationChannel();
+        this.channel = state.config.communicationFactory.getCommunicationChannel(state.config.loggerFactory);
         this.payloadData = payloadData;
     }
 
@@ -64,7 +64,7 @@ export class PayloadSender {
             response = await this.channel.sendPayloadData(
                 this.state.config.beaconURL, StatusRequestImpl.from(this.state), payload);
         } catch (exception) {
-            log.warn('Failed to send payload data with exception', exception);
+            this.logger.warn('Failed to send payload data with exception', exception);
             response = defaultInvalidStatusResponse;
         }
 

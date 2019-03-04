@@ -15,6 +15,7 @@
  */
 
 import { CommunicationChannelFactory } from '../../api/communication/CommunicationChannelFactory';
+import { LoggerFactory } from '../../api/logging/LoggerFactory';
 import { RandomNumberProvider } from '../../api/RandomNumberProvider';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
@@ -22,7 +23,7 @@ import { DataCollectionLevel } from '../../DataCollectionLevel';
 export interface Configuration {
     beaconURL: string;
     applicationId: string;
-    deviceId: number | string;
+    deviceId: string;
 
     applicationName: string;
     applicationVersion?: string;
@@ -32,5 +33,6 @@ export interface Configuration {
     crashReportingLevel: CrashReportingLevel;
 
     communicationFactory: CommunicationChannelFactory;
+    loggerFactory: LoggerFactory;
     random: RandomNumberProvider;
 }

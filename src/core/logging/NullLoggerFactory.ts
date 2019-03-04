@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-import { LoggerFactory } from '../logging/LoggerFactory';
-import { CommunicationChannel } from './CommunicationChannel';
+import { Logger } from '../../api/logging/Logger';
+import { LoggerFactory } from '../../api/logging/LoggerFactory';
+import { defaultNullLogger } from './NullLogger';
 
 /**
- * Interface for creating CommunicationChannels.
+ * LoggerFactory implementation to create loggers which discard all messages.
+ *
+ * @see {@link defaultNullLoggerFactory}
  */
-export interface CommunicationChannelFactory {
-    /**
-     * Get a communication channel.
-     */
-    getCommunicationChannel(loggerFactory: LoggerFactory): CommunicationChannel;
+export class NullLoggerFactory implements LoggerFactory {
+    public createLogger(name: string): Logger {
+        return defaultNullLogger;
+    }
 }
+
+export const defaultNullLoggerFactory = new NullLoggerFactory();

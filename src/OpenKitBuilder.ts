@@ -16,11 +16,14 @@
  */
 
 import { CommunicationChannelFactory } from './api/communication/CommunicationChannelFactory';
+import { LoggerFactory } from './api/logging/LoggerFactory';
+import { LogLevel } from './api/logging/LogLevel';
 import { OpenKit } from './api/OpenKit';
 import { RandomNumberProvider } from './api/RandomNumberProvider';
 import { HttpCommunicationChannelFactory } from './core/communication/http/HttpCommunicationChannelFactory';
 import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
+import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
@@ -30,27 +33,34 @@ import 'es6-promise/auto';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
+const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
 
 /**
  * Builder for an OpenKit instance.
  */
 export class OpenKitBuilder {
-    private readonly config: Configuration;
+    private readonly beaconUrl: string;
+    private readonly applicationId: string;
+    private readonly deviceId: string;
+
+    private applicationName = defaultApplicationName;
+    private operatingSystem = defaultOperatingSystem;
+    private applicationVersion?: string;
+
+    private crashReportingLevel = defaultCrashReportingLevel;
+    private dataCollectionLevel = defaultDataCollectionLevel;
+
+    private communicationFactory?: CommunicationChannelFactory;
+    private randomNumberProvider?: RandomNumberProvider;
+
+    private logLevel = LogLevel.Warn;
+    private loggerFactory?: LoggerFactory;
 
     constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
-        this.config = {
-            beaconURL,
-            applicationId,
-            deviceId,
-
-            applicationName: defaultApplicationName,
-            crashReportingLevel: defaultCrashReportingLevel,
-            dataCollectionLevel: defaultDataCollectionLevel,
-
-            communicationFactory: new HttpCommunicationChannelFactory(),
-            random: new DefaultRandomNumberProvider(),
-        };
+        this.beaconUrl = beaconURL;
+        this.applicationId = applicationId;
+        this.deviceId = String(deviceId);
     }
 
     /**
@@ -61,19 +71,19 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withApplicationName(appName: string): this {
-        this.config.applicationName = String(appName);
+        this.applicationName = String(appName);
 
         return this;
     }
 
     /**
-     * Sets the operating system information.
+     * Sets the operating system information. Defaults to 'OpenKit'.
      *
      * @param operatingSystem The operating system
      * @returns The current OpenKitBuilder
      */
     public withOperatingSystem(operatingSystem: string): this {
-        this.config.operatingSystem = String(operatingSystem);
+        this.operatingSystem = String(operatingSystem);
 
         return this;
     }
@@ -85,7 +95,7 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withApplicationVersion(appVersion: string): this {
-        this.config.applicationVersion = String(appVersion);
+        this.applicationVersion = String(appVersion);
 
         return this;
     }
@@ -96,7 +106,9 @@ export class OpenKitBuilder {
      * Depending on the chosen level the amount and granularity of data sent is controlled.
      * Off (0) - no data collected
      * Performance (1) - only performance related data is collected
-     * UserBehavior (2) - all available RUM data including performance related data is collected
+     * UserBehavior (2) - all available RUM data including performance related data is collected..
+     *
+     * If an invalid value is passed, it is ignored.
      *
      * Default value is UserBehavior (2)
      *
@@ -104,8 +116,9 @@ export class OpenKitBuilder {
      * @returns The current OpenKitBuilder
      */
     public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
-        this.config.dataCollectionLevel = dataCollectionLevel;
-
+        if (typeof dataCollectionLevel === 'number' && dataCollectionLevel >= 0 && dataCollectionLevel <= 2) {
+            this.dataCollectionLevel = dataCollectionLevel;
+        }
         return this;
     }
 
@@ -118,10 +131,14 @@ export class OpenKitBuilder {
      * OptInCrashes = (2) - Crashes are reported
      * </p>
      *
+     * If an invalid value is passed, it is ignored.
+     *
      * @param crashReportingLevel
      */
     public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
-        this.config.crashReportingLevel = crashReportingLevel;
+        if (typeof crashReportingLevel === 'number' && crashReportingLevel >= 0 && crashReportingLevel <= 2) {
+            this.crashReportingLevel = crashReportingLevel;
+        }
 
         return this;
     }
@@ -133,28 +150,57 @@ export class OpenKitBuilder {
      */
     public withCommunicationChannelFactory(communicationFactory: CommunicationChannelFactory): this {
         if (communicationFactory !== null && communicationFactory !== undefined) {
-            this.config.communicationFactory = communicationFactory;
+            this.communicationFactory = communicationFactory;
         }
 
         return this;
     }
 
     /**
-     * Sets the random number provider
+     * Sets the random number provider. If the object is null or undefined, it is ignored.
      *
-     * @param random
+     * @param random The random number provider.
      */
     public withRandomNumberProvider(random: RandomNumberProvider): this {
-        this.config.random = random;
+        if (random !== null && random !== undefined) {
+           this.randomNumberProvider = random;
+        }
 
         return this;
     }
 
     /**
-     * Get the current configuration for OpenKit-js
+     * Sets the logger factory.
+     * If the argument is null or undefined, it is ignored.
+     *
+     * @param loggerFactory
+     */
+    public withLoggerFactory(loggerFactory: LoggerFactory): this {
+        if (loggerFactory !== null && loggerFactory !== undefined) {
+            this.loggerFactory = loggerFactory;
+        }
+
+        return this;
+    }
+
+    /**
+     * Sets the default log level if the default logger factory is used.
+     *
+     * @param logLevel The loglevel for the default logger factory.
+     */
+    public withLogLevel(logLevel: LogLevel): this {
+        this.logLevel = Number(logLevel);
+
+        return this;
+    }
+
+    /**
+     * Builds and gets the current configuration.
+     *
+     * @returns the current configuration
      */
     public getConfig(): Readonly<Configuration> {
-        return this.config;
+        return this.buildConfig();
     }
 
     /**
@@ -163,14 +209,40 @@ export class OpenKitBuilder {
      * @returns The OpenKit instance.
      */
     public build(): OpenKit {
-        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
-            // user does not allow data tracking
-            this.config.deviceId = this.config.random.nextPositiveInteger();
-        }
+        const config = this.buildConfig();
 
-        const openKit = new OpenKitImpl(this.config);
+        const openKit = new OpenKitImpl(config);
         openKit.initialize();
 
         return openKit;
+    }
+
+    private buildConfig(): Readonly<Configuration> {
+        const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
+
+        const communicationFactory = this.communicationFactory || new HttpCommunicationChannelFactory(loggerFactory);
+
+        const random = this.randomNumberProvider || new DefaultRandomNumberProvider();
+
+        // user does not allow data tracking
+        const deviceId = this.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
+            this.deviceId : String(random.nextPositiveInteger());
+
+        return {
+            beaconURL: this.beaconUrl,
+            deviceId,
+            applicationId: this.applicationId,
+
+            applicationName: this.applicationName,
+            applicationVersion: this.applicationVersion,
+            operatingSystem: this.operatingSystem,
+
+            dataCollectionLevel: this.dataCollectionLevel,
+            crashReportingLevel: this.crashReportingLevel,
+
+            communicationFactory,
+            random,
+            loggerFactory,
+        };
     }
 }
