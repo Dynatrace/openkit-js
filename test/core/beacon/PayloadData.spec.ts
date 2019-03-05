@@ -15,14 +15,15 @@
  */
 
 import { instance, mock, when } from 'ts-mockito';
-import { RandomNumberProvider } from '../../../src';
-import { CommunicationChannelFactory } from '../../../src/api/communication/CommunicationChannelFactory';
+import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
 import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { NullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
+import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { defaultTimestampProvider } from '../../../src/core/provider/TimestampProvider';
 import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
@@ -35,8 +36,9 @@ const baseConfiguration: Readonly<Configuration> = {
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
 
-    communicationFactory: {} as CommunicationChannelFactory,
-    random: {} as RandomNumberProvider,
+    random: new DefaultRandomNumberProvider(),
+    loggerFactory: new NullLoggerFactory(),
+    communicationChannel: {} as CommunicationChannel,
 };
 
 const actionMock: ActionImpl = mock(ActionImpl);

@@ -35,7 +35,7 @@ export class PayloadSender {
     constructor(state: State, payloadData: PayloadData) {
         this.logger = state.config.loggerFactory.createLogger('PayloadSender');
         this.state = state;
-        this.channel = state.config.communicationFactory.getCommunicationChannel(state.config.loggerFactory);
+        this.channel = state.config.communicationChannel;
         this.payloadData = payloadData;
     }
 

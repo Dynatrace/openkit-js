@@ -42,9 +42,7 @@ export class SessionImpl extends OpenKitObject implements Session {
 
         this.sessionId = sessionId;
         this.openKit = openKit;
-        this.communicationChannel = this.state.config.communicationFactory.getCommunicationChannel(
-            this.state.config.loggerFactory,
-        );
+        this.communicationChannel = this.state.config.communicationChannel;
 
         this.payloadData = new PayloadData(this.state, clientIp, sessionId);
         this.payloadSender = new PayloadSender(this.state, this.payloadData);
