@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import { LoggerFactory } from '../logging/LoggerFactory';
-import { CommunicationChannel } from './CommunicationChannel';
+import { LoggerFactory } from '../../../../api/logging/LoggerFactory';
+import { HttpClient } from '../HttpClient';
+import { HttpCommunicationChannel } from './HttpCommunicationChannel';
 
-/**
- * Interface for creating CommunicationChannels.
- */
-export interface CommunicationChannelFactory {
-    /**
-     * Get a communication channel.
-     */
-    getCommunicationChannel(loggerFactory: LoggerFactory): CommunicationChannel;
+export interface StateContext {
+    client: HttpClient;
+    loggerFactory: LoggerFactory;
+    stateMachine: HttpCommunicationChannel;
 }

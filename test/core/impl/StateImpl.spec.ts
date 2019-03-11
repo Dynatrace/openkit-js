@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { RandomNumberProvider } from '../../../src';
-import { CommunicationChannelFactory } from '../../../src/api/communication/CommunicationChannelFactory';
+import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { NullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
+import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 
@@ -30,8 +31,9 @@ const config: Readonly<Configuration> = {
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,
     dataCollectionLevel: DataCollectionLevel.Performance,
 
-    communicationFactory: {} as CommunicationChannelFactory,
-    random: {} as RandomNumberProvider,
+    communicationChannel: {} as CommunicationChannel,
+    random: new DefaultRandomNumberProvider(),
+    loggerFactory: new NullLoggerFactory(),
 };
 
 describe('StateImpl', () => {

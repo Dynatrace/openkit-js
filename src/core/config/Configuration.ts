@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CommunicationChannelFactory } from '../../api/communication/CommunicationChannelFactory';
+import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { LoggerFactory } from '../../api/logging/LoggerFactory';
 import { RandomNumberProvider } from '../../api/RandomNumberProvider';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
@@ -32,7 +32,7 @@ export interface Configuration {
     dataCollectionLevel: DataCollectionLevel;
     crashReportingLevel: CrashReportingLevel;
 
-    communicationFactory: CommunicationChannelFactory;
+    communicationChannel: CommunicationChannel;
     loggerFactory: LoggerFactory;
     random: RandomNumberProvider;
 }

@@ -16,12 +16,10 @@
 
 import { mock } from 'ts-mockito';
 import { CommunicationChannel } from '../src/api/communication/CommunicationChannel';
-import { CommunicationChannelFactory } from '../src/api/communication/CommunicationChannelFactory';
 import { StatusRequest } from '../src/api/communication/StatusRequest';
 import { StatusResponse } from '../src/api/communication/StatusResponse';
 import { Logger } from '../src/api/logging/Logger';
 import { LoggerFactory } from '../src/api/logging/LoggerFactory';
-import { HttpCommunicationChannelFactory } from '../src/core/communication/http/HttpCommunicationChannelFactory';
 import { OpenKitImpl } from '../src/core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from '../src/core/logging/ConsoleLoggerFactory';
 import { defaultNullLogger } from '../src/core/logging/NullLogger';
@@ -42,12 +40,6 @@ class StubCommunicationChannel implements CommunicationChannel {
 
     public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
         return {valid: false};
-    }
-}
-
-class StubCommunicationChannelFactory implements CommunicationChannelFactory {
-    public getCommunicationChannel(): CommunicationChannel {
-        return new StubCommunicationChannel();
     }
 }
 
@@ -102,12 +94,12 @@ describe('OpenKitBuilder', () => {
         expect(builder.getConfig().operatingSystem).toEqual('Arch');
     });
 
-    it('should set the communication factoy', () => {
-        const factory = mock(HttpCommunicationChannelFactory);
+    it('should set the communication channel', () => {
+        const channel = new StubCommunicationChannel();
 
-        builder.withCommunicationChannelFactory(factory);
+        builder.withCommunicationChannel(channel);
 
-        expect(builder.getConfig().communicationFactory).toBe(factory);
+        expect(builder.getConfig().communicationChannel).toBe(channel);
     });
 
     it('should set the random provider', () => {
@@ -150,7 +142,7 @@ describe('OpenKitBuilder', () => {
     it('should randomize the device id if DCL = Off', () => {
        builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
-           .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .withCommunicationChannel(new StubCommunicationChannel())
            .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
@@ -160,7 +152,7 @@ describe('OpenKitBuilder', () => {
     it('should return an openkit instance', () => {
        const ok = builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
-           .withCommunicationChannelFactory(new StubCommunicationChannelFactory())
+           .withCommunicationChannel(new StubCommunicationChannel())
            .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 

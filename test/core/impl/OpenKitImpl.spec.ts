@@ -54,11 +54,7 @@ describe('OpenKitImpl', () => {
             crashReportingLevel: CrashReportingLevel.OptOutCrashes,
 
             loggerFactory: defaultNullLoggerFactory,
-            communicationFactory: {
-                getCommunicationChannel(): CommunicationChannel {
-                    return communicationChannelInstance;
-                },
-            },
+            communicationChannel: communicationChannelInstance,
         };
     });
 

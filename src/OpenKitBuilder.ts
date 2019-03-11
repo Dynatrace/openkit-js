@@ -15,12 +15,13 @@
  *
  */
 
-import { CommunicationChannelFactory } from './api/communication/CommunicationChannelFactory';
+import { CommunicationChannel } from './api/communication/CommunicationChannel';
 import { LoggerFactory } from './api/logging/LoggerFactory';
 import { LogLevel } from './api/logging/LogLevel';
 import { OpenKit } from './api/OpenKit';
 import { RandomNumberProvider } from './api/RandomNumberProvider';
-import { HttpCommunicationChannelFactory } from './core/communication/http/HttpCommunicationChannelFactory';
+import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
+import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
 import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
@@ -51,7 +52,7 @@ export class OpenKitBuilder {
     private crashReportingLevel = defaultCrashReportingLevel;
     private dataCollectionLevel = defaultDataCollectionLevel;
 
-    private communicationFactory?: CommunicationChannelFactory;
+    private communicationChannel?: CommunicationChannel;
     private randomNumberProvider?: RandomNumberProvider;
 
     private logLevel = LogLevel.Warn;
@@ -144,13 +145,13 @@ export class OpenKitBuilder {
     }
 
     /**
-     * Sets the communication channel factory. If the object is null or undefined, it is ignored.
+     * Sets the communication channel. If the object is null or undefined, it is ignored.
      *
-     * @param communicationFactory
+     * @param communicationChannel
      */
-    public withCommunicationChannelFactory(communicationFactory: CommunicationChannelFactory): this {
-        if (communicationFactory !== null && communicationFactory !== undefined) {
-            this.communicationFactory = communicationFactory;
+    public withCommunicationChannel(communicationChannel: CommunicationChannel): this {
+        if (communicationChannel !== null && communicationChannel !== undefined) {
+            this.communicationChannel = communicationChannel;
         }
 
         return this;
@@ -220,7 +221,8 @@ export class OpenKitBuilder {
     private buildConfig(): Readonly<Configuration> {
         const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
 
-        const communicationFactory = this.communicationFactory || new HttpCommunicationChannelFactory(loggerFactory);
+        const communicationChannel = this.communicationChannel ||
+            new HttpCommunicationChannel(new AxiosHttpClient(loggerFactory), loggerFactory);
 
         const random = this.randomNumberProvider || new DefaultRandomNumberProvider();
 
@@ -240,7 +242,7 @@ export class OpenKitBuilder {
             dataCollectionLevel: this.dataCollectionLevel,
             crashReportingLevel: this.crashReportingLevel,
 
-            communicationFactory,
+            communicationChannel,
             random,
             loggerFactory,
         };

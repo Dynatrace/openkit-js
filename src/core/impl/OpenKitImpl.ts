@@ -45,7 +45,7 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
     constructor(config: Configuration) {
         super(new StateImpl({...config}), config.loggerFactory.createLogger('OpenKitImpl'));
 
-        this.communicationChannel = config.communicationFactory.getCommunicationChannel(config.loggerFactory);
+        this.communicationChannel = config.communicationChannel;
 
         this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);

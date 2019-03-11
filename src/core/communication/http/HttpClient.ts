@@ -17,6 +17,7 @@
 export interface HttpResponse {
     status: number;
     payload: string;
+    headers: Record<string, string>;
 }
 
 export interface HttpClient {
@@ -24,4 +25,4 @@ export interface HttpClient {
     post(url: string, payload: string): Promise<HttpResponse>;
 }
 
-export const defaultInvalidHttpResponse: HttpResponse = { status: -1, payload: ''};
+export const defaultInvalidHttpResponse: HttpResponse = { status: -1, payload: '', headers: {} };

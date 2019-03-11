@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { anyString, spy, verify } from 'ts-mockito';
+import { anyString, instance, mock, spy, verify, when } from 'ts-mockito';
 import { CommunicationChannel } from '../../../../src/api/communication/CommunicationChannel';
 import { StatusRequest } from '../../../../src/api/communication/StatusRequest';
-import { HttpResponse } from '../../../../src/core/communication/http/AxiosHttpClient';
-import { HttpClient } from '../../../../src/core/communication/http/HttpClient';
-import { HttpCommunicationChannel } from '../../../../src/core/communication/http/HttpCommunicationChannel';
+import { HttpClient, HttpResponse } from '../../../../src/core/communication/http/HttpClient';
+import { HttpCommunicationChannel } from '../../../../src/core/communication/http/state/HttpCommunicationChannel';
+import { OverloadPreventionState } from '../../../../src/core/communication/http/state/OverloadPreventionState';
+import { SendingState } from '../../../../src/core/communication/http/state/SendingState';
 import { defaultNullLoggerFactory } from '../../../../src/core/logging/NullLoggerFactory';
 
 const request: StatusRequest = {
@@ -32,46 +33,103 @@ const request: StatusRequest = {
 
 class StubHttpClient implements HttpClient {
     public async get(url: string): Promise<HttpResponse> {
-        return {status: 200, payload: 'type=m'};
+        return {status: 200, payload: 'type=m', headers: {}};
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
-        return {status: 200, payload: 'type=m'};
+        return {status: 200, payload: 'type=m', headers: {}};
     }
 }
 
 describe('HttpCommunicationChannel', () => {
     let channel: CommunicationChannel;
-    let clientSpy: HttpClient;
+    let clientMock: HttpClient = mock(StubHttpClient);
 
     beforeEach(() => {
-        const client = new StubHttpClient();
-        clientSpy = spy(client);
-        channel = new HttpCommunicationChannel(client, defaultNullLoggerFactory);
+        channel = new HttpCommunicationChannel(instance(clientMock), defaultNullLoggerFactory);
     });
 
-    describe('sendPayloadData', () => {
-        it('should redirect the request to httpclient GET', async() => {
+    describe('state changes', () => {
+        it('should have the initial state Sending', () => {
+            expect((channel as any).state).toBeInstanceOf(SendingState);
+        });
+
+        it('should switch to OverloadPreventionState if a request returns 429', async() => {
+            // given
+            when(clientMock.get(anyString())).thenResolve({status: 429, headers: {}, payload: ''});
+
+            // when
             await channel.sendStatusRequest('https://example.com', request);
 
-            verify(clientSpy.get(anyString())).once();
+            // then
+            expect((channel as any).state).toBeInstanceOf(OverloadPreventionState);
+        });
+
+        [400, 404, 500].forEach(status => {
+            it('should not switch to OverloadPreventionState if a request returns ' + status, async() => {
+                // given
+                when(clientMock.get(anyString())).thenResolve({status, headers: {}, payload: ''});
+
+                // when
+                await channel.sendStatusRequest('https://example.com', request);
+
+                // then
+                expect((channel as any).state).toBeInstanceOf(SendingState);
+            })
+        });
+
+        it('should switch back to SendingState after the retry timeout ran out', (done) => {
+            // given
+            when(clientMock.get(anyString())).thenResolve({status: 429, headers: { 'retry-after': '1'}, payload: ''});
+
+            // when
+            channel.sendStatusRequest('https://example.com', request);
+
+            // then
+            setTimeout(() => {
+                // We expect it after a second to return to SendingState (+500ms margin)
+                expect((channel as any).state).toBeInstanceOf(SendingState);
+
+                done();
+            }, 1500);
         });
     });
 
-    describe('sendNewSessionRequest', () => {
-        it('should redirect the request to httpclient GET', async() => {
+    describe('redirecting requests', () => {
+        it('should redirect sendStatusRequest requests to the current state', async() => {
+            // given
+            when(clientMock.get(anyString())).thenResolve({status: 200, payload: 'type=m', headers: {}});
+            const stateSpy = spy((channel as any).state) as CommunicationChannel;
+
+            // when
+            await channel.sendStatusRequest('https://example.com', request);
+
+            // then
+            verify(stateSpy.sendStatusRequest('https://example.com', request)).once();
+        });
+
+        it('should redirect sendStatusRequest requests to the current state', async() => {
+            // given
+            when(clientMock.get(anyString())).thenResolve({status: 200, payload: 'type=m', headers: {}});
+            const stateSpy = spy((channel as any).state) as CommunicationChannel;
+
+            // when
             await channel.sendNewSessionRequest('https://example.com', request);
 
-            verify(clientSpy.get(anyString())).once();
+            // then
+            verify(stateSpy.sendNewSessionRequest('https://example.com', request)).once();
         });
-    });
 
-    describe('sendStatusRequest', () => {
-        it('should redirect the request to httpclient GET', async() => {
-            await channel.sendPayloadData('https://example.com', request, 'payload=data');
+        it('should redirect sendStatusRequest requests to the current state', async() => {
+            // given
+            when(clientMock.post(anyString(), anyString())).thenResolve({status: 200, payload: 'type=m', headers: {}});
+            const stateSpy = spy((channel as any).state) as CommunicationChannel;
 
-            verify(clientSpy.post(anyString(), 'payload=data')).once();
+            // when
+            await channel.sendPayloadData('https://example.com', request, 'query');
+
+            // then
+            verify(stateSpy.sendPayloadData('https://example.com', request, 'query')).once();
         });
     });
 });
-

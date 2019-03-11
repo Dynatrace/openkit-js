@@ -21,5 +21,5 @@ describe('NullSession', () => {
     it('should return the defaultNullAction on entering an action', () => {
         expect(defaultNullSession.enterAction('someActionName'))
             .toBe(defaultNullAction);
-    })
+    });
 });

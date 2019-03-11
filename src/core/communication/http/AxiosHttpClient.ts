@@ -17,12 +17,7 @@
 import Axios, { AxiosResponse } from 'axios';
 import { LoggerFactory } from '../../../api/logging/LoggerFactory';
 import { Logger } from './../../../api/logging/Logger';
-import { HttpClient } from './HttpClient';
-
-export interface HttpResponse {
-    status: number;
-    payload: string;
-}
+import { HttpClient, HttpResponse } from './HttpClient';
 
 export class AxiosHttpClient implements HttpClient {
     private readonly logger: Logger;
@@ -51,6 +46,7 @@ export class AxiosHttpClient implements HttpClient {
         return {
             status: response.status,
             payload: response.data,
+            headers: response.headers,
         };
     }
 }
