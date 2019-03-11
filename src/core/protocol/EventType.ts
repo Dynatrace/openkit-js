@@ -23,5 +23,6 @@ export const enum EventType {
     SessionStart = 18,
     SessionEnd = 19,
 
+    Crash = 50,
     IdentifyUser = 60,
 }

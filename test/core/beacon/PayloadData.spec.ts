@@ -22,7 +22,7 @@ import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
-import { NullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
+import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { defaultTimestampProvider } from '../../../src/core/provider/TimestampProvider';
 import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
@@ -37,8 +37,8 @@ const baseConfiguration: Readonly<Configuration> = {
     dataCollectionLevel: DataCollectionLevel.Performance,
 
     random: new DefaultRandomNumberProvider(),
-    loggerFactory: new NullLoggerFactory(),
     communicationChannel: {} as CommunicationChannel,
+    loggerFactory: defaultNullLoggerFactory,
 };
 
 const actionMock: ActionImpl = mock(ActionImpl);
