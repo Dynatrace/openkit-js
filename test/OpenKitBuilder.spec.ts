@@ -97,7 +97,7 @@ describe('OpenKitBuilder', () => {
     it('should set the communication channel', () => {
         const channel = new StubCommunicationChannel();
 
-        builder.withCommunicationChannelFactory(channel);
+        builder.withCommunicationChannel(channel);
 
         expect(builder.getConfig().communicationChannel).toBe(channel);
     });
@@ -142,7 +142,7 @@ describe('OpenKitBuilder', () => {
     it('should randomize the device id if DCL = Off', () => {
        builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
-           .withCommunicationChannelFactory(new StubCommunicationChannel())
+           .withCommunicationChannel(new StubCommunicationChannel())
            .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
@@ -152,7 +152,7 @@ describe('OpenKitBuilder', () => {
     it('should return an openkit instance', () => {
        const ok = builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
-           .withCommunicationChannelFactory(new StubCommunicationChannel())
+           .withCommunicationChannel(new StubCommunicationChannel())
            .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 

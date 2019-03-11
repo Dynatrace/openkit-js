@@ -145,11 +145,11 @@ export class OpenKitBuilder {
     }
 
     /**
-     * Sets the communication channel factory. If the object is null or undefined, it is ignored.
+     * Sets the communication channel. If the object is null or undefined, it is ignored.
      *
      * @param communicationChannel
      */
-    public withCommunicationChannelFactory(communicationChannel: CommunicationChannel): this {
+    public withCommunicationChannel(communicationChannel: CommunicationChannel): this {
         if (communicationChannel !== null && communicationChannel !== undefined) {
             this.communicationChannel = communicationChannel;
         }
