@@ -122,6 +122,24 @@ describe('OpenKitBuilder', () => {
         expect(builder.getConfig().loggerFactory).toBeInstanceOf(ConsoleLoggerFactory);
     });
 
+    it('should parse a number as string to a device id', () => {
+        // @ts-ignore
+        expect(new OpenKitBuilder('', '', '12345').getConfig().deviceId)
+            .toEqual('12345');
+    });
+
+    it('should randomize the device id if the device id is a string and not a numeric one', () => {
+        // @ts-ignore
+        const config = new OpenKitBuilder('', '', 'no numeric string')
+            .withRandomNumberProvider({
+                nextPositiveInteger: () => 42,
+            })
+            .withLoggerFactory(defaultNullLoggerFactory)
+            .getConfig();
+
+        expect(config.deviceId).toEqual('42');
+    });
+
     it('should set multiple values at once', () => {
         const config = builder
             .withOperatingSystem('Arch')
