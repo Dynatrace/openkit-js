@@ -31,7 +31,7 @@ export class OverloadPreventionState implements CommunicationChannel {
     ) {
         const retryAfter = this.parseRetryHeader(response.headers);
 
-        setInterval(() => {
+        setTimeout(() => {
             context.stateMachine.setNextState(new SendingState(context));
         }, retryAfter);
     }
