@@ -85,6 +85,9 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.flush();
     }
 
+    /**
+     * @inheritDoc
+     */
     public enterAction(actionName: string): Action {
         if (!this.mayEnterAction()) {
             return defaultNullAction;
@@ -97,12 +100,18 @@ export class SessionImpl extends OpenKitObject implements Session {
         return action;
     }
 
+    /**
+     * @inheritDoc
+     */
     public endAction(action: Action): void {
         removeElement(this.openActions, action);
         this.flush();
     }
 
-    public reportCrash(name: string, reason: string, stacktrace: string): void {
+    /**
+     * @inheritDoc
+     */
+    public reportCrash(name: string, message: string, stacktrace: string): void {
         if (typeof name !== 'string') {
             this.logger.warn('reportCrash', 'name is not a string', name);
 
@@ -114,9 +123,9 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        this.logger.debug('reportCrash', {name, reason, stacktrace});
+        this.logger.debug('reportCrash', {name, reason: message, stacktrace});
 
-        this.payloadData.reportCrash(name, String(reason), String(stacktrace));
+        this.payloadData.reportCrash(name, String(message), String(stacktrace));
     }
 
     public init(): void {
