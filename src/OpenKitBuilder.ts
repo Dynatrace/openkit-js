@@ -15,8 +15,6 @@
  *
  */
 
-// Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
-import 'es6-promise/auto';
 import { CommunicationChannel } from './api/communication/CommunicationChannel';
 import { Logger } from './api/logging/Logger';
 import { LoggerFactory } from './api/logging/LoggerFactory';
@@ -31,6 +29,9 @@ import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
+
+// Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
+import 'es6-promise/auto';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
