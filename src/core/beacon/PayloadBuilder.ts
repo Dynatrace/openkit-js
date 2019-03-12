@@ -59,9 +59,7 @@ export class PayloadBuilder {
         timeSinceSessionStart: number,
     ): string {
         return PayloadBuilder
-            .basicEventData(EventType.NamedEvent)
-            .add(PayloadKey.KeyName, name)
-            .add(PayloadKey.ThreadId, 1)
+            .basicEventData(EventType.NamedEvent, name)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)
