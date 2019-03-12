@@ -38,20 +38,6 @@ const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
 
-const normalizeDeviceId =
-    (deviceId: any, dcl: DataCollectionLevel, random: RandomNumberProvider, logger: Logger): number => {
-    let normalized = typeof deviceId !== 'number' ? parseInt(deviceId, 10) : deviceId;
-
-    if (isNaN(normalized)) {
-        normalized = random.nextPositiveInteger();
-        logger.warn('DeviceId is not a number, using a random generated as device id');
-    } else if (dcl !== DataCollectionLevel.UserBehavior) {
-        normalized = random.nextPositiveInteger();
-    }
-
-    return normalized;
-};
-
 /**
  * Builder for an OpenKit instance.
  */
@@ -263,3 +249,27 @@ export class OpenKitBuilder {
         };
     }
 }
+
+/**
+ * Validates the device id. If it is a string, it tries to parse it to a number. If the data collection level does not
+ * allow capturing the device id, or the id is not a valid number, a random number is generated for the id.
+ *
+ * @param id The current device id.
+ * @param dcl The data collection level
+ * @param random A random number provider.
+ * @param log Logger to log warnings.
+ *
+ * @returns A valid device id.
+ */
+const normalizeDeviceId = (id: any, dcl: DataCollectionLevel, random: RandomNumberProvider, log: Logger): number => {
+    let normalized = typeof id !== 'number' ? parseInt(id, 10) : id;
+
+    if (isNaN(normalized)) {
+        normalized = random.nextPositiveInteger();
+        log.warn('DeviceId is not a number, using a random generated as device id');
+    } else if (dcl !== DataCollectionLevel.UserBehavior) {
+        normalized = random.nextPositiveInteger();
+    }
+
+    return normalized;
+};
