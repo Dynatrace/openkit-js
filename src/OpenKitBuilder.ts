@@ -15,6 +15,8 @@
  *
  */
 
+// Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
+import 'es6-promise/auto';
 import { CommunicationChannel } from './api/communication/CommunicationChannel';
 import { Logger } from './api/logging/Logger';
 import { LoggerFactory } from './api/logging/LoggerFactory';
@@ -30,13 +32,12 @@ import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumber
 import { CrashReportingLevel } from './CrashReportingLevel';
 import { DataCollectionLevel } from './DataCollectionLevel';
 
-// Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
-import 'es6-promise/auto';
-
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
+
+const maxDeviceId = 2 ** 31;
 
 /**
  * Builder for an OpenKit instance.
@@ -59,6 +60,13 @@ export class OpenKitBuilder {
     private logLevel = LogLevel.Warn;
     private loggerFactory?: LoggerFactory;
 
+    /**
+     * Creates a new OpenKitBuilder.
+     *
+     * @param beaconURL The URL to the beacon endpoint.
+     * @param applicationId The id of the custom application.
+     * @param deviceId A numeric identifier between [0, 2**31)
+     */
     constructor(beaconURL: string, applicationId: string, deviceId: number) {
         this.beaconUrl = beaconURL;
         this.applicationId = applicationId;
@@ -233,7 +241,7 @@ export class OpenKitBuilder {
 
         return {
             beaconURL: this.beaconUrl,
-            deviceId: String(deviceId),
+            deviceId,
             applicationId: this.applicationId,
 
             applicationName: this.applicationName,
@@ -251,8 +259,12 @@ export class OpenKitBuilder {
 }
 
 /**
- * Validates the device id. If it is a string, it tries to parse it to a number. If the data collection level does not
- * allow capturing the device id, or the id is not a valid number, a random number is generated for the id.
+ * Validates the device id.
+ *
+ * A valid id must be a positive number between [0, 2^31).
+ * If the data collection level is not UserBehaviour (2), a random number is generated.
+ * If the deviceId is a numeric string, it is first converted to a number before being validated.
+ * If it does not meet the requirements, a random number is generated.
  *
  * @param id The current device id.
  * @param dcl The data collection level
@@ -262,13 +274,17 @@ export class OpenKitBuilder {
  * @returns A valid device id.
  */
 const normalizeDeviceId = (id: any, dcl: DataCollectionLevel, random: RandomNumberProvider, log: Logger): number => {
-    let normalized = typeof id !== 'number' ? parseInt(id, 10) : id;
+    if (dcl !== DataCollectionLevel.UserBehavior) {
+        return random.nextPositiveInteger();
+    }
 
-    if (isNaN(normalized)) {
-        normalized = random.nextPositiveInteger();
-        log.warn('DeviceId is not a number, using a random generated as device id');
-    } else if (dcl !== DataCollectionLevel.UserBehavior) {
-        normalized = random.nextPositiveInteger();
+    // convert it to a number | NaN
+    const normalized = typeof id !== 'number' ? parseInt(id, 10) : id;
+
+    if (isNaN(normalized) || normalized < 0 || normalized >= maxDeviceId) {
+        log.warn('Invalid device id, generating random device id', id);
+
+        return random.nextPositiveInteger();
     }
 
     return normalized;

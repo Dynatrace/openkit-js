@@ -65,7 +65,7 @@ describe('SessionImpl', () => {
         config = {
             applicationId: 'app-id',
             applicationName: '',
-            deviceId: '4',
+            deviceId: 4,
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
             crashReportingLevel: CrashReportingLevel.OptOutCrashes,
 

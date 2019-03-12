@@ -23,7 +23,7 @@ import { DataCollectionLevel } from '../../DataCollectionLevel';
 export interface Configuration {
     beaconURL: string;
     applicationId: string;
-    deviceId: string;
+    deviceId: number;
 
     applicationName: string;
     applicationVersion?: string;

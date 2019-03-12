@@ -30,7 +30,7 @@ import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 
 const baseConfiguration: Readonly<Configuration> = {
     beaconURL: 'https://example.com',
-    deviceId: '42',
+    deviceId: 42,
     applicationName: 'app-name',
     applicationId: 'app-id',
     crashReportingLevel: CrashReportingLevel.OptOutCrashes,

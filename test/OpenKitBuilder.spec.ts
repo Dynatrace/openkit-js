@@ -53,13 +53,13 @@ describe('OpenKitBuilder', () => {
     let builder: OpenKitBuilder;
 
     beforeEach(() => {
-        builder = new OpenKitBuilder('https://example.com', 'app-id', -42);
+        builder = new OpenKitBuilder('https://example.com', 'app-id', 42);
     });
 
     it('should return equal values in the config as set in the constructor', () => {
         const config = builder.getConfig();
 
-        expect(config.deviceId).toEqual('-42');
+        expect(config.deviceId).toEqual(42);
         expect(config.applicationId).toEqual('app-id');
         expect(config.beaconURL).toEqual('https://example.com');
     });
@@ -124,8 +124,8 @@ describe('OpenKitBuilder', () => {
 
     it('should parse a number as string to a device id', () => {
         // @ts-ignore
-        expect(new OpenKitBuilder('', '', '12345').getConfig().deviceId)
-            .toEqual('12345');
+        expect(new OpenKitBuilder('', '', 12345).getConfig().deviceId)
+            .toEqual(12345);
     });
 
     it('should randomize the device id if the device id is a string and not a numeric one', () => {
@@ -137,7 +137,29 @@ describe('OpenKitBuilder', () => {
             .withLoggerFactory(defaultNullLoggerFactory)
             .getConfig();
 
-        expect(config.deviceId).toEqual('42');
+        expect(config.deviceId).toEqual(42);
+    });
+
+    it('should randomize the device d if the device id is negative', () => {
+        const config = new OpenKitBuilder('', '', -1)
+            .withRandomNumberProvider({
+                nextPositiveInteger: () => 42,
+            })
+            .withLoggerFactory(defaultNullLoggerFactory)
+            .getConfig();
+
+        expect(config.deviceId).toBe(42);
+    });
+
+    it('should randomize the device d if the device id is negative', () => {
+        const config = new OpenKitBuilder('', '', 2 ** 31)
+            .withRandomNumberProvider({
+                nextPositiveInteger: () => 42,
+            })
+            .withLoggerFactory(defaultNullLoggerFactory)
+            .getConfig();
+
+        expect(config.deviceId).toBe(42);
     });
 
     it('should set multiple values at once', () => {
@@ -149,7 +171,7 @@ describe('OpenKitBuilder', () => {
             .withApplicationVersion('5.6.7')
             .getConfig();
 
-        expect(config.deviceId).toEqual('-42');
+        expect(config.deviceId).toEqual(42);
         expect(config.operatingSystem).toEqual('Arch');
         expect(config.dataCollectionLevel).toEqual(DataCollectionLevel.UserBehavior);
         expect(config.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
@@ -164,7 +186,7 @@ describe('OpenKitBuilder', () => {
            .withLoggerFactory(defaultNullLoggerFactory)
            .build();
 
-       expect(builder.getConfig().deviceId).not.toBe('-42');
+       expect(builder.getConfig().deviceId).not.toBe(42);
     });
 
     it('should return an openkit instance', () => {
