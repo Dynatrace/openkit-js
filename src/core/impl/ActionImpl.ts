@@ -77,6 +77,20 @@ export class ActionImpl implements Action {
         this.beacon.reportValue(this, name, value);
     }
 
+    public reportEvent(name: string): void {
+        if (!this.mayReportEvent()) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+           return;
+        }
+
+        this.logger.debug(`reportEvent, action id=${this.actionId}`, {name});
+
+        this.beacon.reportEvent(this, name);
+    }
+
     public leaveAction(): null {
         if (this.endTime !== -1) {
             return null;
@@ -107,5 +121,11 @@ export class ActionImpl implements Action {
         }
 
         return true;
+    }
+
+    private mayReportEvent(): boolean {
+        return this.endTime === -1 &&
+            !this.session.state.isCaptureDisabled() &&
+            this.session.state.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
     }
 }

@@ -169,6 +169,77 @@ describe('ActionImpl', () => {
                 verify(payloadDataMock.reportValue(action, 'Name', null)).once();
             });
         });
+    });
 
+    describe('reportEvent', () => {
+        it('should not be able to report an event if the action is closed', () =>{
+            // given
+            action.leaveAction();
+
+            // when
+            action.reportEvent('Some name');
+
+            // then
+            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+        });
+
+        it('should not be able to report an event if the DCL = Off', () =>{
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Off;
+
+            // when
+            action.reportEvent('Some name');
+
+            // then
+            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+        });
+
+        it('should not be able to report an event if the DCL = Performance', () =>{
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Performance;
+
+            // when
+            action.reportEvent('Some name');
+
+            // then
+            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+        });
+
+        it('should not be able to report an event if capturing is disabled', () =>{
+            // given
+            state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
+
+            // when
+            action.reportEvent('Some name');
+
+            // then
+            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+        });
+
+        it('should not be able to report an event if name is not a string', () =>{
+            // when
+            // @ts-ignore
+            action.reportEvent(action);
+
+            // then
+            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+        });
+
+        it('should not be able to report an event if name is an empty string', () =>{
+            // when
+            action.reportEvent('');
+
+            // then
+            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+        });
+
+        it('should be able to report an event', () =>{
+            // when
+            action.reportEvent('Some name');
+
+            // then
+            verify(payloadDataMock.reportEvent(action, 'Some name')).once();
+            verify(payloadDataMock.reportEvent(anything(), anything())).once();
+        });
     });
 });

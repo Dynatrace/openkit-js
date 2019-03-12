@@ -29,6 +29,14 @@ export interface Action {
     reportValue(name: string, value: number | string): void;
 
     /**
+     * Report an event with a given name to Dynatrace.
+     * If the name is longer than 250 characters, it is truncated to this length.
+     *
+     * @param name The name of the event
+     */
+    reportEvent(name: string): void;
+
+    /**
      * Leave the action.
      */
     leaveAction(): null;

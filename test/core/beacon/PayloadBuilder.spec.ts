@@ -272,4 +272,20 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.Value, str250);
         });
     });
+
+    describe('reportEvent', () => {
+       it('should build the payload', () => {
+           const payload = PayloadBuilder.reportNamedEvent('Name', 5, 8, 5431);
+           const {keys, pairs} = parse(payload);
+
+           expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.KeyName, PayloadKey.ThreadId, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0]));
+
+           payloadExpect(pairs, PayloadKey.EventType, EventType.NamedEvent.toString());
+           payloadExpect(pairs, PayloadKey.KeyName, 'Name');
+           payloadExpect(pairs, PayloadKey.ThreadId, '1');
+           payloadExpect(pairs, PayloadKey.ParentActionId, '5');
+           payloadExpect(pairs, PayloadKey.StartSequenceNumber, '8');
+           payloadExpect(pairs, PayloadKey.Time0, '5431');
+       });
+    });
 });
