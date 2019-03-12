@@ -238,7 +238,7 @@ describe('ActionImpl', () => {
             action.reportEvent('Some name');
 
             // then
-            verify(payloadDataMock.reportEvent(action, 'Some name')).once();
+            verify(payloadDataMock.reportEvent(action.actionId, 'Some name')).once();
             verify(payloadDataMock.reportEvent(anything(), anything())).once();
         });
     });

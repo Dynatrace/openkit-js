@@ -88,7 +88,7 @@ export class ActionImpl implements Action {
 
         this.logger.debug(`reportEvent, action id=${this.actionId}`, {name});
 
-        this.beacon.reportEvent(this, name);
+        this.beacon.reportEvent(this.actionId, name);
     }
 
     public leaveAction(): null {

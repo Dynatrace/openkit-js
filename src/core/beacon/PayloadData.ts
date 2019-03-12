@@ -86,10 +86,10 @@ export class PayloadData {
             this.sessionStartTime));
     }
 
-    public reportEvent(param: ActionImpl, name: string): void {
+    public reportEvent(actionId: number, name: string): void {
         this.addPayload(PayloadBuilder.reportNamedEvent(
             name,
-            param.actionId,
+            actionId,
             this.createSequenceNumber(),
             this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime));
     }
