@@ -37,6 +37,15 @@ export interface Action {
     reportEvent(name: string): void;
 
     /**
+     * Reports an error with a specified name, error code and reason to Dynatrace.
+     *
+     * @param name The name of the error.
+     * @param code The error code.
+     * @param message The message (reason) of the error.
+     */
+    reportError(name: string, code: number, message: string): void;
+
+    /**
      * Leave the action.
      */
     leaveAction(): null;

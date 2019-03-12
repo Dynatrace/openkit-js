@@ -103,6 +103,29 @@ export class SessionImpl extends OpenKitObject implements Session {
     /**
      * @inheritDoc
      */
+    public reportError(name: string, code: number, message: string): void {
+        if (!this.mayReportError()) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid name', name);
+            return;
+        }
+
+        if (typeof code !== 'number') {
+            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid name', name);
+            return;
+        }
+
+        this.logger.debug('reportError', `session id=${this.sessionId}`, {name, code, message});
+
+        this.payloadData.reportError(0, name, code, String(message));
+    }
+
+    /**
+     * @inheritDoc
+     */
     public endAction(action: Action): void {
         removeElement(this.openActions, action);
         this.flush();
@@ -198,5 +221,12 @@ export class SessionImpl extends OpenKitObject implements Session {
 
         this.openKit.removeSession(this);
         this.shutdown();
+    }
+
+    private mayReportError(): boolean {
+        return this.status !== Status.Shutdown &&
+            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
+            !this.state.isCaptureDisabled() &&
+            this.state.captureErrors === CaptureMode.On;
     }
 }

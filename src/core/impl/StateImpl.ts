@@ -21,6 +21,7 @@ import { State } from './State';
 const defaultServerId = 1;
 const defaultMaxBeaconSize = 30720; // 30 * 1024
 const defaultMultiplicity = 1;
+const defaultCaptureErrors = CaptureMode.On;
 const defaultCrashReportingMode = CaptureMode.On;
 
 export class StateImpl implements State {
@@ -30,6 +31,7 @@ export class StateImpl implements State {
     public maxBeaconSize: number = defaultMaxBeaconSize;
     public multiplicity: number = defaultMultiplicity;
     public captureCrashes: CaptureMode = defaultCrashReportingMode;
+    public captureErrors: CaptureMode = defaultCaptureErrors;
 
     private isCaptureEnabled = true;
     private serverIdLocked = false;
@@ -83,6 +85,11 @@ export class StateImpl implements State {
         // Max beacon size
         if (response.maxBeaconSizeInKb !== undefined) {
             this.maxBeaconSize = response.maxBeaconSizeInKb >= 0 ? response.maxBeaconSizeInKb * 1024 : defaultMaxBeaconSize;
+        }
+
+        // Capture Errors
+        if (response.captureErrors !== undefined) {
+            this.captureErrors = response.captureErrors;
         }
 
         // Crash reporting level

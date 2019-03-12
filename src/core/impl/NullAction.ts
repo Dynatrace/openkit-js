@@ -28,6 +28,10 @@ export class NullAction implements Action {
     public reportEvent(name: string): void {
         // stub
     }
+
+    public reportError(name: string, code: number, message: string): void {
+        // stub
+    }
 }
 
 export const defaultNullAction = new NullAction();

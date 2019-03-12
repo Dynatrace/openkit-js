@@ -42,6 +42,11 @@ export interface State {
     readonly multiplicity: number;
 
     /**
+     * Flag to check if errors should be captured.
+     */
+    readonly captureErrors: CaptureMode;
+
+    /**
      * The crash reporting mode
      */
     readonly captureCrashes: CaptureMode;

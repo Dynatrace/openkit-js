@@ -31,6 +31,10 @@ export class NullSession implements Session {
         // stub
     }
 
+    public reportError(name: string, code: number, message: string): void {
+        // stub
+    }
+
     public reportCrash(errorName: string, reason: string, stacktrace: string): void {
         // stub
     }
