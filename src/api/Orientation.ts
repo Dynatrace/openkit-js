@@ -1,4 +1,3 @@
-// tslint:disable:file-name-casing
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,17 +14,7 @@
  * limitations under the License.
  */
 
-export * from './Action';
-export * from './CrashReportingLevel';
-export * from './DataCollectionLevel';
-export * from './OpenKit';
-export * from './RandomNumberProvider';
-export * from './Session';
-export * from './WebRequestTracer';
-export * from './Orientation';
-export * from './communication/StatusResponse';
-export * from './communication/StatusRequest';
-export * from './communication/CommunicationChannel';
-export * from './logging/LogLevel';
-export * from './logging/LoggerFactory';
-export * from './logging/Logger';
+export const enum Orientation {
+    Landscape = 'l',
+    Portrait = 'p',
+}

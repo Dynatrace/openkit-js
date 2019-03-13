@@ -22,95 +22,105 @@ describe('ConsoleLogger', () => {
         console.info = jest.fn();
         console.warn = jest.fn();
         console.debug = jest.fn();
+        console.error = jest.fn();
     });
 
    it('should log a debug-message with a given name and level = Debug', () => {
        // given
-       const spy = jest.spyOn(console, 'debug');
        const log = new ConsoleLogger('test-name', LogLevel.Debug);
 
        // when
        log.debug('Test');
 
        // then
-       expect(spy).toHaveBeenCalledTimes(1);
+       expect(console.debug).toHaveBeenCalledTimes(1);
    });
 
    it('should log a info-message with a given name and level = Info', () => {
        // given
-       const spy = jest.spyOn(console, 'info');
        const log = new ConsoleLogger('test-name', LogLevel.Info);
+
+       // when
        log.info('Test');
 
-       expect(spy).toHaveBeenCalledTimes(1);
+       // then
+       expect(console.info).toHaveBeenCalledTimes(1);
    });
 
    it('should log a warn-message with a given name and level = Warn', () => {
        // given
-       const spy = jest.spyOn(console, 'warn');
        const log = new ConsoleLogger('test-name', LogLevel.Warn);
+
+       // when
        log.warn('Test');
 
-       expect(spy).toHaveBeenCalledTimes(1);
+       // then
+       expect(console.warn).toHaveBeenCalledTimes(1);
    });
 
    it('should not log a debug-message if level = Info', () =>{
        // given
-       const spy = jest.spyOn(console, 'debug');
        const log = new ConsoleLogger('test-name', LogLevel.Info);
 
        // when
        log.debug('Test');
 
        // then
-       expect(spy).toHaveBeenCalledTimes(0);
+       expect(console.debug).toHaveBeenCalledTimes(0);
    });
 
    it('should not log a debug-message if level = Warn', () =>{
        // given
-       const spy = jest.spyOn(console, 'debug');
        const log = new ConsoleLogger('test-name', LogLevel.Warn);
 
        // when
        log.debug('Test');
 
        // then
-       expect(spy).toHaveBeenCalledTimes(0);
+       expect(console.debug).toHaveBeenCalledTimes(0);
    });
 
    it('should not log a info-message if level = Warn', () =>{
        // given
-       const spy = jest.spyOn(console, 'info');
        const log = new ConsoleLogger('test-name', LogLevel.Warn);
 
        // when
        log.info('Test');
 
        // then
-       expect(spy).toHaveBeenCalledTimes(0);
+       expect(console.info).toHaveBeenCalledTimes(0);
    });
 
    it('should log a warn-message if level = Debug', () =>{
        // given
-       const spy = jest.spyOn(console, 'warn');
        const log = new ConsoleLogger('test-name', LogLevel.Debug);
 
        // when
        log.warn('Test');
 
        // then
-       expect(spy).toHaveBeenCalledTimes(1);
+       expect(console.warn).toHaveBeenCalledTimes(1);
    });
 
    it('should log a warn-message if level = Info', () =>{
        // given
-       const spy = jest.spyOn(console, 'warn');
        const log = new ConsoleLogger('test-name', LogLevel.Info);
 
        // when
        log.warn('Test');
 
        // then
-       expect(spy).toHaveBeenCalledTimes(1);
+       expect(console.warn).toHaveBeenCalledTimes(1);
+   });
+
+   it('should log a error-message if level = Error', () =>{
+       // given
+       const log = new ConsoleLogger('test-name', LogLevel.Error);
+
+       // when
+       log.error('Test');
+
+       // then
+       expect(console.error).toHaveBeenCalledTimes(1);
    });
 });

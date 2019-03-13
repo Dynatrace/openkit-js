@@ -22,6 +22,7 @@ import {
     DataCollectionLevel,
     Logger,
     LoggerFactory,
+    Orientation,
     RandomNumberProvider,
     StatusRequest,
     StatusResponse,
@@ -287,5 +288,254 @@ describe('OpenKitBuilder', () => {
            // then
            expect(config.deviceId).toBe('5');
        });
+    });
+
+    describe('additional metadata', () => {
+        describe('manufacturer', () => {
+            it('should update the manufacturer if it is a valid string', () => {
+                // when
+                builder.withManufacturer('Dynatrace');
+
+                // then
+                expect(builder.getConfig().manufacturer).toEqual('Dynatrace');
+            });
+
+            it('should not update the manufacturer if it is not a valid string', () => {
+                // given
+                const invalidOptions: any = [NaN, 1234, {}, builder, true, false, []];
+
+                invalidOptions.forEach((value: any) => {
+                    // when
+                    builder.withManufacturer(value as string);
+
+                    // then
+                    expect(builder.getConfig().manufacturer).not.toEqual(String(value));
+                    expect(builder.getConfig().manufacturer).not.toEqual(value);
+                });
+
+                // then
+                expect(builder.getConfig().manufacturer).toBeUndefined();
+            });
+
+            it('should not update the manufacturer if it is empty string', () => {
+                // when
+                builder.withManufacturer('');
+
+                // then
+                expect(builder.getConfig().manufacturer).not.toEqual('');
+                expect(builder.getConfig().manufacturer).toBeUndefined();
+            });
+
+            it('should truncate a manufacturer over 250 characters', () => {
+                // given
+                const validName = 'a'.repeat(250);
+                const tooLongName = validName + 'b';
+
+                // when
+                builder.withManufacturer(tooLongName);
+
+                // then
+                expect(builder.getConfig().manufacturer).toEqual(validName);
+            });
+
+            it('should return the same instance', () => {
+                // when, then
+                expect(builder.withManufacturer('Dynatrace')).toBe(builder);
+            });
+        });
+
+        describe('modelId', () => {
+            it('should update the modelId if it is a valid string', () => {
+                // when
+                builder.withModelId('Dynatrace');
+
+                // then
+                expect(builder.getConfig().modelId).toEqual('Dynatrace');
+            });
+
+            it('should not update the modelId if it is not a valid string', () => {
+                // given
+                const invalidOptions: any = [NaN, 1234, {}, builder, true, false, []];
+
+                invalidOptions.forEach((value: any) => {
+                    // when
+                    builder.withModelId(value as string);
+
+                    // then
+                    expect(builder.getConfig().modelId).not.toEqual(String(value));
+                    expect(builder.getConfig().modelId).not.toEqual(value);
+                });
+
+                // then
+                expect(builder.getConfig().modelId).toBeUndefined();
+            });
+
+            it('should not update the modelId if it is empty string', () => {
+                // when
+                builder.withModelId('');
+
+                // then
+                expect(builder.getConfig().modelId).not.toEqual('');
+                expect(builder.getConfig().modelId).toBeUndefined();
+            });
+
+            it('should truncate a modelId over 250 characters', () => {
+                // given
+                const validName = 'a'.repeat(250);
+                const tooLongName = validName + 'b';
+
+                // when
+                builder.withModelId(tooLongName);
+
+                // then
+                expect(builder.getConfig().modelId).toEqual(validName);
+            });
+
+            it('should return the same instance', () => {
+                // when, then
+                expect(builder.withModelId('Dynatrace')).toBe(builder);
+            });
+        });
+
+        describe('userLanguage', () => {
+            it('should update the userLanguage if it is a valid string', () => {
+                // when
+                builder.withUserLanguage('Dynatrace');
+
+                // then
+                expect(builder.getConfig().userLanguage).toEqual('Dynatrace');
+            });
+
+            it('should not update the userLanguage if it is not a valid string', () => {
+                // given
+                const invalidOptions: any = [NaN, 1234, {}, builder, true, false, []];
+
+                invalidOptions.forEach((value: any) => {
+                    // when
+                    builder.withUserLanguage(value as string);
+
+                    // then
+                    expect(builder.getConfig().userLanguage).not.toEqual(String(value));
+                    expect(builder.getConfig().userLanguage).not.toEqual(value);
+                });
+
+                // then
+                expect(builder.getConfig().userLanguage).toBeUndefined();
+            });
+
+            it('should not update the userLanguage if it is empty string', () => {
+                // when
+                builder.withUserLanguage('');
+
+                // then
+                expect(builder.getConfig().userLanguage).not.toEqual('');
+                expect(builder.getConfig().userLanguage).toBeUndefined();
+            });
+        });
+
+        describe('screenResolution', () => {
+            it('should update the screen resolution properties with valid values', () => {
+                // when
+                builder.withScreenResolution(1200, 900);
+
+                // then
+                expect(builder.getConfig().screenWidth).toBe(1200);
+                expect(builder.getConfig().screenHeight).toBe(900);
+            });
+
+            it('should update the screen resolution properties with valid numbers as string', () => {
+                // when
+                // @ts-ignore
+                builder.withScreenResolution('1200', '900');
+
+                // then
+                expect(builder.getConfig().screenWidth).toBe(1200);
+                expect(builder.getConfig().screenHeight).toBe(900);
+            });
+
+            it('should not update if width or height is not a finite number', () => {
+               // given
+                const invalidInputs = [NaN, Infinity, -Infinity, 'some string', {}, -42];
+
+                invalidInputs.forEach(width => {
+                    // when
+                    builder.withScreenResolution(width as number, 900).getConfig();
+
+                    // then
+                    expect(builder.getConfig().screenWidth).toBeUndefined();
+                    expect(builder.getConfig().screenHeight).toBeUndefined();
+                });
+
+                invalidInputs.forEach(height => {
+                    // when
+                    builder.withScreenResolution(1200, height as number).getConfig();
+
+                    // then
+                    expect(builder.getConfig().screenWidth).toBeUndefined();
+                    expect(builder.getConfig().screenHeight).toBeUndefined();
+                });
+            });
+        });
+
+        describe('screen density', () =>{
+            it('should update the screen density with valid numbers', () => {
+                // when
+                builder.withScreenDensity(2);
+
+                // then
+                expect(builder.getConfig().screenDensity).toBe(2);
+            });
+
+            it('should update the screen resolution properties with valid numbers as string', () => {
+                // when
+                // @ts-ignore
+                builder.withScreenDensity('2');
+
+                // then
+                expect(builder.getConfig().screenDensity).toBe(2);
+            });
+
+            it('should not update if width or height is not a finite number', () => {
+                // given
+                const invalidInputs = [NaN, Infinity, -Infinity, 'some string', {}, -6544];
+
+                invalidInputs.forEach(invalidDensity => {
+                    // when
+                    builder.withScreenDensity(invalidDensity as number).getConfig();
+
+                    // then
+                    expect(builder.getConfig().screenWidth).toBeUndefined();
+                    expect(builder.getConfig().screenHeight).toBeUndefined();
+                });
+            });
+        });
+
+        describe('screen orientation', () => {
+            it('should allow Portrait and Landscape as valid values', () => {
+                // given
+                const validInputs = [Orientation.Portrait, Orientation.Landscape];
+
+                validInputs.forEach(orientation => {
+                    // when
+                    builder.withScreenOrientation(orientation);
+
+                    // then
+                    expect(builder.getConfig().orientation).toBe(orientation);
+                });
+            });
+
+            it('should ignore any other values', () => {
+                // given
+                const invalidInputs = [-1, 0, 1, 'some string', NaN];
+
+                invalidInputs.forEach(invalidInput => {
+                    // when
+                    builder.withScreenOrientation(invalidInput as Orientation);
+
+                    // then
+                    expect(builder.getConfig().orientation).toBeUndefined();
+                });
+            });
+        });
     });
 });

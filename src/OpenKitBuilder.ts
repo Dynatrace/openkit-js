@@ -19,10 +19,10 @@ import {
     CommunicationChannel,
     CrashReportingLevel,
     DataCollectionLevel,
-    Logger,
     LoggerFactory,
     LogLevel,
     OpenKit,
+    Orientation,
     RandomNumberProvider,
 } from './api';
 import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
@@ -31,6 +31,7 @@ import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
+import { truncate } from './core/utils/Utils';
 
 // Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
 import 'es6-promise/auto';
@@ -41,6 +42,8 @@ const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
 
 const validDeviceIdPattern = /^-?\d{1,19}$/;
+
+const isFinite = (n: number) => n !== Infinity && n !== -Infinity && !isNaN(n);
 
 /**
  * Builder for an OpenKit instance.
@@ -62,6 +65,14 @@ export class OpenKitBuilder {
 
     private logLevel = LogLevel.Warn;
     private loggerFactory?: LoggerFactory;
+
+    private manufacturer?: string;
+    private modelId?: string;
+    private userLanguage?: string;
+    private screenWidth?: number;
+    private screenHeight?: number;
+    private screenDensity?: number;
+    private orientation?: Orientation;
 
     /**
      * Creates a new OpenKitBuilder
@@ -183,6 +194,83 @@ export class OpenKitBuilder {
     }
 
     /**
+     * Sets the manufacturer of the device. If the argument is not a string or empty string, it is ignored.
+     *
+     * @param manufacturer The manufacturer of the device
+     */
+    public withManufacturer(manufacturer: string): this {
+        if (typeof  manufacturer === 'string' && manufacturer.length !== 0) {
+            this.manufacturer = truncate(manufacturer);
+        }
+
+        return this;
+    }
+
+    /**
+     * Sets the modelId of the device. If the argument is not a string or empty string, it is ignored.
+     *
+     * @param modelId The model id of the device
+     */
+    public withModelId(modelId: string): this {
+        if (typeof modelId === 'string' && modelId.length !== 0) {
+            this.modelId = truncate(modelId);
+        }
+
+        return this;
+    }
+
+    /**
+     * Sets the user language. If the langauge is not a string or empty string, it is ignored.
+     *
+     *
+     * @param language The user language
+     */
+    public withUserLanguage(language: string): this {
+        if (typeof language === 'string' && language.length !== 0) {
+            this.userLanguage = language;
+        }
+
+        return this;
+    }
+
+    /**
+     * Sets the screen resolution. If the width or height are not positive finite numbers, both are ignored.
+     *
+     * @param width The width of the screen
+     * @param height The height of the screen
+     */
+    public withScreenResolution(width: number, height: number): this {
+        // Check input for valid numbers
+        const w = parseInt(width as any, 10);
+        const h = parseInt(height as any, 10);
+
+        if (isFinite(w) && isFinite(h) && w >= 0 && h >= 0) {
+            this.screenWidth = w;
+            this.screenHeight = h;
+        }
+
+        return this;
+    }
+
+    public withScreenDensity(density: number): this {
+        const d = parseInt(density as any, 10);
+
+        if (isFinite(d)) {
+            this.screenDensity = d;
+        }
+
+        return this;
+    }
+
+    public withScreenOrientation(orientation: Orientation): this {
+        if (orientation === Orientation.Landscape || orientation === Orientation.Portrait) {
+            this.orientation = orientation;
+        }
+
+        return this;
+    }
+
+    /**
      * Sets the logger factory.
      * If the argument is null or undefined, it is ignored.
      *
@@ -232,7 +320,6 @@ export class OpenKitBuilder {
 
     private buildConfig(): Readonly<Configuration> {
         const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
-        const logger = loggerFactory.createLogger('OpenKitBuilder');
 
         const communicationChannel = this.communicationChannel ||
             new HttpCommunicationChannel(new AxiosHttpClient(loggerFactory), loggerFactory);
@@ -240,7 +327,7 @@ export class OpenKitBuilder {
         const random = this.randomNumberProvider || new DefaultRandomNumberProvider();
 
         // user does not allow data tracking
-        const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random, logger);
+        const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random);
         return {
             beaconURL: this.beaconUrl,
             deviceId,
@@ -256,11 +343,19 @@ export class OpenKitBuilder {
             communicationChannel,
             random,
             loggerFactory,
+
+            manufacturer: this.manufacturer,
+            modelId: this.modelId,
+            userLanguage: this.userLanguage,
+            screenWidth: this.screenWidth,
+            screenHeight: this.screenHeight,
+            screenDensity: this.screenDensity,
+            orientation: this.orientation,
         };
     }
 }
 
-const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: RandomNumberProvider, log: Logger): string => {
+const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: RandomNumberProvider): string => {
     // Check if we may capture the device id
     let id = dcl !== DataCollectionLevel.UserBehavior ? String(random.nextPositiveInteger()) : deviceId;
 

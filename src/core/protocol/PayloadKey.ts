@@ -29,10 +29,15 @@ export const enum PayloadKey {
     DataCollectionLevel = 'dl',
     CrashReportingLevel = 'cl',
 
-    // Device data constants
+    // Additional metadata
     DeviceOs = 'os',
-    DeviceManufactur = 'mf',
+    DeviceManufacturer = 'mf',
     DeviceModel = 'md',
+    ScreenWidth = 'sw',
+    ScreenHeight = 'sh',
+    ScreenDensity = 'sd',
+    UserLanguage = 'ul',
+    Orientation = 'so',
 
     // timestamp constants
     SessionStartTime = 'tv',
