@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '../../api/logging/Logger';
-import { LoggerFactory } from '../../api/logging/LoggerFactory';
+import { Logger, LoggerFactory } from '../../api';
 import { defaultNullLogger } from './NullLogger';
 
 /**

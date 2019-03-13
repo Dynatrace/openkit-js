@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { StatusRequest } from '../../api/communication/StatusRequest';
-import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../PlatformConstants';
+import { StatusRequest } from '../../api';
+import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../PlatformConstants';
 import { State } from './State';
 
 export class StatusRequestImpl implements StatusRequest {

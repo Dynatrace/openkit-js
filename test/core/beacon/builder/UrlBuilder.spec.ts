@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {UrlBuilder} from '../../../../src/core/communication/http/UrlBuilder';
-import {QueryKey} from '../../../../src/core/protocol/QueryKey';
+import { UrlBuilder } from '../../../../src/core/communication/http/UrlBuilder';
+import { QueryKey } from '../../../../src/core/protocol/QueryKey';
 
 describe('UrlBuilder', () => {
     let builder: UrlBuilder;

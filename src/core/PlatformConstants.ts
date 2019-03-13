@@ -14,5 +14,23 @@
  * limitations under the License.
  */
 
-export * from './OpenKitBuilder';
-export * from './api';
+/**
+ * The OpenKit-JavaScript version.
+ * For now, it must be equal to the mobile agent version.
+ */
+export const openKitVersion = '7.0.0000';
+
+/**
+ * Constant for the OneAgent Mobile Communication Protocol Version 3.
+ */
+export const protocolVersion = 3;
+
+/**
+ * Constant for all OpenKit platforms.
+ */
+export const platformTypeOpenKit = 1;
+
+/**
+ * The OpenKit-JavaScript agent technology type constant.
+ */
+export const agentTechnologyType = 'okjs';

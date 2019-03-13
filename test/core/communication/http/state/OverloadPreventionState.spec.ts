@@ -15,7 +15,7 @@
  */
 
 import { anyOfClass, anything, instance, mock, reset, verify } from 'ts-mockito';
-import { StatusRequest } from '../../../../../src/api/communication/StatusRequest';
+import { StatusRequest } from '../../../../../src/api';
 import { AxiosHttpClient } from '../../../../../src/core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from '../../../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OverloadPreventionState } from '../../../../../src/core/communication/http/state/OverloadPreventionState';

@@ -15,8 +15,7 @@
  */
 
 import { anyString, instance, mock, spy, verify, when } from 'ts-mockito';
-import { CommunicationChannel } from '../../../../src/api/communication/CommunicationChannel';
-import { StatusRequest } from '../../../../src/api/communication/StatusRequest';
+import { CommunicationChannel, StatusRequest } from '../../../../src/api';
 import { HttpClient, HttpResponse } from '../../../../src/core/communication/http/HttpClient';
 import { HttpCommunicationChannel } from '../../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OverloadPreventionState } from '../../../../src/core/communication/http/state/OverloadPreventionState';

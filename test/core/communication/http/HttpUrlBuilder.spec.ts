@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { StatusRequest } from '../../../../src/api/communication/StatusRequest';
+import { StatusRequest } from '../../../../src/api';
 import { buildHttpUrl } from '../../../../src/core/communication/http/HttpUrlBuilder';
 
 const request: StatusRequest = {

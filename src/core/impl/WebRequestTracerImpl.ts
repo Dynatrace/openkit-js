@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { Logger } from '../../api/logging/Logger';
-import { LoggerFactory } from '../../api/logging/LoggerFactory';
-import { WebRequestTracer } from '../../api/WebRequestTracer';
-import { protocolVersion } from '../../PlatformConstants';
+import { Logger, LoggerFactory, WebRequestTracer } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
+import { protocolVersion } from '../PlatformConstants';
 
 const tagPrefix = 'MT';
 

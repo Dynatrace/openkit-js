@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { LoggerFactory } from '../../../../api/logging/LoggerFactory';
+import { LoggerFactory } from '../../../../api';
 import { HttpClient } from '../HttpClient';
 import { HttpCommunicationChannel } from './HttpCommunicationChannel';
 

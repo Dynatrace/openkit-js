@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { StatusRequest } from '../../../api/communication/StatusRequest';
+import { StatusRequest } from '../../../api';
 import { QueryKey } from '../../protocol/QueryKey';
 import { UrlBuilder } from './UrlBuilder';
 

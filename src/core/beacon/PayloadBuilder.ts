@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../../PlatformConstants';
 import { Configuration } from '../config/Configuration';
 import { ActionImpl } from '../impl/ActionImpl';
+import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
 import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DataCollectionLevel } from '../../DataCollectionLevel';
+import { DataCollectionLevel } from '../../api';
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
 import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';

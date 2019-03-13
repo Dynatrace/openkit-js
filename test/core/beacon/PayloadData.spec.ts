@@ -15,7 +15,7 @@
  */
 
 import { instance, mock, when } from 'ts-mockito';
-import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
+import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
 import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { Configuration } from '../../../src/core/config/Configuration';
@@ -25,8 +25,6 @@ import { StateImpl } from '../../../src/core/impl/StateImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { defaultTimestampProvider } from '../../../src/core/provider/TimestampProvider';
-import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
-import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 
 const baseConfiguration: Readonly<Configuration> = {
     beaconURL: 'https://example.com',

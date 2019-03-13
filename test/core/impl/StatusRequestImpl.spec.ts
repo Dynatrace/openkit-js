@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src';
-import { StatusRequest } from '../../../src/api/communication/StatusRequest';
+import { StatusRequest } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
 import { StatusRequestImpl } from '../../../src/core/impl/StatusRequestImpl';
+import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src/core/PlatformConstants';
 
 describe('StatusRequestImpl', () => {
     let request: StatusRequest;

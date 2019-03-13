@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '../../api/logging/Logger';
-import { LoggerFactory } from '../../api/logging/LoggerFactory';
-import { LogLevel } from '../../api/logging/LogLevel';
+import { Logger, LoggerFactory, LogLevel } from '../../api';
 import { ConsoleLogger } from './ConsoleLogger';
 
 /**

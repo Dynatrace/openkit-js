@@ -15,20 +15,22 @@
  */
 
 import { mock } from 'ts-mockito';
-import { RandomNumberProvider } from '../src/api/RandomNumberProvider';
-import { CommunicationChannel } from '../src/api/communication/CommunicationChannel';
-import { StatusRequest } from '../src/api/communication/StatusRequest';
-import { StatusResponse } from '../src/api/communication/StatusResponse';
-import { Logger } from '../src/api/logging/Logger';
-import { LoggerFactory } from '../src/api/logging/LoggerFactory';
+import { OpenKitBuilder } from '../src';
+import {
+    CommunicationChannel,
+    CrashReportingLevel,
+    DataCollectionLevel,
+    Logger,
+    LoggerFactory,
+    RandomNumberProvider,
+    StatusRequest,
+    StatusResponse,
+} from '../src/api';
 import { OpenKitImpl } from '../src/core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from '../src/core/logging/ConsoleLoggerFactory';
 import { defaultNullLogger } from '../src/core/logging/NullLogger';
 import { defaultNullLoggerFactory } from '../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../src/core/provider/DefaultRandomNumberProvider';
-import { CrashReportingLevel } from '../src/CrashReportingLevel';
-import { DataCollectionLevel } from '../src/DataCollectionLevel';
-import { OpenKitBuilder } from '../src/OpenKitBuilder';
 
 class StubCommunicationChannel implements CommunicationChannel {
     public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {

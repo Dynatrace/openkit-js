@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { CaptureMode, StatusResponse } from '../../../api/communication/StatusResponse';
-import { Logger } from '../../../api/logging/Logger';
-import { LoggerFactory } from '../../../api/logging/LoggerFactory';
+import { CaptureMode, Logger, LoggerFactory, StatusResponse } from '../../../api';
 import { ResponseKey } from '../../protocol/ResponseKey';
 import { PayloadDecoder } from '../../utils/PayloadDecoder';
 import { HttpResponse } from './HttpClient';

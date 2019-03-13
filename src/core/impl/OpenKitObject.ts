@@ -15,8 +15,7 @@
  */
 
 import { InitCallback } from '../..';
-import { StatusResponse } from '../../api/communication/StatusResponse';
-import { Logger } from '../../api/logging/Logger';
+import { Logger, StatusResponse } from '../../api';
 import { CallbackHolder } from '../utils/CallbackHolder';
 import { State } from './State';
 

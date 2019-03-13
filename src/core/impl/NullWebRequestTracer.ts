@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { WebRequestTracer } from '../../api/WebRequestTracer';
+import { WebRequestTracer } from '../../api';
 
 class NullWebRequestTracer implements  WebRequestTracer {
     public getTag(): string {

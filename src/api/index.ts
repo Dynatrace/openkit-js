@@ -12,26 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-/**
- * The OpenKit-JavaScript version.
- * For now, it must be equal to the mobile agent version.
- */
-export const openKitVersion = '7.0.0000';
-
-/**
- * Constant for the OneAgent Mobile Communication Protocol Version 3.
- */
-export const protocolVersion = 3;
-
-/**
- * Constant for all OpenKit platforms.
- */
-export const platformTypeOpenKit = 1;
-
-/**
- * The OpenKit-JavaScript agent technology type constant.
- */
-export const agentTechnologyType = 'okjs';
+export * from './Action';
+export * from './CrashReportingLevel';
+export * from './DataCollectionLevel';
+export * from './OpenKit';
+export * from './RandomNumberProvider';
+export * from './Session';
+export * from './WebRequestTracer';
+export * from './communication/StatusResponse';
+export * from './communication/StatusRequest';
+export * from './communication/CommunicationChannel';
+export * from './logging/LogLevel';
+export * from './logging/LoggerFactory';
+export * from './logging/Logger';

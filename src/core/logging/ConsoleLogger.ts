@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '../../api/logging/Logger';
-import { LogLevel } from '../../api/logging/LogLevel';
+import { Logger, LogLevel } from '../../api';
 
 // tslint:disable:no-console
 /**

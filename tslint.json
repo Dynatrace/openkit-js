@@ -17,7 +17,7 @@
       "check-space"
     ],
     "completed-docs": false,
-    "file-name-casing": [true, "pascal-case"],
+    "file-name-casing": false,
     "interface-name": [
       true,
       "never-prefix"

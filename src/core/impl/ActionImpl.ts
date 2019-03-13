@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
-import { CaptureMode } from '../../api/communication/StatusResponse';
-import { Logger } from '../../api/logging/Logger';
-import { WebRequestTracer } from '../../api/WebRequestTracer';
-import { DataCollectionLevel } from '../../DataCollectionLevel';
+import { Action, CaptureMode, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { defaultNullWebRequestTracer } from './NullWebRequestTracer';

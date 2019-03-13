@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CaptureMode } from '../../../../src/api/communication/StatusResponse';
+import { CaptureMode } from '../../../../src/api';
 import { HttpStatusResponse } from '../../../../src/core/communication/http/HttpStatusResponse';
 import { defaultNullLoggerFactory } from '../../../../src/core/logging/NullLoggerFactory';
 
