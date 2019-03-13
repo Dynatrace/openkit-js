@@ -61,6 +61,13 @@ export class OpenKitBuilder {
     private logLevel = LogLevel.Warn;
     private loggerFactory?: LoggerFactory;
 
+    /**
+     * Creates a new OpenKitBuilder
+     *
+     * @param beaconURL The url to the beacon endpoint
+     * @param applicationId The id of the custom application
+     * @param deviceId The id of the current device, which must be a number between 1 and 19 digits inclusive.
+     */
     constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
         this.beaconUrl = beaconURL;
         this.applicationId = applicationId;
