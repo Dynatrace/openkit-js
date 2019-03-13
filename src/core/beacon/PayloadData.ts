@@ -86,6 +86,17 @@ export class PayloadData {
             this.sessionStartTime));
     }
 
+    public reportCrash(errorName: string, reason: string, stacktrace: string): void {
+        this.addPayload(PayloadBuilder.reportCrash(
+            errorName,
+            reason,
+            stacktrace,
+            this.createSequenceNumber(),
+            this.sessionStartTime,
+            this.timestampProvider.getCurrentTimestamp(),
+        ));
+    }
+
     public reportEvent(actionId: number, name: string): void {
         this.addPayload(PayloadBuilder.reportNamedEvent(
             name,

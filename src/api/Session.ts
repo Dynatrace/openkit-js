@@ -33,6 +33,15 @@ export interface Session {
     identifyUser(userTag: string): void;
 
     /**
+     * Report a crash to Dynatrace.
+     *
+     * @param name The name of the crash.
+     * @param message Why the crash occurred.
+     * @param stacktrace The stacktrace of the crash.
+     */
+    reportCrash(name: string, message: string, stacktrace: string): void;
+
+    /**
      * Ends the session and sends all remaining data.
      */
     end(): void;

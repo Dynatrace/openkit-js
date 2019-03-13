@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { StatusResponse } from '../../api/communication/StatusResponse';
+import { CaptureMode, StatusResponse } from '../../api/communication/StatusResponse';
 import { Configuration } from '../config/Configuration';
 
 /**
@@ -40,6 +40,11 @@ export interface State {
      * The multiplicity which should be send to the server.
      */
     readonly multiplicity: number;
+
+    /**
+     * The crash reporting mode
+     */
+    readonly captureCrashes: CaptureMode;
 
     /**
      * Locks the server id so it can't change.

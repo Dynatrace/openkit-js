@@ -22,6 +22,17 @@ import { PayloadKey } from '../protocol/PayloadKey';
 import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
+    public static reportCrash(errorName: string, reason: string, stacktrace: string,
+                              sequenceNumber: number, sessionStartTime: number, currentTime: number): string {
+        return PayloadBuilder
+            .basicEventData(EventType.Crash, errorName)
+            .add(PayloadKey.ParentActionId, 0)
+            .add(PayloadKey.StartSequenceNumber, sequenceNumber)
+            .add(PayloadKey.Time0, currentTime - sessionStartTime)
+            .add(PayloadKey.Reason, reason)
+            .add(PayloadKey.Stacktrace, stacktrace)
+            .build();
+    }
     public static startSession(sequenceNumber: number): string {
         return PayloadBuilder
             .basicEventData(EventType.SessionStart)

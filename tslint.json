@@ -58,7 +58,8 @@
       true,
       "allow-null-union",
       "allow-undefined-union",
-      "allow-string"
+      "allow-string",
+      "ignore-rhs"
     ],
     "typedef": [
       true,

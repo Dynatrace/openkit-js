@@ -30,6 +30,10 @@ export class NullSession implements Session {
     public identifyUser(userTag: string): void {
         // stub
     }
+
+    public reportCrash(errorName: string, reason: string, stacktrace: string): void {
+        // stub
+    }
 }
 
 export const defaultNullSession = new NullSession();

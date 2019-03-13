@@ -93,7 +93,6 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.EndSequenceNumber, '98765');
             payloadExpect(pairs, PayloadKey.Time0, '420');
             payloadExpect(pairs, PayloadKey.Time1, '2');
-
         });
     });
 
@@ -271,6 +270,24 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
             payloadExpect(pairs, PayloadKey.Value, str250);
         });
+    });
+
+    describe('reportCrash', () => {
+       it('should build the correct payload', () => {
+          const payload = PayloadBuilder.reportCrash('errorName', 'reason', 'stacktrace', 6, 10, 4000);
+
+          const {keys, pairs} = parse(payload);
+          expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.Stacktrace]));
+
+          payloadExpect(pairs, PayloadKey.EventType, EventType.Crash.toString());
+          payloadExpect(pairs, PayloadKey.ThreadId, '1');
+          payloadExpect(pairs, PayloadKey.KeyName, 'errorName');
+          payloadExpect(pairs, PayloadKey.ParentActionId, '0');
+          payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
+          payloadExpect(pairs, PayloadKey.Time0, '3990');
+          payloadExpect(pairs, PayloadKey.Reason, 'reason');
+          payloadExpect(pairs, PayloadKey.Stacktrace, 'stacktrace');
+       });
     });
 
     describe('reportEvent', () => {

@@ -372,6 +372,106 @@ describe('SessionImpl', () => {
         });
     });
 
+    describe('reportCrash', () => {
+        it('should not be possible to enter reportCrash if the status is shutdown', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            session.shutdown();
+
+            // when
+            session.reportCrash('name', 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to enter reportCrash if the name is empty string', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            session.shutdown();
+
+            // when
+            session.reportCrash('', 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to enter reportCrash if the name is not a string', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            session.shutdown();
+
+            // when
+            session.reportCrash({} as string, 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to enter reportCrash if capture is off', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
+
+            // when
+            session.reportCrash({} as string, 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to enter reportCrash if captureCrashes is Off', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            state.updateFromResponse({valid: true, captureCrashes: CaptureMode.Off})
+
+            // when
+            session.reportCrash({} as string, 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to enter reportCrash if captureCrashes is OptOut in the config', () => {
+            // given
+            config.crashReportingLevel = CrashReportingLevel.OptOutCrashes;
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            session.reportCrash({} as string, 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to enter reportCrash if captureCrashes is Off in the config', () => {
+            // given
+            config.crashReportingLevel = CrashReportingLevel.Off;
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            session.reportCrash({} as string, 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).never();
+        });
+
+        it('should report the crash if capture mode is on', () => {
+            // given
+            config.crashReportingLevel = CrashReportingLevel.OptInCrashes;
+            state.updateFromResponse({valid: true, captureCrashes: CaptureMode.On});
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            session.reportCrash('name', 'reason', 'stacktrace');
+
+            // then
+            verify(payloadDataSpy.reportCrash(anything(), anything(), anything())).once();
+            verify(payloadDataSpy.reportCrash('name', 'reason', 'stacktrace')).once();
+        });
+    });
+
     describe('end', () => {
         it('should close all child-actions', (done) => {
             // given

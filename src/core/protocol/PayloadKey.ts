@@ -49,6 +49,9 @@ export const enum PayloadKey {
     EndSequenceNumber = 's1',
     Time1 = 't1',
 
+    Reason = 'rs',
+    Stacktrace = 'st',
+
     // Report Values
     Value = 'vl',
 }

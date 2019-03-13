@@ -18,7 +18,7 @@ import { CommunicationChannel } from '../../../src/api/communication/Communicati
 import { Configuration } from '../../../src/core/config/Configuration';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
-import { NullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
+import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
 import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
@@ -33,7 +33,7 @@ const config: Readonly<Configuration> = {
 
     communicationChannel: {} as CommunicationChannel,
     random: new DefaultRandomNumberProvider(),
-    loggerFactory: new NullLoggerFactory(),
+    loggerFactory: defaultNullLoggerFactory,
 };
 
 describe('StateImpl', () => {

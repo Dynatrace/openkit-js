@@ -16,8 +16,9 @@
 
 import { Action } from '../../api/Action';
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
-import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
+import { CaptureMode, defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
 import { Session } from '../../api/Session';
+import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { PayloadSender } from '../beacon/PayloadSender';
@@ -84,6 +85,9 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.flush();
     }
 
+    /**
+     * @inheritDoc
+     */
     public enterAction(actionName: string): Action {
         if (!this.mayEnterAction()) {
             return defaultNullAction;
@@ -96,9 +100,32 @@ export class SessionImpl extends OpenKitObject implements Session {
         return action;
     }
 
+    /**
+     * @inheritDoc
+     */
     public endAction(action: Action): void {
         removeElement(this.openActions, action);
         this.flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public reportCrash(name: string, message: string, stacktrace: string): void {
+        if (typeof name !== 'string') {
+            this.logger.warn('reportCrash', 'name is not a string', name);
+
+            return;
+        }
+
+        if (!this.mayReportCrash() || name.length === 0) {
+
+            return;
+        }
+
+        this.logger.debug('reportCrash', {name, reason: message, stacktrace});
+
+        this.payloadData.reportCrash(name, String(message), String(stacktrace));
     }
 
     public init(): void {
@@ -136,6 +163,13 @@ export class SessionImpl extends OpenKitObject implements Session {
 
         this.finishInitialization(response);
         this.logger.debug('Successfully initialized Session', this.sessionId);
+    }
+
+    private mayReportCrash(): boolean {
+        return this.status !== Status.Shutdown &&
+            !this.state.isCaptureDisabled() &&
+            this.state.config.crashReportingLevel === CrashReportingLevel.OptInCrashes &&
+            this.state.captureCrashes === CaptureMode.On;
     }
 
     private mayEnterAction(): boolean {
