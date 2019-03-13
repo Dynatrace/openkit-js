@@ -15,6 +15,7 @@
  */
 
 import { mock } from 'ts-mockito';
+import { RandomNumberProvider } from '../src/api/RandomNumberProvider';
 import { CommunicationChannel } from '../src/api/communication/CommunicationChannel';
 import { StatusRequest } from '../src/api/communication/StatusRequest';
 import { StatusResponse } from '../src/api/communication/StatusResponse';
@@ -139,16 +140,6 @@ describe('OpenKitBuilder', () => {
         expect(config.applicationVersion).toEqual('5.6.7');
     });
 
-    it('should randomize the device id if DCL = Off', () => {
-       builder
-           .withDataCollectionLevel(DataCollectionLevel.Off)
-           .withCommunicationChannel(new StubCommunicationChannel())
-           .withLoggerFactory(defaultNullLoggerFactory)
-           .build();
-
-       expect(builder.getConfig().deviceId).not.toBe('-42');
-    });
-
     it('should return an openkit instance', () => {
        const ok = builder
            .withDataCollectionLevel(DataCollectionLevel.Off)
@@ -157,5 +148,142 @@ describe('OpenKitBuilder', () => {
            .build();
 
        expect(ok).toBeInstanceOf(OpenKitImpl);
+    });
+
+    describe('deviceId', () => {
+        const randomNumberProvider: RandomNumberProvider = { nextPositiveInteger: () => 1337 };
+
+       it('should generate a random device id, if the id is not a numeric string', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', 'not a numeric string')
+                .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+            expect(config.deviceId).toBe('1337');
+       });
+
+       it('should generate a random device id, if the dcl = Off', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', 12345)
+               .withRandomNumberProvider(randomNumberProvider)
+               .withDataCollectionLevel(DataCollectionLevel.Off);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('1337');
+       });
+
+       it('should generate a random device id, if the dcl = Performance', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', 12345)
+               .withRandomNumberProvider(randomNumberProvider)
+               .withDataCollectionLevel(DataCollectionLevel.Performance);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('1337');
+       });
+
+       it('should remove a "+" from the start of a device id', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '+12345');
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('12345');
+       });
+
+       it('should generate a random device id, if there is a "+" in the device id, which is not at the start', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '12+431')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('1337');
+       });
+
+       it('should generate a random device id, if there is a "+" at the start, but no number', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '+')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('1337');
+       });
+
+       it('should use the device id if it is negative', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '-54321')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('-54321');
+       });
+
+       it('should generate a random device id, if the number is longer than 19 characters', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '-11111222223333344444')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('1337');
+       });
+
+       it('should use the device id, if it is 19 characters and negative', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '-1111122222333334444')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('-1111122222333334444');
+       });
+
+       it('should use the device id, if it is 19 characters and positive', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '1111122222333334444')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('1111122222333334444');
+       });
+
+       it('should use the device id, if it is 1 character', () => {
+           // given
+           const builder = new OpenKitBuilder('https://example.com', '123', '5')
+               .withRandomNumberProvider(randomNumberProvider);
+
+           // when
+           const config = builder.getConfig();
+
+           // then
+           expect(config.deviceId).toBe('5');
+       });
     });
 });
