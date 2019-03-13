@@ -52,6 +52,20 @@ export class PayloadBuilder {
             .build();
     }
 
+    public static reportNamedEvent(
+        name: string,
+        parentActionId: number,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+    ): string {
+        return PayloadBuilder
+            .basicEventData(EventType.NamedEvent, name)
+            .add(PayloadKey.ParentActionId, parentActionId)
+            .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
+            .build();
+    }
+
     public static prefix(config: Configuration, sessionId: number, clientIpAddress: string): string {
         return new PayloadQueryBuilder()
             .add(PayloadKey.ProtocolVersion, protocolVersion)

@@ -24,6 +24,10 @@ export class NullAction implements Action {
     public leaveAction(): null {
         return null;
     }
+
+    public reportEvent(name: string): void {
+        // stub
+    }
 }
 
 export const defaultNullAction = new NullAction();

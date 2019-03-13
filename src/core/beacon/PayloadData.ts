@@ -86,6 +86,14 @@ export class PayloadData {
             this.sessionStartTime));
     }
 
+    public reportEvent(actionId: number, name: string): void {
+        this.addPayload(PayloadBuilder.reportNamedEvent(
+            name,
+            actionId,
+            this.createSequenceNumber(),
+            this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime));
+    }
+
     public getNextPayload(): string | undefined {
         if (this.payloadQueue.length === 0) {
             return undefined;

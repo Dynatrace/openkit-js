@@ -20,4 +20,12 @@ describe('NullAction', () => {
     it('should return null on leaveAction', () => {
         expect(defaultNullAction.leaveAction()).toBeNull();
     });
+
+    it('should be able to call reportEvent without an error', () => {
+        defaultNullAction.reportEvent('some name');
+    });
+
+    it('should be able to call reportValue without an error', () => {
+        defaultNullAction.reportValue('name', 'value');
+    });
 });
