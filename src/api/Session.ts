@@ -35,7 +35,7 @@ export interface Session {
     /**
      * Report a crash to Dynatrace.
      *
-     * @param name The name of the error.
+     * @param name The name of the crash.
      * @param message Why the crash occurred.
      * @param stacktrace The stacktrace of the crash.
      */
