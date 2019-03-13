@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { WebRequestTracer } from './WebRequestTracer';
+
 /**
  * Action public interface
  */
@@ -35,6 +37,19 @@ export interface Action {
      * @param name The name of the event
      */
     reportEvent(name: string): void;
+
+    /**
+     * Allows tracing and timing of a web request handled by any HTTP Client
+     * (e.g. XmlHttpRequest, fetch, 'http'-module, ...).
+     * In this case the Dynatrace HTTP header has to be set manually to the tag value of this WebRequestTracer. <br>
+     * If the web request is continued on a server-side Agent (e.g. Java, .NET, ...) this Session will be correlated to
+     * the resulting server-side PurePath.
+     *
+     * @see {@link webRequestTagHeader}
+     * @param url the URL of the web request to be tagged and timed
+     * @return a WebRequestTracer which allows getting the tag value and adding timing information
+     */
+    traceWebRequest(url: string): WebRequestTracer;
 
     /**
      * Reports an error with a specified name, error code and reason to Dynatrace.

@@ -28,13 +28,14 @@ import { PayloadSender } from '../../../src/core/beacon/PayloadSender';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { defaultNullWebRequestTracer } from '../../../src/core/impl/NullWebRequestTracer';
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
-import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 
 class StubCommunicationChannel implements CommunicationChannel {
     public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
@@ -607,5 +608,50 @@ describe('SessionImpl', () => {
             verify(payloadDataSpy.reportError(0, 'name', 1337, 'message')).once();
             verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).once();
         });
-    })
+    });
+
+    describe('traceWebRequest', () => {
+        let session: Session;
+
+        beforeEach(() => {
+            ({session} = buildSession());
+        });
+
+        it('should return defaultNullWebRequest if the url is not a string', () => {
+            // when
+            // @ts-ignore
+            const wr = session.traceWebRequest(session);
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
+        it('should return defaultNullWebRequest if the url is empty string', () => {
+            // when
+            // @ts-ignore
+            const wr = session.traceWebRequest('');
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
+        it('should return a webRequestTracer object with valid inputs', () =>{
+            // when
+            const wr = session.traceWebRequest('https://example.com');
+
+            // then
+            expect(wr).toBeInstanceOf(WebRequestTracerImpl);
+        });
+
+        it('should return defaultNullWebRequest if dcl = Off', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Off;
+
+            // when
+            const wr = session.traceWebRequest('https://example.com');
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+    });
 });

@@ -15,6 +15,7 @@
  */
 
 import { defaultNullAction } from '../../../src/core/impl/NullAction';
+import { defaultNullWebRequestTracer } from '../../../src/core/impl/NullWebRequestTracer';
 
 describe('NullAction', () => {
     it('should return null on leaveAction', () => {
@@ -32,4 +33,8 @@ describe('NullAction', () => {
     it('should not crash if an error is reported', () => {
         defaultNullAction.reportError('name', 404, 'message');
     });
+
+    it('should return defaultNullWebRequestTracer on traceWebRequest', () => {
+        expect(defaultNullAction.traceWebRequest('any string')).toBe(defaultNullWebRequestTracer);
+    })
 });

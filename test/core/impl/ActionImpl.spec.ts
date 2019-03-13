@@ -20,9 +20,11 @@ import { CaptureMode } from '../../../src/api/communication/StatusResponse';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
+import { defaultNullWebRequestTracer } from '../../../src/core/impl/NullWebRequestTracer';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 
@@ -310,6 +312,43 @@ describe('ActionImpl', () => {
             // then
             verify(payloadDataMock.reportError(action.actionId, 'name', 1337, 'message')).once();
             verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).once();
+        });
+    });
+
+    describe('traceWebRequest', () => {
+        it('should return defaultNullWebRequest if the url is not a string', () => {
+            // when
+            // @ts-ignore
+            const wr = action.traceWebRequest(action);
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
+        it('should return defaultNullWebRequest if the url is empty string', () => {
+            // when
+            // @ts-ignore
+            const wr = action.traceWebRequest('');
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
+        it('should return defaultNullWebRequest if the action is closed', () => {
+            // when
+            action.leaveAction();
+            const wr = action.traceWebRequest('https://example.com');
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
+        it('should return a webRequestTracer object with valid inputs', () =>{
+            // when
+            const wr = action.traceWebRequest('https://example.com');
+
+            // then
+            expect(wr).toBeInstanceOf(WebRequestTracerImpl);
         });
     });
 });

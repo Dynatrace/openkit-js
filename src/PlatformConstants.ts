@@ -35,3 +35,8 @@ export const platformTypeOpenKit = 1;
  * The OpenKit-JavaScript agent technology type constant.
  */
 export const agentTechnologyType = 'okjs';
+
+/**
+ * Name of Dynatrace HTTP header which is used for tracing web requests.
+ */
+export  const webRequestTagHeader = 'X-dynaTrace';
