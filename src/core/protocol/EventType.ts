@@ -17,6 +17,7 @@
 export const enum EventType {
     ManualAction = 1,
 
+    NamedEvent = 10,
     ValueString = 11,
     ValueDouble = 13,
 
