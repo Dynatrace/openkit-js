@@ -114,7 +114,7 @@ export class SessionImpl extends OpenKitObject implements Session {
         }
 
         if (typeof code !== 'number') {
-            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid name', name);
+            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid error code', name);
             return;
         }
 

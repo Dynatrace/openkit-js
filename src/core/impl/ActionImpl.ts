@@ -112,7 +112,7 @@ export class ActionImpl implements Action {
         }
 
         if (typeof code !== 'number') {
-            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid name', name);
+            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid error code', name);
             return;
         }
 
