@@ -16,6 +16,7 @@
  */
 
 import { CommunicationChannel } from './api/communication/CommunicationChannel';
+import { Logger } from './api/logging/Logger';
 import { LoggerFactory } from './api/logging/LoggerFactory';
 import { LogLevel } from './api/logging/LogLevel';
 import { OpenKit } from './api/OpenKit';
@@ -36,6 +37,8 @@ const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
+
+const validDeviceIdPattern = /^-?\d{1,19}$/;
 
 /**
  * Builder for an OpenKit instance.
@@ -58,6 +61,13 @@ export class OpenKitBuilder {
     private logLevel = LogLevel.Warn;
     private loggerFactory?: LoggerFactory;
 
+    /**
+     * Creates a new OpenKitBuilder
+     *
+     * @param beaconURL The url to the beacon endpoint
+     * @param applicationId The id of the custom application
+     * @param deviceId The id of the current device, which must be a number between 1 and 19 digits inclusive.
+     */
     constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
         this.beaconUrl = beaconURL;
         this.applicationId = applicationId;
@@ -220,6 +230,7 @@ export class OpenKitBuilder {
 
     private buildConfig(): Readonly<Configuration> {
         const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
+        const logger = loggerFactory.createLogger('OpenKitBuilder');
 
         const communicationChannel = this.communicationChannel ||
             new HttpCommunicationChannel(new AxiosHttpClient(loggerFactory), loggerFactory);
@@ -227,9 +238,7 @@ export class OpenKitBuilder {
         const random = this.randomNumberProvider || new DefaultRandomNumberProvider();
 
         // user does not allow data tracking
-        const deviceId = this.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
-            this.deviceId : String(random.nextPositiveInteger());
-
+        const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random, logger);
         return {
             beaconURL: this.beaconUrl,
             deviceId,
@@ -248,3 +257,19 @@ export class OpenKitBuilder {
         };
     }
 }
+
+const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: RandomNumberProvider, log: Logger): string => {
+    // Check if we may capture the device id
+    let id = dcl !== DataCollectionLevel.UserBehavior ? String(random.nextPositiveInteger()) : deviceId;
+
+    // remove a possible '+' at the start
+    if (id.charAt(0) === '+') {
+        id = id.substr(1);
+    }
+
+    if (!validDeviceIdPattern.test(id)) {
+        id = String(random.nextPositiveInteger());
+    }
+
+    return id;
+};
