@@ -49,7 +49,9 @@ export const enum PayloadKey {
     EndSequenceNumber = 's1',
     Time1 = 't1',
 
+    // Error & Crash
     Reason = 'rs',
+    ErrorValue = 'ev',
     Stacktrace = 'st',
 
     // Report Values

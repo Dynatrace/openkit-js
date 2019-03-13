@@ -124,6 +124,24 @@ export class PayloadBuilder {
             .build();
     }
 
+    public static reportError(
+        name: string,
+        parentActionId: number,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+        reason: string,
+        errorValue: number,
+    ): string {
+        return PayloadBuilder
+            .basicEventData(EventType.Error, name)
+            .add(PayloadKey.ParentActionId, parentActionId)
+            .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
+            .add(PayloadKey.Reason, reason)
+            .add(PayloadKey.ErrorValue, errorValue)
+            .build();
+    }
+
     public static identifyUser(
         userTag: string,
         sequenceNumber: number,

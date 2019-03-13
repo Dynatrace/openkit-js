@@ -242,4 +242,74 @@ describe('ActionImpl', () => {
             verify(payloadDataMock.reportEvent(anything(), anything())).once();
         });
     });
+
+    describe('reportError', () => {
+        it('should not be possible to report an error if the name is not a string', () => {
+            // when
+            // @ts-ignore
+            action.reportError(action, 1337, 'message');
+
+            // then
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if the name is empty', () => {
+            // when
+            action.reportError('', 1337, 'message');
+
+            // then
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if the code is not a number', () => {
+            // when
+            // @ts-ignore
+            action.reportError('name', 'invalid number', 'message');
+
+            // then
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if the action is closed', () => {
+            // given
+            action.leaveAction();
+
+            // when
+            action.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if capture errors is off', () => {
+            // given
+            state.updateFromResponse({valid: true, captureErrors: CaptureMode.Off});
+
+            // when
+            action.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if DCL = Off', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Off;
+
+            // when
+            action.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should be able to report an error', () => {
+            // when
+            action.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataMock.reportError(action.actionId, 'name', 1337, 'message')).once();
+            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).once();
+        });
+    });
 });

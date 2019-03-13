@@ -15,7 +15,7 @@
  */
 
 import { anyString, anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
-import { Action, CrashReportingLevel, DataCollectionLevel } from '../../../src';
+import { Action, CrashReportingLevel, DataCollectionLevel, Session } from '../../../src';
 import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
 import { StatusRequest } from '../../../src/api/communication/StatusRequest';
 import {
@@ -535,4 +535,77 @@ describe('SessionImpl', () => {
             verify(mockOpenKitImpl.removeSession(session)).never();
         });
     });
+
+    describe('reportError', () => {
+        it('should not be possible to report an error if the name is not a string', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            // @ts-ignore
+            session.reportError(session, 1337, 'message');
+
+            // then
+            verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if the name is empty', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            session.reportError('', 1337, 'message');
+
+            // then
+            verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if the code is not a number', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            // @ts-ignore
+            session.reportError('name', 'invalid number', 'message');
+
+            // then
+            verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if capture errors is off', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            session.state.updateFromResponse({valid: true, captureErrors: CaptureMode.Off});
+
+            // when
+            session.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should not be possible to report an error if DCL = Off', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+            config.dataCollectionLevel = DataCollectionLevel.Off;
+
+            // when
+            session.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).never();
+        });
+
+        it('should be able to report an error', () => {
+            // given
+            const {session, payloadDataSpy} = buildSession();
+
+            // when
+            session.reportError('name', 1337, 'message');
+
+            // then
+            verify(payloadDataSpy.reportError(0, 'name', 1337, 'message')).once();
+            verify(payloadDataSpy.reportError(anything(), anything(), anything(), anything())).once();
+        });
+    })
 });

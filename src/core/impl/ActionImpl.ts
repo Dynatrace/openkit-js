@@ -15,6 +15,7 @@
  */
 
 import { Action } from '../../api/Action';
+import { CaptureMode } from '../../api/communication/StatusResponse';
 import { Logger } from '../../api/logging/Logger';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
@@ -58,6 +59,9 @@ export class ActionImpl implements Action {
         this.logger.debug(`Created action id=${this.actionId} with name='${name}' in session=${session.sessionId}`);
     }
 
+    /**
+     * @inheritDoc
+     */
     public reportValue(name: string, value: number | string | null | undefined): void {
         if (!this.mayReportValue()) {
             return;
@@ -77,6 +81,9 @@ export class ActionImpl implements Action {
         this.beacon.reportValue(this, name, value);
     }
 
+    /**
+     * @inheritDoc
+     */
     public reportEvent(name: string): void {
         if (!this.mayReportEvent()) {
             return;
@@ -89,6 +96,29 @@ export class ActionImpl implements Action {
         this.logger.debug(`reportEvent, action id=${this.actionId}`, {name});
 
         this.beacon.reportEvent(this.actionId, name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public reportError(name: string, code: number, message: string): void {
+        if (!this.mayReportError()) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid name', name);
+            return;
+        }
+
+        if (typeof code !== 'number') {
+            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid error code', name);
+            return;
+        }
+
+        this.logger.debug('reportError', `action id=${this.actionId}`, {name, code, message});
+
+        this.beacon.reportError(this.actionId, name, code, String(message));
     }
 
     public leaveAction(): null {
@@ -127,5 +157,12 @@ export class ActionImpl implements Action {
         return this.endTime === -1 &&
             !this.session.state.isCaptureDisabled() &&
             this.session.state.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
+    }
+
+    private mayReportError(): boolean {
+        return this.endTime === -1 &&
+            !this.session.state.isCaptureDisabled() &&
+            this.session.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
+            this.session.state.captureErrors === CaptureMode.On;
     }
 }

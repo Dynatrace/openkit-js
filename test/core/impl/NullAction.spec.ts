@@ -28,4 +28,8 @@ describe('NullAction', () => {
     it('should be able to call reportValue without an error', () => {
         defaultNullAction.reportValue('name', 'value');
     });
+
+    it('should not crash if an error is reported', () => {
+        defaultNullAction.reportError('name', 404, 'message');
+    });
 });
