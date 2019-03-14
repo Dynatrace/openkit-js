@@ -15,26 +15,31 @@
  */
 
 /**
+ * Name of Dynatrace HTTP header which is used for tracing web requests.
+ */
+export  const webRequestTagHeader = 'X-dynaTrace';
+
+/**
  * This interface allows tracing and timing of a web request.
  */
 export interface WebRequestTracer {
     /**
      * Returns the Dynatrace tag which has to be set manually as Dynatrace HTTP header ({@link webRequestTagHeader}).
      *
-     * @see {@link webrequestTagHeader}
+     * @see {@link webRequestTagHeader}
      * @return the Dynatrace tag to be set as HTTP header value or an empty String if capture is off
      */
     getTag(): string;
 
     /**
-     * Sets the amount of sent data of this web request. Has to be called before {@link WebRequestTracer#stop()}.
+     * Sets the amount of sent data of this web request. Has to be called before {@link stop}.
      *
      * @param bytesSent number of bytes
      */
     setBytesSent(bytesSent: number): this;
 
     /**
-     * Sets the amount of received data of this web request. Has to be called before {@link WebRequestTracer#stop()}.
+     * Sets the amount of received data of this web request. Has to be called before {@link stop}.
      *
      * @param bytesReceived number of bytes
      */
