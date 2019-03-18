@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
-import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
-import { InitCallback, OpenKit } from '../../api/OpenKit';
-import { Session } from '../../api/Session';
-import { DataCollectionLevel } from '../../DataCollectionLevel';
+import {
+    CommunicationChannel,
+    DataCollectionLevel,
+    defaultInvalidStatusResponse,
+    InitCallback,
+    OpenKit,
+    Session,
+    StatusResponse,
+} from '../../api';
 import { Configuration } from '../config/Configuration';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { LogLevel } from '../../../src/api/logging/LogLevel';
+import { LogLevel } from '../../../src/api';
 import { ConsoleLogger } from '../../../src/core/logging/ConsoleLogger';
 
 describe('ConsoleLogger', () => {

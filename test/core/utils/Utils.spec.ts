@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {removeElement} from '../../../src/core/utils/Utils';
+import { removeElement } from '../../../src/core/utils/Utils';
 
 describe('Utils', () => {
    describe('removeElement', () => {

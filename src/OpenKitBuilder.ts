@@ -15,20 +15,22 @@
  *
  */
 
-import { CommunicationChannel } from './api/communication/CommunicationChannel';
-import { Logger } from './api/logging/Logger';
-import { LoggerFactory } from './api/logging/LoggerFactory';
-import { LogLevel } from './api/logging/LogLevel';
-import { OpenKit } from './api/OpenKit';
-import { RandomNumberProvider } from './api/RandomNumberProvider';
+import {
+    CommunicationChannel,
+    CrashReportingLevel,
+    DataCollectionLevel,
+    Logger,
+    LoggerFactory,
+    LogLevel,
+    OpenKit,
+    RandomNumberProvider,
+} from './api';
 import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
 import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
-import { CrashReportingLevel } from './CrashReportingLevel';
-import { DataCollectionLevel } from './DataCollectionLevel';
 
 // Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
 import 'es6-promise/auto';

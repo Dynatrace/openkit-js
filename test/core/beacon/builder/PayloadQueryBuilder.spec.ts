@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {PayloadQueryBuilder} from '../../../../src/core/beacon/builder/PayloadQueryBuilder';
-import {PayloadKey} from '../../../../src/core/protocol/PayloadKey';
+import { PayloadQueryBuilder } from '../../../../src/core/beacon/builder/PayloadQueryBuilder';
+import { PayloadKey } from '../../../../src/core/protocol/PayloadKey';
 
 describe('PayloadQueryBuilder', () => {
     let builder: PayloadQueryBuilder;

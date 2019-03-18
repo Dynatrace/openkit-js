@@ -15,14 +15,13 @@
  */
 
 import { instance, mock, when } from 'ts-mockito';
+import { CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
 import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { EventType } from '../../../src/core/protocol/EventType';
 import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
 import { PayloadDecoder } from '../../../src/core/utils/PayloadDecoder';
-import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
-import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 import arrayContaining = jasmine.arrayContaining;
 
 const parse = (payload: string) => {

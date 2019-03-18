@@ -16,13 +16,13 @@
 
 import { anyString, anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
 import { Action, CrashReportingLevel, DataCollectionLevel, Session } from '../../../src';
-import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
-import { StatusRequest } from '../../../src/api/communication/StatusRequest';
 import {
     CaptureMode,
+    CommunicationChannel,
     defaultInvalidStatusResponse,
+    StatusRequest,
     StatusResponse,
-} from '../../../src/api/communication/StatusResponse';
+} from '../../../src/api';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { PayloadSender } from '../../../src/core/beacon/PayloadSender';
 import { Configuration } from '../../../src/core/config/Configuration';

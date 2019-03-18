@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '../../api/logging/Logger';
+import { Logger } from '../../api';
 
 /**
  * Logger implementation to discard all messages.

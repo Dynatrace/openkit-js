@@ -16,7 +16,7 @@
 
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
 import { DataCollectionLevel } from '../../../src';
-import { CaptureMode } from '../../../src/api/communication/StatusResponse';
+import { CaptureMode } from '../../../src/api';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';

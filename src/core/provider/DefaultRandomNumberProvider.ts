@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RandomNumberProvider } from '../../api/RandomNumberProvider';
+import { RandomNumberProvider } from '../../api';
 
 const random = (low: number, high: number): number => {
     return Math.random() * (high - low) + low;

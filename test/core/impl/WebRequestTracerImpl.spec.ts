@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
+import { instance, mock, reset, when } from 'ts-mockito';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';

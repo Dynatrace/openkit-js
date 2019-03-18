@@ -14,7 +14,7 @@
     "test": "jest",
     "lint": "tslint --project ./tsconfig.base.json -c tslint.json",
     "lint:spec": "tslint --project ./tsconfig.base.json -c tslint.spec.json",
-    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/api --tsconfig tsconfig.base.json",
+    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/index.ts src/api --tsconfig tsconfig.base.json --exclude src/core/**/* --excludePrivate --excludeNotExported",
     "docs:markdown": "yarn docs --theme markdown",
     "build": "yarn build:browser && yarn build:node",
     "build:node": "tsc -p tsconfig.node.json",

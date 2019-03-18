@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
-import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
-import { CaptureMode, defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
-import { Session } from '../../api/Session';
-import { WebRequestTracer } from '../../api/WebRequestTracer';
-import { CrashReportingLevel } from '../../CrashReportingLevel';
-import { DataCollectionLevel } from '../../DataCollectionLevel';
+import {
+    Action,
+    CaptureMode,
+    CommunicationChannel,
+    CrashReportingLevel,
+    DataCollectionLevel,
+    defaultInvalidStatusResponse,
+    Session,
+    StatusResponse,
+    WebRequestTracer,
+} from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
 import { PayloadSender } from '../beacon/PayloadSender';
 import { removeElement } from '../utils/Utils';

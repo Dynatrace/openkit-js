@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
-import { defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
-import { Logger } from '../../api/logging/Logger';
+import { CommunicationChannel, defaultInvalidStatusResponse, Logger, StatusResponse } from '../../api';
 import { State } from '../impl/State';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { PayloadData } from './PayloadData';

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../../../api/communication/CommunicationChannel';
-import { StatusRequest } from '../../../../api/communication/StatusRequest';
-import { StatusResponse } from '../../../../api/communication/StatusResponse';
+import { CommunicationChannel, StatusRequest, StatusResponse } from '../../../../api';
 import { timeout } from '../../../utils/Utils';
 import { defaultInvalidHttpResponse, HttpResponse } from '../HttpClient';
 import { HttpStatusResponse } from '../HttpStatusResponse';

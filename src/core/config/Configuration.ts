@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
-import { LoggerFactory } from '../../api/logging/LoggerFactory';
-import { RandomNumberProvider } from '../../api/RandomNumberProvider';
-import { CrashReportingLevel } from '../../CrashReportingLevel';
-import { DataCollectionLevel } from '../../DataCollectionLevel';
+import {
+    CommunicationChannel,
+    CrashReportingLevel,
+    DataCollectionLevel,
+    LoggerFactory,
+    RandomNumberProvider,
+} from '../../api';
 
 export interface Configuration {
     beaconURL: string;

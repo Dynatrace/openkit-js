@@ -15,8 +15,7 @@
  */
 
 import Axios, { AxiosResponse } from 'axios';
-import { LoggerFactory } from '../../../api/logging/LoggerFactory';
-import { Logger } from './../../../api/logging/Logger';
+import { Logger, LoggerFactory } from '../../../api';
 import { HttpClient, HttpResponse } from './HttpClient';
 
 export class AxiosHttpClient implements HttpClient {

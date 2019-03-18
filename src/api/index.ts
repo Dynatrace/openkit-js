@@ -1,3 +1,4 @@
+// tslint:disable:file-name-casing
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -14,25 +15,16 @@
  * limitations under the License.
  */
 
-import { Logger, LoggerFactory, LogLevel } from '../../api';
-import { ConsoleLogger } from './ConsoleLogger';
-
-/**
- * Logger factory for generating Loggers which wrap the `console` object.
- *
- * @see {@link ConsoleLogger}
- */
-export class ConsoleLoggerFactory implements LoggerFactory {
-    private readonly logLevel: LogLevel;
-
-    constructor(logLevel: LogLevel) {
-        this.logLevel = logLevel;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public createLogger(name: string): Logger {
-        return new ConsoleLogger(name, this.logLevel);
-    }
-}
+export * from './Action';
+export * from './CrashReportingLevel';
+export * from './DataCollectionLevel';
+export * from './OpenKit';
+export * from './RandomNumberProvider';
+export * from './Session';
+export * from './WebRequestTracer';
+export * from './communication/StatusResponse';
+export * from './communication/StatusRequest';
+export * from './communication/CommunicationChannel';
+export * from './logging/LogLevel';
+export * from './logging/LoggerFactory';
+export * from './logging/Logger';

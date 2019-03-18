@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../../src/api/communication/CommunicationChannel';
+import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
-import { CrashReportingLevel } from '../../../src/CrashReportingLevel';
-import { DataCollectionLevel } from '../../../src/DataCollectionLevel';
 
 const config: Readonly<Configuration> = {
     beaconURL: 'https://example.com',

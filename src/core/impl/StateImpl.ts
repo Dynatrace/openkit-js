@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CaptureMode, StatusResponse } from '../../api/communication/StatusResponse';
+import { CaptureMode, StatusResponse } from '../../api';
 import { Configuration } from '../config/Configuration';
 import { State } from './State';
 

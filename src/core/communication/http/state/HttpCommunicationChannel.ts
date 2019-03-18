@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../../../api/communication/CommunicationChannel';
-import { StatusRequest } from '../../../../api/communication/StatusRequest';
-import { StatusResponse } from '../../../../api/communication/StatusResponse';
-import { Logger } from '../../../../api/logging/Logger';
-import { LoggerFactory } from '../../../../api/logging/LoggerFactory';
+import { CommunicationChannel, Logger, LoggerFactory, StatusRequest, StatusResponse } from '../../../../api';
 import { HttpClient } from '../HttpClient';
 import { SendingState } from './SendingState';
 import { StateContext } from './StateContext';
