@@ -222,7 +222,6 @@ export class OpenKitBuilder {
     /**
      * Sets the user language. If the langauge is not a string or empty string, it is ignored.
      *
-     *
      * @param language The user language
      */
     public withUserLanguage(language: string): this {
@@ -252,6 +251,11 @@ export class OpenKitBuilder {
         return this;
     }
 
+    /**
+     * Sets the screen density. If the density is not a positive finite number, it is ignored.
+     *
+     * @param density The screen density.
+     */
     public withScreenDensity(density: number): this {
         const d = parseInt(density as any, 10);
 
@@ -262,6 +266,12 @@ export class OpenKitBuilder {
         return this;
     }
 
+    /**
+     * Sets the screen orientation. Allowed values are Orientation.Portrait ('p') and Orientation.Landscape ('l').
+     * All other values are ignored.
+     *
+     * @param orientation The orientation. 'p' || 'l'.
+     */
     public withScreenOrientation(orientation: Orientation): this {
         if (orientation === Orientation.Landscape || orientation === Orientation.Portrait) {
             this.orientation = orientation;
