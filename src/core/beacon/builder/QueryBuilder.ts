@@ -23,6 +23,7 @@ export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
 
     public add(key: T, value: string | number): this {
         this.options[key] = truncate(value.toString());
+
         return this;
     }
 
@@ -30,6 +31,7 @@ export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
         if (value !== undefined) {
             this.add(key, value);
         }
+
         return this;
     }
 
@@ -37,6 +39,15 @@ export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
         if (value !== undefined && value !== null) {
             this.add(key, value);
         }
+
+        return this;
+    }
+
+    public addIfNotNegative(key: T, value: number): this {
+        if (value >= 0) {
+            this.add(key, value);
+        }
+
         return this;
     }
 

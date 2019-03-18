@@ -18,6 +18,7 @@ import { Action } from '../../api/Action';
 import { CommunicationChannel } from '../../api/communication/CommunicationChannel';
 import { CaptureMode, defaultInvalidStatusResponse, StatusResponse } from '../../api/communication/StatusResponse';
 import { Session } from '../../api/Session';
+import { WebRequestTracer } from '../../api/WebRequestTracer';
 import { CrashReportingLevel } from '../../CrashReportingLevel';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
@@ -25,9 +26,11 @@ import { PayloadSender } from '../beacon/PayloadSender';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './NullAction';
+import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 import { OpenKitImpl } from './OpenKitImpl';
 import { OpenKitObject, Status } from './OpenKitObject';
 import { StatusRequestImpl } from './StatusRequestImpl';
+import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class SessionImpl extends OpenKitObject implements Session {
     public readonly payloadData: PayloadData;
@@ -157,6 +160,26 @@ export class SessionImpl extends OpenKitObject implements Session {
                 this.initialize();
             }
         });
+    }
+
+    public traceWebRequest(url: string): WebRequestTracer {
+        if (typeof url !== 'string' || url.length === 0) {
+            return defaultNullWebRequestTracer;
+        }
+
+        if (this.status === Status.Shutdown) {
+            return defaultNullWebRequestTracer;
+        }
+
+        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            return defaultNullWebRequestTracer;
+        }
+
+        const { serverId, config: {deviceId, loggerFactory, applicationId} } = this.state;
+
+        return new WebRequestTracerImpl(
+            this.payloadData, 0, url, loggerFactory, serverId, deviceId, applicationId, this.sessionId,
+        );
     }
 
     public flush(): void {

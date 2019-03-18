@@ -17,10 +17,13 @@
 import { Action } from '../../api/Action';
 import { CaptureMode } from '../../api/communication/StatusResponse';
 import { Logger } from '../../api/logging/Logger';
+import { WebRequestTracer } from '../../api/WebRequestTracer';
 import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { PayloadData } from '../beacon/PayloadData';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
+import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 import { SessionImpl } from './SessionImpl';
+import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class ActionImpl implements Action {
     public readonly name: string;
@@ -121,8 +124,31 @@ export class ActionImpl implements Action {
         this.beacon.reportError(this.actionId, name, code, String(message));
     }
 
+    public traceWebRequest(url: string): WebRequestTracer {
+        if (typeof url !== 'string' || url.length === 0) {
+            return defaultNullWebRequestTracer;
+        }
+
+        if (this.isActionLeft()) {
+            return defaultNullWebRequestTracer;
+        }
+
+        const { serverId, config: {deviceId, applicationId, loggerFactory }} = this.session.state;
+
+        return new WebRequestTracerImpl(
+            this.beacon,
+            this.actionId,
+            url,
+            loggerFactory,
+            serverId,
+            deviceId,
+            applicationId,
+            this.session.sessionId,
+        );
+    }
+
     public leaveAction(): null {
-        if (this.endTime !== -1) {
+        if (this.isActionLeft()) {
             return null;
         }
 
@@ -137,7 +163,7 @@ export class ActionImpl implements Action {
     }
 
     private mayReportValue(): boolean {
-        if (this.endTime !== -1) {
+        if (this.isActionLeft()) {
             return false;
         }
 
@@ -154,15 +180,19 @@ export class ActionImpl implements Action {
     }
 
     private mayReportEvent(): boolean {
-        return this.endTime === -1 &&
+        return !this.isActionLeft() &&
             !this.session.state.isCaptureDisabled() &&
             this.session.state.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
     }
 
     private mayReportError(): boolean {
-        return this.endTime === -1 &&
+        return !this.isActionLeft() &&
             !this.session.state.isCaptureDisabled() &&
             this.session.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
             this.session.state.captureErrors === CaptureMode.On;
+    }
+
+    private isActionLeft(): boolean {
+        return this._endTime !== -1;
     }
 }

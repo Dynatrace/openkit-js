@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import { DataCollectionLevel } from '../../DataCollectionLevel';
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
+import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { PayloadBuilder } from './PayloadBuilder';
@@ -132,6 +134,28 @@ export class PayloadData {
         } while (this.payloadQueue.length !== 0 && (remainingLength - this.payloadQueue[0].length) > 0);
 
         return currentPayload;
+    }
+
+    public currentTimestamp(): number {
+        return this.timestampProvider.getCurrentTimestamp();
+    }
+
+    public addWebRequest(webrequest: WebRequestTracerImpl, parentActionId: number): void {
+        if (this.state.isCaptureDisabled() || this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            return;
+        }
+
+        this.addPayload(PayloadBuilder.webRequest(
+            webrequest.getUrl(),
+            parentActionId,
+            webrequest.getStartSequenceNumber(),
+            this.currentTimestamp() - webrequest.getStart(),
+            webrequest.getEndSequenceNumber(),
+            webrequest.getDuration(),
+            webrequest.getBytesSent(),
+            webrequest.getBytesReceived(),
+            webrequest.getResponseCode(),
+        ));
     }
 
     public hasPayloadsLeft(): boolean {

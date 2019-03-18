@@ -155,6 +155,29 @@ export class PayloadBuilder {
             .build();
     }
 
+    public static webRequest(
+        url: string,
+        parentActionId: number,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+        endSequenceNumber: number,
+        duration: number,
+        bytesSent: number,
+        bytesReceived: number,
+        responseCode: number,
+    ): string {
+        return PayloadBuilder.basicEventData(EventType.WebRequest, url)
+            .add(PayloadKey.ParentActionId, parentActionId)
+            .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
+            .add(PayloadKey.EndSequenceNumber, endSequenceNumber)
+            .add(PayloadKey.Time1, duration)
+            .addIfNotNegative(PayloadKey.BytesSent, bytesSent)
+            .addIfNotNegative(PayloadKey.BytesReceived, bytesReceived)
+            .addIfNotNegative(PayloadKey.ResponseCode, responseCode)
+            .build();
+    }
+
     private static basicEventData(eventType: EventType, name?: string): PayloadQueryBuilder {
         return new PayloadQueryBuilder()
             .add(PayloadKey.EventType, eventType)

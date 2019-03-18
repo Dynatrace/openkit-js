@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-import { Action } from '../../api/Action';
 import { WebRequestTracer } from '../../api/WebRequestTracer';
-import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 
-export class NullAction implements Action {
-    public reportValue(name: string, value: number | string): void {
+class NullWebRequestTracer implements  WebRequestTracer {
+    public getTag(): string {
+        return '';
+    }
+
+    public setBytesReceived(bytesReceived: number): this {
+        return this;
+    }
+
+    public setBytesSent(bytesSent: number): this {
+        return this;
+    }
+
+    public start(): this {
+        return this;
+    }
+
+    public stop(responseCode?: number): void {
         // stub
-    }
-
-    public leaveAction(): null {
-        return null;
-    }
-
-    public reportEvent(name: string): void {
-        // stub
-    }
-
-    public reportError(name: string, code: number, message: string): void {
-        // stub
-    }
-
-    public traceWebRequest(url: string): WebRequestTracer {
-        return defaultNullWebRequestTracer;
     }
 }
 
-export const defaultNullAction = new NullAction();
+export const defaultNullWebRequestTracer = new NullWebRequestTracer();

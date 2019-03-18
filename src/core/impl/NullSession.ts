@@ -16,7 +16,9 @@
 
 import { Action } from '../../api/Action';
 import { Session } from '../../api/Session';
+import { WebRequestTracer } from '../../api/WebRequestTracer';
 import { defaultNullAction } from './NullAction';
+import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 
 export class NullSession implements Session {
     public enterAction(actionName: string): Action {
@@ -37,6 +39,10 @@ export class NullSession implements Session {
 
     public reportCrash(errorName: string, reason: string, stacktrace: string): void {
         // stub
+    }
+
+    public traceWebRequest(url: string): WebRequestTracer {
+        return defaultNullWebRequestTracer;
     }
 }
 

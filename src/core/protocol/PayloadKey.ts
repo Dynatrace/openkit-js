@@ -56,4 +56,10 @@ export const enum PayloadKey {
 
     // Report Values
     Value = 'vl',
+
+    // Web request
+    ResponseCode = 'rc',
+    BytesSent = 'bs',
+    BytesReceived = 'br',
+
 }

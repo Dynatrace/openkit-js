@@ -15,6 +15,7 @@
  */
 
 import { Action } from './Action';
+import { WebRequestTracer } from './WebRequestTracer';
 
 /**
  * Session public interface
@@ -49,6 +50,20 @@ export interface Session {
      * @param stacktrace The stacktrace of the crash.
      */
     reportCrash(name: string, message: string, stacktrace: string): void;
+
+    /**
+     * Allows tracing and timing of a web request handled by any HTTP Client
+     * (e.g. XmlHttpRequest, fetch, 'http'-module, ...).
+     * In this case the Dynatrace HTTP header ({@link webRequestTagHeader}) has to be set manually to the tag value of this
+     * WebRequestTracer. <br>
+     * If the web request is continued on a server-side Agent (e.g. Java, .NET, ...) this Session will be correlated to
+     * the resulting server-side PurePath.
+     *
+     * @see {@link webRequestTagHeader}
+     * @param url the URL of the web request to be tagged and timed
+     * @return a WebRequestTracer which allows getting the tag value and adding timing information
+     */
+    traceWebRequest(url: string): WebRequestTracer;
 
     /**
      * Ends the session and sends all remaining data.
