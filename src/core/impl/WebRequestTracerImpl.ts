@@ -25,7 +25,17 @@ const tagPrefix = 'MT';
 // We do not need to percent encode, because the device id and application id are only [0-9a-fA-F-]
 const createTag =
     (actionId: number, sessionNumber: number, sequenceNumber: number, serverId: number, deviceId: string, appId: string): string =>
-    `${tagPrefix}_${protocolVersion}_${serverId}_${deviceId}_${sessionNumber}_${appId}_${actionId}_1_${sequenceNumber}`;
+        [
+            tagPrefix,
+            protocolVersion,
+            serverId,
+            deviceId,
+            sessionNumber,
+            appId,
+            actionId,
+            1,
+            sequenceNumber,
+        ].join('_');
 
 export class WebRequestTracerImpl implements WebRequestTracer {
     private readonly payload: PayloadData;

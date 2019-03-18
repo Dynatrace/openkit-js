@@ -17,7 +17,7 @@
 /**
  * Name of Dynatrace HTTP header which is used for tracing web requests.
  */
-export  const webRequestTagHeader = 'X-dynaTrace';
+export const webRequestTagHeader = 'X-dynaTrace';
 
 /**
  * This interface allows tracing and timing of a web request.
