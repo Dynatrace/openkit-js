@@ -1,3 +1,4 @@
+// tslint:disable:file-name-casing
 /*
  * Copyright 2019 Dynatrace LLC
  *
