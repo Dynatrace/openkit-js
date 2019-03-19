@@ -25,102 +25,102 @@ describe('ConsoleLogger', () => {
         console.error = jest.fn();
     });
 
-   it('should log a debug-message with a given name and level = Debug', () => {
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Debug);
+    it('should log a debug-message with a given name and level = Debug', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Debug);
 
-       // when
-       log.debug('Test');
+        // when
+        log.debug('Test');
 
-       // then
-       expect(console.debug).toHaveBeenCalledTimes(1);
-   });
+        // then
+        expect(console.debug).toHaveBeenCalledTimes(1);
+    });
 
-   it('should log a info-message with a given name and level = Info', () => {
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Info);
+    it('should log a info-message with a given name and level = Info', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Info);
 
-       // when
-       log.info('Test');
+        // when
+        log.info('Test');
 
-       // then
-       expect(console.info).toHaveBeenCalledTimes(1);
-   });
+        // then
+        expect(console.info).toHaveBeenCalledTimes(1);
+    });
 
-   it('should log a warn-message with a given name and level = Warn', () => {
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Warn);
+    it('should log a warn-message with a given name and level = Warn', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Warn);
 
-       // when
-       log.warn('Test');
+        // when
+        log.warn('Test');
 
-       // then
-       expect(console.warn).toHaveBeenCalledTimes(1);
-   });
+        // then
+        expect(console.warn).toHaveBeenCalledTimes(1);
+    });
 
-   it('should not log a debug-message if level = Info', () =>{
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Info);
+    it('should not log a debug-message if level = Info', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Info);
 
-       // when
-       log.debug('Test');
+        // when
+        log.debug('Test');
 
-       // then
-       expect(console.debug).toHaveBeenCalledTimes(0);
-   });
+        // then
+        expect(console.debug).toHaveBeenCalledTimes(0);
+    });
 
-   it('should not log a debug-message if level = Warn', () =>{
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Warn);
+    it('should not log a debug-message if level = Warn', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Warn);
 
-       // when
-       log.debug('Test');
+        // when
+        log.debug('Test');
 
-       // then
-       expect(console.debug).toHaveBeenCalledTimes(0);
-   });
+        // then
+        expect(console.debug).toHaveBeenCalledTimes(0);
+    });
 
-   it('should not log a info-message if level = Warn', () =>{
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Warn);
+    it('should not log a info-message if level = Warn', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Warn);
 
-       // when
-       log.info('Test');
+        // when
+        log.info('Test');
 
-       // then
-       expect(console.info).toHaveBeenCalledTimes(0);
-   });
+        // then
+        expect(console.info).toHaveBeenCalledTimes(0);
+    });
 
-   it('should log a warn-message if level = Debug', () =>{
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Debug);
+    it('should log a warn-message if level = Debug', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Debug);
 
-       // when
-       log.warn('Test');
+        // when
+        log.warn('Test');
 
-       // then
-       expect(console.warn).toHaveBeenCalledTimes(1);
-   });
+        // then
+        expect(console.warn).toHaveBeenCalledTimes(1);
+    });
 
-   it('should log a warn-message if level = Info', () =>{
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Info);
+    it('should log a warn-message if level = Info', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Info);
 
-       // when
-       log.warn('Test');
+        // when
+        log.warn('Test');
 
-       // then
-       expect(console.warn).toHaveBeenCalledTimes(1);
-   });
+        // then
+        expect(console.warn).toHaveBeenCalledTimes(1);
+    });
 
-   it('should log a error-message if level = Error', () =>{
-       // given
-       const log = new ConsoleLogger('test-name', LogLevel.Error);
+    it('should log an error-message if level = Error', () => {
+        // given
+        const log = new ConsoleLogger('test-name', LogLevel.Error);
 
-       // when
-       log.error('Test');
+        // when
+        log.error('Test');
 
-       // then
-       expect(console.error).toHaveBeenCalledTimes(1);
-   });
+        // then
+        expect(console.error).toHaveBeenCalledTimes(1);
+    });
 });

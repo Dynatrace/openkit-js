@@ -43,3 +43,5 @@ export const timeout = (milliseconds: number): Promise<void> => {
        setTimeout(res, milliseconds);
    });
 };
+
+export const isFinite = (n: number) => n !== Infinity && n !== -Infinity && !isNaN(n);

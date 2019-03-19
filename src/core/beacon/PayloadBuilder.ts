@@ -100,7 +100,6 @@ export class PayloadBuilder {
             .addIfDefined(PayloadKey.ScreenWidth, config.screenWidth)
             .addIfDefined(PayloadKey.ScreenHeight, config.screenHeight)
             .addIfDefined(PayloadKey.UserLanguage, config.userLanguage)
-            .addIfDefined(PayloadKey.ScreenDensity, config.screenDensity)
             .addIfDefined(PayloadKey.Orientation, config.orientation)
             .build();
     }

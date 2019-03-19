@@ -31,7 +31,7 @@ import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
-import { truncate } from './core/utils/Utils';
+import { isFinite, truncate } from './core/utils/Utils';
 
 // Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
 import 'es6-promise/auto';
@@ -42,8 +42,6 @@ const defaultOperatingSystem = 'OpenKit';
 const defaultApplicationName = '';
 
 const validDeviceIdPattern = /^-?\d{1,19}$/;
-
-const isFinite = (n: number) => n !== Infinity && n !== -Infinity && !isNaN(n);
 
 /**
  * Builder for an OpenKit instance.
@@ -199,7 +197,7 @@ export class OpenKitBuilder {
      * @param manufacturer The manufacturer of the device
      */
     public withManufacturer(manufacturer: string): this {
-        if (typeof  manufacturer === 'string' && manufacturer.length !== 0) {
+        if (typeof manufacturer === 'string' && manufacturer.length !== 0) {
             this.manufacturer = truncate(manufacturer);
         }
 
@@ -220,7 +218,8 @@ export class OpenKitBuilder {
     }
 
     /**
-     * Sets the user language. If the langauge is not a string or empty string, it is ignored.
+     * Sets the user language. If the language is not a string or empty string, it is ignored.
+     * Currently, there are no restrictions on RFC/ISO codes.
      *
      * @param language The user language
      */
@@ -243,24 +242,9 @@ export class OpenKitBuilder {
         const w = parseInt(width as any, 10);
         const h = parseInt(height as any, 10);
 
-        if (isFinite(w) && isFinite(h) && w >= 0 && h >= 0) {
+        if (isFinite(w) && isFinite(h) && w > 0 && h > 0) {
             this.screenWidth = w;
             this.screenHeight = h;
-        }
-
-        return this;
-    }
-
-    /**
-     * Sets the screen density. If the density is not a positive finite number, it is ignored.
-     *
-     * @param density The screen density.
-     */
-    public withScreenDensity(density: number): this {
-        const d = parseInt(density as any, 10);
-
-        if (isFinite(d)) {
-            this.screenDensity = d;
         }
 
         return this;
@@ -359,7 +343,6 @@ export class OpenKitBuilder {
             userLanguage: this.userLanguage,
             screenWidth: this.screenWidth,
             screenHeight: this.screenHeight,
-            screenDensity: this.screenDensity,
             orientation: this.orientation,
         };
     }

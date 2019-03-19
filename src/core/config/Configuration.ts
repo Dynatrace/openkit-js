@@ -45,6 +45,5 @@ export interface Configuration {
     userLanguage?: string;
     screenWidth?: number;
     screenHeight?: number;
-    screenDensity?: number;
     orientation?: Orientation;
 }

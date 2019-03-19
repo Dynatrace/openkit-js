@@ -317,7 +317,7 @@ describe('OpenKitBuilder', () => {
                 expect(builder.getConfig().manufacturer).toBeUndefined();
             });
 
-            it('should not update the manufacturer if it is empty string', () => {
+            it('should not update the manufacturer if it is an empty string', () => {
                 // when
                 builder.withManufacturer('');
 
@@ -370,7 +370,7 @@ describe('OpenKitBuilder', () => {
                 expect(builder.getConfig().modelId).toBeUndefined();
             });
 
-            it('should not update the modelId if it is empty string', () => {
+            it('should not update the modelId if it is an empty string', () => {
                 // when
                 builder.withModelId('');
 
@@ -423,7 +423,7 @@ describe('OpenKitBuilder', () => {
                 expect(builder.getConfig().userLanguage).toBeUndefined();
             });
 
-            it('should not update the userLanguage if it is empty string', () => {
+            it('should not update the userLanguage if it is an empty string', () => {
                 // when
                 builder.withUserLanguage('');
 
@@ -453,7 +453,7 @@ describe('OpenKitBuilder', () => {
                 expect(builder.getConfig().screenHeight).toBe(900);
             });
 
-            it('should not update if width or height is not a finite number', () => {
+            it('should not update if width or height is not a finite number or positive', () => {
                // given
                 const invalidInputs = [NaN, Infinity, -Infinity, 'some string', {}, -42];
 
@@ -469,39 +469,6 @@ describe('OpenKitBuilder', () => {
                 invalidInputs.forEach(height => {
                     // when
                     builder.withScreenResolution(1200, height as number).getConfig();
-
-                    // then
-                    expect(builder.getConfig().screenWidth).toBeUndefined();
-                    expect(builder.getConfig().screenHeight).toBeUndefined();
-                });
-            });
-        });
-
-        describe('screen density', () =>{
-            it('should update the screen density with valid numbers', () => {
-                // when
-                builder.withScreenDensity(2);
-
-                // then
-                expect(builder.getConfig().screenDensity).toBe(2);
-            });
-
-            it('should update the screen resolution properties with valid numbers as string', () => {
-                // when
-                // @ts-ignore
-                builder.withScreenDensity('2');
-
-                // then
-                expect(builder.getConfig().screenDensity).toBe(2);
-            });
-
-            it('should not update if width or height is not a finite number', () => {
-                // given
-                const invalidInputs = [NaN, Infinity, -Infinity, 'some string', {}, -6544];
-
-                invalidInputs.forEach(invalidDensity => {
-                    // when
-                    builder.withScreenDensity(invalidDensity as number).getConfig();
 
                     // then
                     expect(builder.getConfig().screenWidth).toBeUndefined();

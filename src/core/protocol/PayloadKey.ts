@@ -35,7 +35,6 @@ export const enum PayloadKey {
     DeviceModel = 'md',
     ScreenWidth = 'sw',
     ScreenHeight = 'sh',
-    ScreenDensity = 'sd',
     UserLanguage = 'ul',
     Orientation = 'so',
 
