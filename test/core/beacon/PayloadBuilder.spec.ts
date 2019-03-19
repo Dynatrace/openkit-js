@@ -304,4 +304,47 @@ describe('PayloadBuilder', () => {
            payloadExpect(pairs, PayloadKey.Time0, '5431');
        });
     });
+
+    describe('webRequest', () => {
+       it('should build the payload with all optional values', () => {
+           const payload = PayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, 1400, 5430, 200);
+           const {keys, pairs} = parse(payload);
+
+           expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
+               PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
+               PayloadKey.Time1, PayloadKey.BytesSent, PayloadKey.BytesReceived, PayloadKey.ResponseCode]));
+
+           payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
+           payloadExpect(pairs, PayloadKey.ThreadId, '1');
+           payloadExpect(pairs, PayloadKey.KeyName, 'https://example.com');
+           payloadExpect(pairs, PayloadKey.ParentActionId, '70');
+           payloadExpect(pairs, PayloadKey.StartSequenceNumber, '196');
+           payloadExpect(pairs, PayloadKey.Time0, '500');
+           payloadExpect(pairs, PayloadKey.EndSequenceNumber, '207');
+           payloadExpect(pairs, PayloadKey.Time1, '5000');
+           payloadExpect(pairs, PayloadKey.BytesSent, '1400');
+           payloadExpect(pairs, PayloadKey.BytesReceived, '5430');
+           payloadExpect(pairs, PayloadKey.ResponseCode, '200');
+       });
+       it('should build the payload without optional values', () => {
+           const payload = PayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, -1, -1, -1);
+           const {keys, pairs} = parse(payload);
+
+           expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
+               PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
+               PayloadKey.Time1]));
+
+           payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
+           payloadExpect(pairs, PayloadKey.ThreadId, '1');
+           payloadExpect(pairs, PayloadKey.KeyName, 'https://example.com');
+           payloadExpect(pairs, PayloadKey.ParentActionId, '70');
+           payloadExpect(pairs, PayloadKey.StartSequenceNumber, '196');
+           payloadExpect(pairs, PayloadKey.Time0, '500');
+           payloadExpect(pairs, PayloadKey.EndSequenceNumber, '207');
+           payloadExpect(pairs, PayloadKey.Time1, '5000');
+           payloadExpect(pairs, PayloadKey.BytesSent, undefined);
+           payloadExpect(pairs, PayloadKey.BytesReceived, undefined);
+           payloadExpect(pairs, PayloadKey.ResponseCode, undefined);
+       });
+    });
 });

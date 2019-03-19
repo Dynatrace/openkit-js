@@ -19,6 +19,7 @@ import {
     CrashReportingLevel,
     DataCollectionLevel,
     LoggerFactory,
+    Orientation,
     RandomNumberProvider,
 } from '../../api';
 
@@ -37,4 +38,12 @@ export interface Configuration {
     communicationChannel: CommunicationChannel;
     loggerFactory: LoggerFactory;
     random: RandomNumberProvider;
+
+    // Additional metadata
+    manufacturer?: string;
+    modelId?: string;
+    userLanguage?: string;
+    screenWidth?: number;
+    screenHeight?: number;
+    orientation?: Orientation;
 }

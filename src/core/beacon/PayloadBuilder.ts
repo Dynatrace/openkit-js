@@ -94,6 +94,13 @@ export class PayloadBuilder {
 
             .add(PayloadKey.DataCollectionLevel, config.dataCollectionLevel)
             .add(PayloadKey.CrashReportingLevel, config.crashReportingLevel)
+
+            .addIfDefined(PayloadKey.DeviceManufacturer, config.manufacturer)
+            .addIfDefined(PayloadKey.DeviceModel, config.modelId)
+            .addIfDefined(PayloadKey.ScreenWidth, config.screenWidth)
+            .addIfDefined(PayloadKey.ScreenHeight, config.screenHeight)
+            .addIfDefined(PayloadKey.UserLanguage, config.userLanguage)
+            .addIfDefined(PayloadKey.Orientation, config.orientation)
             .build();
     }
 

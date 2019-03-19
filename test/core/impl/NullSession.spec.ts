@@ -27,4 +27,16 @@ describe('NullSession', () => {
     it('should return the defaultNullWebRequestTracer on tracing a web request', () =>{
        expect(defaultNullSession.traceWebRequest('https://any.url')).toBe(defaultNullWebRequestTracer);
     });
+
+    it('should not crash if identifyUser is called', () => {
+        defaultNullSession.identifyUser('some user tag');
+    });
+
+    it('should not crash if reportError is called', () => {
+        defaultNullSession.reportError('error name', 300, 'error message');
+    });
+
+    it('should not crash if reportCrash is called', () => {
+        defaultNullSession.reportCrash('name', 'reason', 'message');
+    });
 });
