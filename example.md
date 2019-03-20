@@ -51,7 +51,7 @@ customize OpenKit. This includes device specific information like operating syst
 
 ## Logging
 
-By default, OpenKit uses a logger implementation that logs to console. If the default logger is used, the desired
+By default, OpenKit uses a logger implementation that logs to the console. If the default logger is used, the desired
 minimum log level can be set by calling `withLogLevel` in the builder, and only messages with the same or higher 
 priorities are logged.
 

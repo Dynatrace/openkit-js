@@ -72,7 +72,8 @@ within one process, there should be one unique instance.
 
 A `Session` represents kind of a user session, similar to a browser session in a web application.
 However the application developer is free to choose how to treat a `Session`.  
-The `Session` is used to create `Action` instances, report application crashes and to identify users. 
+The `Session` is used to create `Action` instances, report application crashes, identify users and 
+to trace web requests when there is no `Action` available. 
 
 When a `Session` is no longer required, it's highly recommended to end it, using the `Session.end()` method.
 
@@ -95,7 +96,8 @@ A named `Event` is attached to an `Action` and contains a name.
 ### Key-Value Pairs
 
 For an `Action` key-value pairs can also be reported. The key is always a String
-and the value may be a `number` or a `string`.
+and the value may be a `number` or a `string`. All reported numbers are handled as floating point
+values by Dynatrace.
 
 ### Errors & Crashes
 
