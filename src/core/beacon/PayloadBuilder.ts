@@ -82,7 +82,7 @@ export class PayloadBuilder {
             .add(PayloadKey.ProtocolVersion, protocolVersion)
             .add(PayloadKey.OpenKitVersion, openKitVersion)
             .add(PayloadKey.ApplicationId, config.applicationId)
-            .add(PayloadKey.ApplicationName, config.applicationName)
+            .add(PayloadKey.ApplicationName, config.applicationName === undefined ? '' : config.applicationName)
             .addIfDefined(PayloadKey.ApplicationVersion, config.applicationVersion)
             .addIfDefined(PayloadKey.DeviceOs, config.operatingSystem)
             .add(PayloadKey.PlatformType, platformTypeOpenKit)

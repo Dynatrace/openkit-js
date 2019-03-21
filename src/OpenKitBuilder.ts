@@ -23,7 +23,7 @@ import {
     LogLevel,
     OpenKit,
     Orientation,
-    RandomNumberProvider,
+    RandomNumberProvider, StatusRequest, StatusResponse,
 } from './api';
 import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
@@ -31,7 +31,7 @@ import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
-import { isFinite, truncate } from './core/utils/Utils';
+import { isFinite, timeout, truncate } from './core/utils/Utils';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
@@ -310,6 +310,8 @@ export class OpenKitBuilder {
     }
 
     private buildConfig(): Readonly<Configuration> {
+        this.withCommunicationChannel(new TestCommunicationChannel());
+
         const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
 
         const communicationChannel = this.communicationChannel ||
@@ -360,3 +362,27 @@ const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: R
 
     return id;
 };
+
+// tslint:disable
+class TestCommunicationChannel implements CommunicationChannel {
+    private static async getValidStatusResponse(...args: any[]): Promise<StatusResponse> {
+        console.warn(...args);
+
+        await timeout(100);
+
+        return { valid: true };
+    }
+
+    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return TestCommunicationChannel.getValidStatusResponse('new session request', url, request);
+    }
+
+    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+        return TestCommunicationChannel.getValidStatusResponse('payload data', url, request, query);
+    }
+
+    public sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+        return TestCommunicationChannel.getValidStatusResponse('status request', url, request);
+    }
+}
+// tslint:enable

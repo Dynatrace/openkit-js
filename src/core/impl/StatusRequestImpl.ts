@@ -20,12 +20,16 @@ import { State } from './State';
 
 export class StatusRequestImpl implements StatusRequest {
     public static from(state: State): StatusRequestImpl {
+        return StatusRequestImpl.create(state.config.applicationId, state.serverId);
+    }
+
+    public static create(appId: string, serverId: number): StatusRequestImpl {
         return new StatusRequestImpl(
             agentTechnologyType,
-            state.config.applicationId,
+            appId,
             openKitVersion,
             platformTypeOpenKit,
-            state.serverId);
+            serverId);
     }
 
     public readonly agentTechnologyType: string;

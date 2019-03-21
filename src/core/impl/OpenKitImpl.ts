@@ -14,45 +14,46 @@
  * limitations under the License.
  */
 
-import {
-    CommunicationChannel,
-    DataCollectionLevel,
-    defaultInvalidStatusResponse,
-    InitCallback,
-    OpenKit,
-    Session,
-    StatusResponse,
-} from '../../api';
+import { CommunicationChannel, DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
+import { BeaconSender } from '../beacon.v2/BeaconSender';
 import { Configuration } from '../config/Configuration';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
-import { removeElement } from '../utils/Utils';
 import { defaultNullSession } from './NullSession';
-import { OpenKitObject, Status } from './OpenKitObject';
 import { SessionImpl } from './SessionImpl';
+import { State } from './State';
 import { StateImpl } from './StateImpl';
-import { StatusRequestImpl } from './StatusRequestImpl';
 
 /**
  * Implementation of the {@link OpenKit} interface.
  */
-export class OpenKitImpl extends OpenKitObject implements OpenKit {
-    private readonly openSessions: Session[] = [];
+export class OpenKitImpl implements OpenKit {
+    public readonly state: State;
+    public readonly logger: Logger;
+
+    private isShutdown = false;
+
     private readonly sessionIdProvider: IdProvider;
     private readonly communicationChannel: CommunicationChannel;
+
+    private readonly beaconSender: BeaconSender;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
      * @param config The app configuration.
      */
     constructor(config: Configuration) {
-        super(new StateImpl({...config}), config.loggerFactory.createLogger('OpenKitImpl'));
+        this.state = new StateImpl(config);
+        this.logger = config.loggerFactory.createLogger('OpenKitImpl');
 
         this.communicationChannel = config.communicationChannel;
 
         this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
+
+        this.beaconSender = new BeaconSender(this.communicationChannel, config);
+
     }
 
     /**
@@ -60,35 +61,17 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * If an invalid response is sent back, we shutdown.
      */
     public async initialize(): Promise<void> {
-        let response: StatusResponse;
-
-        try {
-            response = await this.communicationChannel.sendStatusRequest(
-                this.state.config.beaconURL, StatusRequestImpl.from(this.state));
-        } catch (exception) {
-            this.logger.warn('Failed to initialize with exception', exception);
-            response = defaultInvalidStatusResponse;
-        }
-
-        this.finishInitialization(response);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public isInitialized(): boolean {
-        return this.status === Status.Initialized;
+        this.beaconSender.init();
     }
 
     /**
      * @inheritDoc
      */
     public shutdown(): void {
-        // close all child-sessions and remove them from the array
-        this.openSessions.forEach((session) => session.end());
-        this.openSessions.splice(0, this.openSessions.length);
+        this.logger.debug('Shutting down');
+        this.isShutdown = true;
 
-        super.shutdown();
+        this.beaconSender.shutdown();
     }
 
     /**
@@ -98,29 +81,14 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         // We always send the createSession-request to the server, even when DataCollectionLevel = Off, but no user
         // activity is recorded.
 
-        if (this.status === Status.Shutdown || this.state.isCaptureDisabled()) {
+        if (this.isShutdown || this.state.isCaptureDisabled()) {
             return defaultNullSession;
         }
 
         const session = new SessionImpl(this, clientIP, this.sessionIdProvider.next());
-        session.init();
 
-        this.openSessions.push(session);
+        this.beaconSender.addSession(session);
 
         return session;
-    }
-
-    /**
-     * Removes a session from the openSessions array.
-     */
-    public removeSession(session: SessionImpl): void {
-        removeElement(this.openSessions, session);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public waitForInit(callback: InitCallback, timeout?: number): void {
-        super.waitForInit(callback, timeout);
     }
 }

@@ -17,43 +17,42 @@
 import {
     Action,
     CaptureMode,
-    CommunicationChannel,
     CrashReportingLevel,
     DataCollectionLevel,
-    defaultInvalidStatusResponse,
+    Logger,
     Session,
-    StatusResponse,
     WebRequestTracer,
 } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
-import { PayloadSender } from '../beacon/PayloadSender';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './NullAction';
 import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 import { OpenKitImpl } from './OpenKitImpl';
-import { OpenKitObject, Status } from './OpenKitObject';
-import { StatusRequestImpl } from './StatusRequestImpl';
+import { Status } from './OpenKitObject';
+import { State } from './State';
+import { StateImpl } from './StateImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
-export class SessionImpl extends OpenKitObject implements Session {
+export class SessionImpl implements Session {
     public readonly payloadData: PayloadData;
     public readonly sessionId: number;
+    public readonly state: State;
 
+    public status: Status = Status.Idle;
     private readonly openKit: OpenKitImpl;
     private readonly openActions: Action[] = [];
-    private readonly payloadSender: PayloadSender;
-    private readonly communicationChannel: CommunicationChannel;
+
+    private readonly logger: Logger;
 
     constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
-        super(openKit.state.clone(), openKit.state.config.loggerFactory.createLogger(`SessionImpl`));
+        this.state = new StateImpl(openKit.state.config);
+        this.logger = openKit.state.config.loggerFactory.createLogger('SessionImpl');
 
         this.sessionId = sessionId;
         this.openKit = openKit;
-        this.communicationChannel = this.state.config.communicationChannel;
 
         this.payloadData = new PayloadData(this.state, clientIp, sessionId);
-        this.payloadSender = new PayloadSender(this.state, this.payloadData);
 
         this.payloadData.startSession();
 
@@ -64,9 +63,7 @@ export class SessionImpl extends OpenKitObject implements Session {
      * @inheritDoc
      */
     public end(): void {
-        this.waitForInit(() => {
-            this.endSession();
-        });
+        this.endSession();
     }
 
     /**
@@ -87,9 +84,6 @@ export class SessionImpl extends OpenKitObject implements Session {
 
         this.logger.debug(`Identify User ${userTag} in session`, this.sessionId);
         this.payloadData.identifyUser(userTag);
-
-        // Send immediately as we can not be sure that the session has a correct 'end'
-        this.flush();
     }
 
     /**
@@ -135,7 +129,6 @@ export class SessionImpl extends OpenKitObject implements Session {
      */
     public endAction(action: Action): void {
         removeElement(this.openActions, action);
-        this.flush();
     }
 
     /**
@@ -158,14 +151,6 @@ export class SessionImpl extends OpenKitObject implements Session {
         this.payloadData.reportCrash(name, String(message), String(stacktrace));
     }
 
-    public init(): void {
-        this.openKit.waitForInit(() => {
-            if (this.openKit.status === Status.Initialized) {
-                this.initialize();
-            }
-        });
-    }
-
     public traceWebRequest(url: string): WebRequestTracer {
         if (typeof url !== 'string' || url.length === 0) {
             return defaultNullWebRequestTracer;
@@ -184,35 +169,6 @@ export class SessionImpl extends OpenKitObject implements Session {
         return new WebRequestTracerImpl(
             this.payloadData, 0, url, loggerFactory, serverId, deviceId, applicationId, this.sessionId,
         );
-    }
-
-    public flush(): void {
-        this.waitForInit(() => {
-            if (this.status === Status.Initialized) {
-                this.payloadSender.flush();
-            }
-        });
-    }
-
-    private async initialize(): Promise<void> {
-        if (this.openKit.status !== Status.Initialized) {
-            return;
-        }
-
-        // our state may be outdated, update it
-        this.state.updateFromState(this.openKit.state);
-
-        let response: StatusResponse;
-        try {
-            response = await this.communicationChannel.sendNewSessionRequest(
-                this.state.config.beaconURL, StatusRequestImpl.from(this.state));
-        } catch (exception) {
-            this.logger.warn('Initialization failed with exception', exception);
-            response = defaultInvalidStatusResponse;
-        }
-
-        this.finishInitialization(response);
-        this.logger.debug('Successfully initialized Session', this.sessionId);
     }
 
     private mayReportCrash(): boolean {
@@ -238,16 +194,13 @@ export class SessionImpl extends OpenKitObject implements Session {
             return;
         }
 
-        this.logger.debug(`Ending Session (${this.sessionId}`);
+        this.logger.debug(`Ending Session (${this.sessionId})`);
 
         this.openActions.slice().forEach((action) => action.leaveAction());
 
-        if (this.status === Status.Initialized) {
-            this.payloadData.endSession();
-        }
+        this.payloadData.endSession();
 
-        this.openKit.removeSession(this);
-        this.shutdown();
+        this.status = Status.Shutdown;
     }
 
     private mayReportError(): boolean {
