@@ -23,6 +23,7 @@ This repository contains the reference implementation in pure TypeScript. Other 
 * Identify users on sessions
 * Report values on actions
 * Use it together with Dynatrace
+* Trace web requests to server-side PurePaths
 
 ## What you cannot do with the OpenKit
 * Create server-side PurePaths (this functionality is provided by [OneAgent SDKs](https://github.com/Dynatrace/OneAgent-SDK))
@@ -33,59 +34,77 @@ This repository contains the reference implementation in pure TypeScript. Other 
 * Incorrect usage of the OpenKit should still lead to valid results, if possible
 * Design reentrant APIs and document them
 
-## Prerequisites
-### Node.js
+## Runtime requirements
 
-#### Windows
+### Promises
 
-On Windows machine, go to [Node.js download](https://nodejs.org/en/download/) or use [nvm for Windows](https://github.com/coreybutler/nvm-windows) to be able to easily
-switch between Node.js versions.
-After that, execute on PowerShell with Administration privileges (Run as administrator):
-```sh
-npm install -g --production windows-build-tools
-```
+Promises are required for OpenKit to work at all. If your environment does not support them, they can be
+polyfilled using a polyfill library.
 
-#### Linux
+### Communication library
 
-On Linux machine, you can install [n](https://github.com/tj/n) tool, which does pretty much the same 
-like `nvm` but in a more convenient way.
+If you use a platform without XMLHttpRequests and not node.js (http-module), you have to either polyfill
+the XMLHttpRequest, or provide your own CommunicationChannel implementation, which can use the protocol
+you want (e.g. MQTT).
 
-### Yarn package manager
+## Development
 
-```sh
-sudo npm install -g yarn
-```
+See [development.md](development.md).
 
-## Install dependencies
-```sh
-yarn install
-```
+## General Concepts
 
-## Building the .js library
-```sh
-yarn build                  # Build browser and node.js library
-yarn build:node             # Build the node.js library
-yarn build:browser          # Build the browser library
-yarn build:browser:dev      # Build the browser library in dev mode
-yarn build:browser:dev -w   # Build and watch the browser library in dev mode
-```
+In this part the concepts used throughout OpenKit are explained. A short sample how to use OpenKit is
+also provided. For detailed code samples have a look into [example.md](example.md) and the code documentation.
 
-## Building the documentation
-```sh
-yarn docs           # Build the docs in html format
-yarn docs:markdown  # Build the docs in markdown format
-```
+### OpenKitBuilder
 
-### Generated files
-* `dist/browser` the library for the browser in a `bundle.js`
-* `dist/node` the library for Node.JS
-* `dist/types` the definition files for usage with TypeScript.
-* `build/coverage` the coverage information of the tests
-* `docs` the generated tsdocs in markdown or html
+An `OpenKitBuilder` instance is responsible for getting and setting application relevant information, e.g.
+the application's version and device specific information.
 
-### Other commands
-| Command               | Description               |
-|-----------------------|---------------------------| 
-| `yarn lint`           | Run tslint                |
-| `yarn lint:spec`      | Run tslint                |
-| `yarn test`           | Run tests with coverage   |
+### OpenKit
+
+The `OpenKit` is responsible for creating user sessions (see `Session`).
+
+Although it would be possible to have multiple `OpenKit` instances connected to the same endpoint
+within one process, there should be one unique instance.
+
+### Session
+
+A `Session` represents kind of a user session, similar to a browser session in a web application.
+However the application developer is free to choose how to treat a `Session`.  
+The `Session` is used to create `Action` instances, report application crashes, identify users and 
+to trace web requests when there is no `Action` available. 
+
+When a `Session` is no longer required, it's highly recommended to end it, using the `Session.end()` method.
+
+### Action
+
+The `Action` are named hierarchical nodes for timing and attaching further details.
+An `Action` is created from the `Session`. Actions provide the possibility to attach key-value pairs, 
+named events and errors, and can be used for tracing web requests.
+
+### WebRequestTracer
+
+When the application developer wants to trace a web request, which is served by a service 
+instrumented by Dynatrace, a `WebRequestTracer` should be used, which can be
+requested from an `Action` and `Session`.
+
+### Named Events
+
+A named `Event` is attached to an `Action` and contains a name.
+
+### Key-Value Pairs
+
+For an `Action` key-value pairs can also be reported. The key is always a String
+and the value may be a `number` or a `string`. All reported numbers are handled as floating point
+values by Dynatrace.
+
+### Errors & Crashes
+
+Errors are a way to report an erroneous condition on an `Action`.  
+Crashes are used to report (unhandled) exceptions on a `Session`.
+
+### Identify Users
+
+OpenKit enables you to tag sessions with unique user tags. The user tag is a String 
+that allows to uniquely identify a single user.

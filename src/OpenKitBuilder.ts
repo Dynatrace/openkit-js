@@ -33,9 +33,6 @@ import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
 import { isFinite, truncate } from './core/utils/Utils';
 
-// Polyfills for IE11, only get polyfilled if window.Promise and/or window.fetch are not available
-import 'es6-promise/auto';
-
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
