@@ -15,67 +15,68 @@
  */
 
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
-import { DataCollectionLevel } from '../../../src';
-import { CaptureMode } from '../../../src/api';
-import { PayloadData } from '../../../src/core/beacon/PayloadData';
-import { Configuration } from '../../../src/core/config/Configuration';
+import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
+import { OpenKitConfiguration, PrivacyConfiguration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
-import { defaultNullWebRequestTracer } from '../../../src/core/impl/NullWebRequestTracer';
+import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
+import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
-import { State } from '../../../src/core/impl/State';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
+import { Mutable } from '../../Helpers';
 
 describe('ActionImpl', () => {
     const sessionMock = mock(SessionImpl);
-    const payloadDataMock = mock(PayloadData);
+    const payloadBuilder = mock(PayloadBuilderHelper);
     const timestampProviderMock = mock(TimestampProvider);
 
-    let state: State;
     let action: ActionImpl;
-    let config: Partial<Configuration>;
+    let config: Partial<Mutable<PrivacyConfiguration & OpenKitConfiguration>>;
 
     beforeEach(() => {
         config = {
-            loggerFactory: defaultNullLoggerFactory,
+            crashReportingLevel: CrashReportingLevel.OptInCrashes,
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
+
+            loggerFactory: defaultNullLoggerFactory,
         };
 
-        state = new StateImpl(config as Configuration);
-
         reset(sessionMock);
-        reset(payloadDataMock);
+        reset(payloadBuilder);
         reset(timestampProviderMock);
 
-        when(payloadDataMock.createSequenceNumber()).thenReturn(5, 6, 7);
-        when(payloadDataMock.createId()).thenReturn(3);
-        when(timestampProviderMock.getCurrentTimestamp()).thenReturn(1, 2, 3);
-        when(sessionMock.state).thenReturn(state);
+        when(payloadBuilder.createSequenceNumber()).thenReturn(5, 6, 7);
+        when(payloadBuilder.createActionId()).thenReturn(3);
+        when(timestampProviderMock.getCurrentTimestamp()).thenReturn(4500);
+
+        const timestampInstance = instance(timestampProviderMock);
+        when(payloadBuilder.currentTimestamp()).thenCall(() => timestampInstance.getCurrentTimestamp());
 
         action = new ActionImpl(
-            instance(sessionMock),
             'my action',
-            instance(payloadDataMock),
-            instance(timestampProviderMock));
+            1000,
+            instance(sessionMock),
+            instance(payloadBuilder),
+            config as PrivacyConfiguration & OpenKitConfiguration,
+        );
     });
 
     it('should create the action', () => {
        expect(action.name).toEqual('my action');
        expect(action.startSequenceNumber).toBe(5);
        expect(action.actionId).toBe(3);
-       expect(action.startTime).toEqual(1);
+       expect(action.startTime).toEqual(1000);
     });
 
-    it('should set properties after leaving the action', () => {
+    it('should set endSequenceNumber and endTime on leaveAction call', () => {
         action.leaveAction();
 
         expect(action.endSequenceNumber).toBe(6);
-        expect(action.endTime).toBe(2);
+        expect(action.endTime).toBe(4500);
 
-        verify(sessionMock.endAction(action)).once();
-        verify(payloadDataMock.addAction(action)).once();
+        verify(sessionMock._endAction(action)).once();
+        verify(payloadBuilder.addAction(action)).once();
     });
 
     it('if leaveAction() was already called, do not process it again', () => {
@@ -83,10 +84,10 @@ describe('ActionImpl', () => {
         action.leaveAction();
 
         expect(action.endSequenceNumber).toBe(6);
-        expect(action.endTime).toBe(2);
+        expect(action.endTime).toBe(4500);
 
-        verify(sessionMock.endAction(action)).once();
-        verify(payloadDataMock.addAction(action)).once();
+        verify(sessionMock._endAction(action)).once();
+        verify(payloadBuilder.addAction(action)).once();
     });
 
     describe('reportValue', () => {
@@ -99,7 +100,7 @@ describe('ActionImpl', () => {
                 action.reportValue('Some Name', 'Some Value');
 
                 // then
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
+                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
             });
 
             it('should not report a value if DCL = Off', () => {
@@ -110,7 +111,7 @@ describe('ActionImpl', () => {
                 action.reportValue('Some Name', 'Some Value');
 
                 // then
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
+                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
             });
 
             it('should not report a value if DCL = Performance', () => {
@@ -121,28 +122,22 @@ describe('ActionImpl', () => {
                 action.reportValue('Some Name', 'Some Value');
 
                 // then
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
+                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
             });
 
             it('should not report a value if the name is not a string', () => {
                 action.reportValue(undefined as unknown as string, '');
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
+                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
             });
 
             it('should not report a value if the name is empty', () => {
                 action.reportValue('',  '');
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
+                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
             });
 
             it('should not report a value if the value not a string, number, null or undefined', () => {
                 action.reportValue('Name',  {} as unknown as undefined);
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
-            });
-
-            it('should not report a value if the multiplicity = 0', () => {
-                state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
-                action.reportValue('Name',  'Value');
-                verify(payloadDataMock.reportValue(anything(), anything(), anything())).never();
+                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
             });
         });
 
@@ -150,25 +145,25 @@ describe('ActionImpl', () => {
             it('should report a value if the value is string', () => {
                 action.reportValue('Name', 'Value');
 
-                verify(payloadDataMock.reportValue(action, 'Name', 'Value')).once();
+                verify(payloadBuilder.reportValue(action, 'Name', 'Value')).once();
             });
 
             it('should report a value if the value is a number', () => {
                 action.reportValue('Name', 1234);
 
-                verify(payloadDataMock.reportValue(action, 'Name', 1234)).once();
+                verify(payloadBuilder.reportValue(action, 'Name', 1234)).once();
             });
 
             it('should report a value if the value is undefined', () => {
                 action.reportValue('Name', undefined);
 
-                verify(payloadDataMock.reportValue(action, 'Name', undefined)).once();
+                verify(payloadBuilder.reportValue(action, 'Name', undefined)).once();
             });
 
             it('should report a value if the value is null', () => {
                 action.reportValue('Name', null);
 
-                verify(payloadDataMock.reportValue(action, 'Name', null)).once();
+                verify(payloadBuilder.reportValue(action, 'Name', null)).once();
             });
         });
     });
@@ -182,7 +177,7 @@ describe('ActionImpl', () => {
             action.reportEvent('Some name');
 
             // then
-            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+            verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
         it('should not be able to report an event if the DCL = Off', () =>{
@@ -193,7 +188,7 @@ describe('ActionImpl', () => {
             action.reportEvent('Some name');
 
             // then
-            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+            verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
         it('should not be able to report an event if the DCL = Performance', () =>{
@@ -204,18 +199,7 @@ describe('ActionImpl', () => {
             action.reportEvent('Some name');
 
             // then
-            verify(payloadDataMock.reportEvent(anything(), anything())).never();
-        });
-
-        it('should not be able to report an event if capturing is disabled', () =>{
-            // given
-            state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
-
-            // when
-            action.reportEvent('Some name');
-
-            // then
-            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+            verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
         it('should not be able to report an event if name is not a string', () =>{
@@ -224,7 +208,7 @@ describe('ActionImpl', () => {
             action.reportEvent(action);
 
             // then
-            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+            verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
         it('should not be able to report an event if name is an empty string', () =>{
@@ -232,7 +216,7 @@ describe('ActionImpl', () => {
             action.reportEvent('');
 
             // then
-            verify(payloadDataMock.reportEvent(anything(), anything())).never();
+            verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
         it('should be able to report an event', () =>{
@@ -240,8 +224,8 @@ describe('ActionImpl', () => {
             action.reportEvent('Some name');
 
             // then
-            verify(payloadDataMock.reportEvent(action.actionId, 'Some name')).once();
-            verify(payloadDataMock.reportEvent(anything(), anything())).once();
+            verify(payloadBuilder.reportEvent(action.actionId, 'Some name')).once();
+            verify(payloadBuilder.reportEvent(anything(), anything())).once();
         });
     });
 
@@ -252,7 +236,7 @@ describe('ActionImpl', () => {
             action.reportError(action, 1337, 'message');
 
             // then
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
         });
 
         it('should not be possible to report an error if the name is empty', () => {
@@ -260,7 +244,7 @@ describe('ActionImpl', () => {
             action.reportError('', 1337, 'message');
 
             // then
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
         });
 
         it('should not be possible to report an error if the code is not a number', () => {
@@ -269,7 +253,7 @@ describe('ActionImpl', () => {
             action.reportError('name', 'invalid number', 'message');
 
             // then
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
         });
 
         it('should not be possible to report an error if the action is closed', () => {
@@ -280,29 +264,7 @@ describe('ActionImpl', () => {
             action.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
-        });
-
-        it('should not be possible to report an error if capture errors is off', () => {
-            // given
-            state.updateFromResponse({valid: true, captureErrors: CaptureMode.Off});
-
-            // when
-            action.reportError('name', 1337, 'message');
-
-            // then
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
-        });
-
-        it('should not be possible to report an error if DCL = Off', () => {
-            // given
-            config.dataCollectionLevel = DataCollectionLevel.Off;
-
-            // when
-            action.reportError('name', 1337, 'message');
-
-            // then
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).never();
+            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
         });
 
         it('should be able to report an error', () => {
@@ -310,8 +272,8 @@ describe('ActionImpl', () => {
             action.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadDataMock.reportError(action.actionId, 'name', 1337, 'message')).once();
-            verify(payloadDataMock.reportError(anything(), anything(), anything(), anything())).once();
+            verify(payloadBuilder.reportError(action.actionId, 'name', 1337, 'message')).once();
+            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).once();
         });
     });
 

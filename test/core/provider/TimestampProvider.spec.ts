@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from '../../utils/QueryBuilder';
+import { defaultTimestampProvider, TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
-    }
+describe('TimestampProvider', () => {
+    it('should provide a defaultTimestampProvider', () => {
+        expect(defaultTimestampProvider).toBeInstanceOf(TimestampProvider);
+    });
 
-    public build(): string {
-        const query = super.build();
+    it('should return the current timestamp', () => {
+        spyOn(Date.prototype, 'getTime').and.returnValue(5000);
 
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
-    }
-}
+        expect(defaultTimestampProvider.getCurrentTimestamp()).toBe(5000);
+    });
+});

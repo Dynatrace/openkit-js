@@ -15,9 +15,7 @@
  */
 
 import { StatusRequest } from '../../../src/api';
-import { Configuration } from '../../../src/core/config/Configuration';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
-import { StatusRequestImpl } from '../../../src/core/impl/StatusRequestImpl';
+import { StatusRequestImpl } from '../../../src/core/beacon/StatusRequestImpl';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src/core/PlatformConstants';
 
 describe('StatusRequestImpl', () => {
@@ -48,13 +46,10 @@ describe('StatusRequestImpl', () => {
     });
 
     it('should create the request from a state', () => {
-       const state = new StateImpl({applicationId: '1.2.3'} as Configuration);
-       state.updateFromResponse({valid: true, serverId: 8});
-
-       const request = StatusRequestImpl.from(state);
+       const request = StatusRequestImpl.create('app-id', 8);
 
        expect(request.agentTechnologyType).toEqual(agentTechnologyType);
-       expect(request.applicationId).toEqual('1.2.3');
+       expect(request.applicationId).toEqual('app-id');
        expect(request.openKitVersion).toEqual(openKitVersion);
        expect(request.platformType).toEqual(platformTypeOpenKit);
        expect(request.serverId).toBe(8);

@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-import { Action, CaptureMode, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
-import { PayloadData } from '../beacon/PayloadData';
-import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
-import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
+import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
+import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { validationFailed } from '../logging/LoggingUtils';
+import { isFinite } from '../utils/Utils';
+import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { SessionImpl } from './SessionImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class ActionImpl implements Action {
-    public readonly name: string;
-    public readonly startTime: number;
     public readonly startSequenceNumber: number;
     public readonly actionId: number;
     public endSequenceNumber?: number;
-
-    private readonly session: SessionImpl;
-    private readonly beacon: PayloadData;
-    private readonly timestampProvider: TimestampProvider;
 
     private readonly logger: Logger;
 
@@ -40,103 +36,116 @@ export class ActionImpl implements Action {
     }
 
     constructor(
-        session: SessionImpl,
-        name: string,
-        beacon: PayloadData,
-        timestampProvider: TimestampProvider = defaultTimestampProvider) {
+        public readonly name: string,
+        public readonly startTime: number,
+        private readonly session: SessionImpl,
+        private readonly payloadBuilder: PayloadBuilderHelper,
+        private readonly config: PrivacyConfiguration & OpenKitConfiguration,
+    ) {
+        this.startSequenceNumber = this.payloadBuilder.createSequenceNumber();
+        this.actionId = this.payloadBuilder.createActionId();
 
-        this.logger = session.state.config.loggerFactory.createLogger('ActionImpl');
+        this.logger = config.loggerFactory.createLogger(`ActionImpl (sessionId=${session.sessionId}, actionId=${this.actionId})`);
 
-        this.session = session;
-        this.name = name;
-        this.beacon = beacon;
-        this.startTime = timestampProvider.getCurrentTimestamp();
-        this.startSequenceNumber = this.beacon.createSequenceNumber();
-        this.actionId = this.beacon.createId();
-        this.timestampProvider = timestampProvider;
-
-        this.logger.debug(`Created action id=${this.actionId} with name='${name}' in session=${session.sessionId}`);
+        this.logger.debug('created', {name});
     }
 
     /**
      * @inheritDoc
      */
     public reportValue(name: string, value: number | string | null | undefined): void {
-        if (!this.mayReportValue()) {
+        if (this.isActionLeft() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
+            validationFailed(this.logger, 'reportValue', 'Name must be a non empty string', {name});
+
             return;
         }
 
         const type = typeof value;
         if (type !== 'string' && type !== 'number' && value !== null && value !== undefined) {
+            validationFailed(this.logger, 'reportValue', 'Value is not a valid type', {value});
+
             return;
         }
 
-        this.logger.debug(`Report value in action id=${this.actionId} with name=${name} and value=${value}`);
+        this.logger.debug('reportValue', {name, value});
 
-        this.beacon.reportValue(this, name, value);
+        this.payloadBuilder.reportValue(this, name, value);
     }
 
     /**
      * @inheritDoc
      */
     public reportEvent(name: string): void {
-        if (!this.mayReportEvent()) {
+        if (this.isActionLeft() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-           return;
+            validationFailed(this.logger, 'reportEvent', 'Name must be a non empty string', {name});
+
+            return;
         }
 
-        this.logger.debug(`reportEvent, action id=${this.actionId}`, {name});
+        this.logger.debug('reportEvent', {name});
 
-        this.beacon.reportEvent(this.actionId, name);
+        this.payloadBuilder.reportEvent(this.actionId, name);
     }
 
     /**
      * @inheritDoc
      */
     public reportError(name: string, code: number, message: string): void {
-        if (!this.mayReportError()) {
+        if (this.isActionLeft()) {
+            validationFailed(this.logger, 'reportError', 'Action is already closed');
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid name', name);
+            validationFailed(this.logger, 'reportError', 'Name must be a non empty string', {name});
+
             return;
         }
 
-        if (typeof code !== 'number') {
-            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid error code', name);
+        if (!isFinite(code)) {
+            validationFailed(this.logger, 'reportError', 'Code must be a finite number', {code});
+
             return;
         }
 
-        this.logger.debug('reportError', `action id=${this.actionId}`, {name, code, message});
+        this.logger.debug('reportError', {name, code, message});
 
-        this.beacon.reportError(this.actionId, name, code, String(message));
+        this.payloadBuilder.reportError(this.actionId, name, code, String(message));
     }
 
     public traceWebRequest(url: string): WebRequestTracer {
-        if (typeof url !== 'string' || url.length === 0) {
-            return defaultNullWebRequestTracer;
-        }
-
         if (this.isActionLeft()) {
+            validationFailed(this.logger, 'traceWebRequest', 'Action is already closed');
+
             return defaultNullWebRequestTracer;
         }
 
-        const { serverId, config: {deviceId, applicationId, loggerFactory }} = this.session.state;
+        if (typeof url !== 'string' || url.length === 0) {
+            validationFailed(this.logger, 'traceWebRequest', 'Url must be a non empty string', {url});
+
+            return defaultNullWebRequestTracer;
+        }
+
+        this.logger.debug('traceWebRequest', {url});
+
+        const {deviceId, applicationId, loggerFactory } = this.config;
 
         return new WebRequestTracerImpl(
-            this.beacon,
+            this.payloadBuilder,
             this.actionId,
             url,
             loggerFactory,
-            serverId,
             deviceId,
             applicationId,
             this.session.sessionId,
@@ -145,47 +154,18 @@ export class ActionImpl implements Action {
 
     public leaveAction(): null {
         if (this.isActionLeft()) {
+
             return null;
         }
 
-        this.logger.debug(`Leaving action id=${this.actionId}`);
+        this.endSequenceNumber = this.payloadBuilder.createSequenceNumber();
+        this._endTime = this.payloadBuilder.currentTimestamp();
+        this.payloadBuilder.addAction(this);
+        this.session._endAction(this);
 
-        this.endSequenceNumber = this.beacon.createSequenceNumber();
-        this._endTime = this.timestampProvider.getCurrentTimestamp();
-        this.beacon.addAction(this);
-        this.session.endAction(this);
+        this.logger.debug('leaveAction');
 
         return null;
-    }
-
-    private mayReportValue(): boolean {
-        if (this.isActionLeft()) {
-            return false;
-        }
-
-        if (this.session.state.isCaptureDisabled()) {
-            return false;
-        }
-
-        // We only report values iff DCL = UserBehavior
-        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private mayReportEvent(): boolean {
-        return !this.isActionLeft() &&
-            !this.session.state.isCaptureDisabled() &&
-            this.session.state.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
-    }
-
-    private mayReportError(): boolean {
-        return !this.isActionLeft() &&
-            !this.session.state.isCaptureDisabled() &&
-            this.session.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
-            this.session.state.captureErrors === CaptureMode.On;
     }
 
     private isActionLeft(): boolean {

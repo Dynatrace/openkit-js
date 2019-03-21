@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Action, Session, WebRequestTracer } from '../../api';
+import { Action, Session, WebRequestTracer } from '../../../api';
 import { defaultNullAction } from './NullAction';
 import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 

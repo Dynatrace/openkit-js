@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from '../../utils/QueryBuilder';
+import { WebRequestTracer } from '../../../api';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
+class NullWebRequestTracer implements  WebRequestTracer {
+    public getTag(): string {
+        return '';
     }
 
-    public build(): string {
-        const query = super.build();
+    public setBytesReceived(bytesReceived: number): this {
+        return this;
+    }
 
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
+    public setBytesSent(bytesSent: number): this {
+        return this;
+    }
+
+    public start(): this {
+        return this;
+    }
+
+    public stop(responseCode?: number): void {
+        // stub
     }
 }
+
+export const defaultNullWebRequestTracer = new NullWebRequestTracer();

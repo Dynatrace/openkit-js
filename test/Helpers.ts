@@ -14,28 +14,4 @@
  * limitations under the License.
  */
 
-import { WebRequestTracer } from '../../api';
-
-class NullWebRequestTracer implements  WebRequestTracer {
-    public getTag(): string {
-        return '';
-    }
-
-    public setBytesReceived(bytesReceived: number): this {
-        return this;
-    }
-
-    public setBytesSent(bytesSent: number): this {
-        return this;
-    }
-
-    public start(): this {
-        return this;
-    }
-
-    public stop(responseCode?: number): void {
-        // stub
-    }
-}
-
-export const defaultNullWebRequestTracer = new NullWebRequestTracer();
+export type Mutable<T> = { -readonly [P in keyof T]-?: T[P] };

@@ -14,45 +14,55 @@
  * limitations under the License.
  */
 
-import {
-    CommunicationChannel,
-    DataCollectionLevel,
-    defaultInvalidStatusResponse,
-    InitCallback,
-    OpenKit,
-    Session,
-    StatusResponse,
-} from '../../api';
-import { Configuration } from '../config/Configuration';
+import { DataCollectionLevel, InitCallback, Logger, OpenKit, Session } from '../../api';
+import { BeaconSender } from '../beacon/BeaconSender';
+import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
+import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
+import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { validationFailed } from '../logging/LoggingUtils';
+import { Payload } from '../payload/Payload';
+import { PayloadBuilder } from '../payload/PayloadBuilder';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
-import { removeElement } from '../utils/Utils';
-import { defaultNullSession } from './NullSession';
-import { OpenKitObject, Status } from './OpenKitObject';
+import { defaultTimestampProvider } from '../provider/TimestampProvider';
+import { CallbackHolder } from '../utils/CallbackHolder';
+import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
-import { StateImpl } from './StateImpl';
-import { StatusRequestImpl } from './StatusRequestImpl';
+
+const createIdProvider = (dcl: DataCollectionLevel) =>
+    dcl === DataCollectionLevel.UserBehavior ? new SequenceIdProvider() : new SingleIdProvider(1);
 
 /**
  * Implementation of the {@link OpenKit} interface.
  */
-export class OpenKitImpl extends OpenKitObject implements OpenKit {
-    private readonly openSessions: Session[] = [];
+export class OpenKitImpl implements OpenKit {
+    private readonly initCallbackHolder = new CallbackHolder<boolean>();
+
     private readonly sessionIdProvider: IdProvider;
-    private readonly communicationChannel: CommunicationChannel;
+    private readonly beaconSender: BeaconSender;
+    private readonly logger: Logger;
+    private readonly applicationWidePrefix: Payload;
+
+    private readonly sessionConfig: PrivacyConfiguration & OpenKitConfiguration;
+    private readonly cache = new BeaconCacheImpl();
+
+    private initialized = false;
+    private isShutdown = false;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
      * @param config The app configuration.
      */
-    constructor(config: Configuration) {
-        super(new StateImpl({...config}), config.loggerFactory.createLogger('OpenKitImpl'));
+    constructor(private readonly config: Configuration) {
+        this.logger = config.openKit.loggerFactory.createLogger('OpenKitImpl');
 
-        this.communicationChannel = config.communicationChannel;
+        this.sessionIdProvider = createIdProvider(config.privacy.dataCollectionLevel);
+        this.sessionConfig = {...config.privacy, ...config.openKit};
+        this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(this.config);
 
-        this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
-            new SequenceIdProvider() : new SingleIdProvider(1);
+        this.beaconSender = new BeaconSender(this, this.cache, config.openKit);
     }
 
     /**
@@ -60,35 +70,23 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
      * If an invalid response is sent back, we shutdown.
      */
     public async initialize(): Promise<void> {
-        let response: StatusResponse;
+        this.logger.debug('initialize');
 
-        try {
-            response = await this.communicationChannel.sendStatusRequest(
-                this.state.config.beaconURL, StatusRequestImpl.from(this.state));
-        } catch (exception) {
-            this.logger.warn('Failed to initialize with exception', exception);
-            response = defaultInvalidStatusResponse;
-        }
-
-        this.finishInitialization(response);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public isInitialized(): boolean {
-        return this.status === Status.Initialized;
+        this.beaconSender.init();
     }
 
     /**
      * @inheritDoc
      */
     public shutdown(): void {
-        // close all child-sessions and remove them from the array
-        this.openSessions.forEach((session) => session.end());
-        this.openSessions.splice(0, this.openSessions.length);
+        if (this.isShutdown) {
+            return;
+        }
+        this.isShutdown = true;
 
-        super.shutdown();
+        this.logger.debug('shutdown');
+
+        this.beaconSender.shutdown();
     }
 
     /**
@@ -98,29 +96,82 @@ export class OpenKitImpl extends OpenKitObject implements OpenKit {
         // We always send the createSession-request to the server, even when DataCollectionLevel = Off, but no user
         // activity is recorded.
 
-        if (this.status === Status.Shutdown || this.state.isCaptureDisabled()) {
+        if (this.isShutdown) {
+            validationFailed(this.logger, 'createSession', 'OpenKit is already shutdown');
+
             return defaultNullSession;
         }
 
-        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.next());
-        session.init();
+        this.logger.debug('createSession', {clientIP});
 
-        this.openSessions.push(session);
+        const sessionId = this.createSessionId();
+        const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
+        const sessionPrefix = StaticPayloadBuilder.sessionPrefix(this.applicationWidePrefix, sessionId, clientIP, sessionStartTime);
+
+        const communicationState = new CommunicationStateImpl();
+        const payloadBuilder = new PayloadBuilder(communicationState);
+
+        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.sessionConfig);
+
+        const cacheEntry = this.cache.register(session, sessionPrefix, payloadBuilder, communicationState);
+
+        this.beaconSender.sessionAdded(cacheEntry);
 
         return session;
     }
 
-    /**
-     * Removes a session from the openSessions array.
-     */
-    public removeSession(session: SessionImpl): void {
-        removeElement(this.openSessions, session);
+    public isInitialized(): boolean {
+        return this.initialized;
     }
 
-    /**
-     * @inheritDoc
-     */
     public waitForInit(callback: InitCallback, timeout?: number): void {
-        super.waitForInit(callback, timeout);
+        // Trivial case: We already initialized and the waitForInit comes after initialization. We can resolve
+        // immediately and synchronous.
+        if (this.initialized || this.isShutdown) {
+            callback(this.initialized);
+            return;
+        }
+
+        if (timeout !== undefined) {
+            // Init with timeout: We setup a timeout which resolves after X milliseconds. If the callback triggers,
+            // we clear it, and check if the callback is still in the callback holder. If it is, it was not resolved,
+            // so we can execute it, and remove it from the callback holder, so it can't get executed again.
+            const wait = setTimeout(() => {
+                if (this.initCallbackHolder.contains(callback)) {
+                    clearTimeout(wait);
+                    callback(false);
+                    this.initCallbackHolder.remove(callback);
+                }
+            }, timeout);
+        }
+
+        // Add the callback to the initCallbackHolder, so it gets resolved once the initialization fails or succeeds,
+        // for both cases with and without timeout.
+        this.initCallbackHolder.add(callback);
+    }
+
+    public notifyInitialized(successfully: boolean): void {
+        this.initialized = true;
+        this.initCallbackHolder.resolve(successfully);
+
+        if (!successfully) {
+            this.shutdown();
+        }
+    }
+
+    public _isShutdown(): boolean {
+        return this.isShutdown;
+    }
+
+    public _getBeaconSender(): BeaconSender {
+        return this.beaconSender;
+    }
+
+    public _getPayloadCache(): BeaconCacheImpl {
+        return this.cache;
+    }
+
+    private createSessionId(): number {
+        return this.sessionIdProvider.next();
     }
 }

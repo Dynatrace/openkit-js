@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from '../../utils/QueryBuilder';
+import { EventType } from '../protocol/EventType';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
+export type Payload = string;
+
+export const combinePayloads = (p1: Payload, p2: Payload): Payload => {
+    return `${p1}&${p2}`;
+};
+
+export const getEventType = (payload: Payload): EventType | undefined => {
+    if (!payload.startsWith('et')) {
+       return undefined;
     }
 
-    public build(): string {
-        const query = super.build();
+    const value = payload.substring(payload.indexOf('=') + 1, payload.indexOf('&'));
 
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
-    }
-}
+    return parseInt(value, 10);
+};
