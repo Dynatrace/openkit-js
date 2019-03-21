@@ -20,7 +20,7 @@ import { Configuration } from '../config/Configuration';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
-import { defaultNullSession } from './NullSession';
+import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
 import { State } from './State';
 import { StateImpl } from './StateImpl';

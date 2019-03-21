@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { defaultNullAction } from '../../../src/core/impl/NullAction';
-import { defaultNullWebRequestTracer } from '../../../src/core/impl/NullWebRequestTracer';
+import { defaultNullAction } from '../../../src/core/impl/null/NullAction';
+import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
 
 describe('NullAction', () => {
     it('should return null on leaveAction', () => {

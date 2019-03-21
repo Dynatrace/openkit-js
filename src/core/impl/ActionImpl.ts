@@ -17,7 +17,7 @@
 import { Action, CaptureMode, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
-import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
+import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
 import { SessionImpl } from './SessionImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 

@@ -18,7 +18,7 @@ import { anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
 import { CaptureMode, CommunicationChannel, StatusRequest, StatusResponse } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
-import { defaultNullSession } from '../../../src/core/impl/NullSession';
+import { defaultNullSession } from '../../../src/core/impl/null/NullSession';
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';

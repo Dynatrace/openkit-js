@@ -20,7 +20,7 @@ import { CaptureMode } from '../../../src/api';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
-import { defaultNullWebRequestTracer } from '../../../src/core/impl/NullWebRequestTracer';
+import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { State } from '../../../src/core/impl/State';
 import { StateImpl } from '../../../src/core/impl/StateImpl';
