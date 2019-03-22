@@ -15,10 +15,10 @@
  */
 
 import { CommunicationChannel } from '../../api';
-import { PayloadBuilder } from '../beacon/PayloadBuilder';
 import { Configuration } from '../config/Configuration';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
+import { Payload } from '../payload.v2/Payload';
 import { removeElement, timeout } from '../utils/Utils';
 
 const DEFAULT_SERVER_ID = 1;
@@ -58,7 +58,7 @@ export class BeaconSender {
 
             await this.sendNewSessionRequests();
             await this.finishSessions();
-            await this.sendPayloadDatas();
+            await this.sendPayloadData();
 
             await timeout(1000);
         }
@@ -103,7 +103,7 @@ export class BeaconSender {
         }
     }
 
-    private async sendPayloadDatas() {
+    private async sendPayloadData() {
         const openSessions = this.sessions.filter(session => session.initialized);
 
         for (const session of openSessions) {
@@ -114,9 +114,12 @@ export class BeaconSender {
     private async sendPayload(session: SessionInformation) {
         const pl = session.session.payloadData;
 
-        let x: string | undefined;
-        while (x = pl.getNextPayload(session.prefix)) {
-            await this.channel.sendPayloadData(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.serverId), x);
+        let payload: Payload | undefined;
+        // noinspection JSAssignmentUsedAsCondition
+        while (payload = pl.getNextPayload(session.prefix)) {
+            const request = StatusRequestImpl.create(this.config.applicationId, session.serverId);
+
+            await this.channel.sendPayloadData(this.config.beaconURL, request, payload);
         }
     }
 

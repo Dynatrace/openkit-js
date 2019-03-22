@@ -18,6 +18,7 @@ import { DataCollectionLevel } from '../../api';
 import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
 import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';
+import { Payload } from '../payload.v2/Payload';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { PayloadBuilder } from './PayloadBuilder';
@@ -26,7 +27,7 @@ import { PayloadBuilder } from './PayloadBuilder';
  * Responsible for creating and holding all payload data for a session.
  */
 export class PayloadData {
-    private readonly payloadQueue: string[] = [];
+    private readonly payloadQueue: Payload[] = [];
 
     private readonly state: State;
 
@@ -113,7 +114,7 @@ export class PayloadData {
             this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime));
     }
 
-    public getNextPayload(prefix: string): string | undefined {
+    public getNextPayload(prefix: string): Payload | undefined {
         if (this.payloadQueue.length === 0) {
             return undefined;
         }
@@ -135,21 +136,21 @@ export class PayloadData {
         return this.timestampProvider.getCurrentTimestamp();
     }
 
-    public addWebRequest(webrequest: WebRequestTracerImpl, parentActionId: number): void {
+    public addWebRequest(webRequest: WebRequestTracerImpl, parentActionId: number): void {
         if (this.state.isCaptureDisabled() || this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return;
         }
 
         this.addPayload(PayloadBuilder.webRequest(
-            webrequest.getUrl(),
+            webRequest.getUrl(),
             parentActionId,
-            webrequest.getStartSequenceNumber(),
-            this.currentTimestamp() - webrequest.getStart(),
-            webrequest.getEndSequenceNumber(),
-            webrequest.getDuration(),
-            webrequest.getBytesSent(),
-            webrequest.getBytesReceived(),
-            webrequest.getResponseCode(),
+            webRequest.getStartSequenceNumber(),
+            this.currentTimestamp() - webRequest.getStart(),
+            webRequest.getEndSequenceNumber(),
+            webRequest.getDuration(),
+            webRequest.getBytesSent(),
+            webRequest.getBytesReceived(),
+            webRequest.getResponseCode(),
         ));
     }
 
@@ -157,14 +158,14 @@ export class PayloadData {
         return this.payloadQueue.length > 0;
     }
 
-    private getCompletePayloadPrefix(prefix: string): string {
+    private getCompletePayloadPrefix(prefix: string): Payload {
         const mutablePart = PayloadBuilder.mutable(
             this.sessionStartTime, this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
 
         return `${prefix}&${mutablePart}`;
     }
 
-    private addPayload(payload: string): void {
+    private addPayload(payload: Payload): void {
         this.payloadQueue.push(payload);
     }
 }

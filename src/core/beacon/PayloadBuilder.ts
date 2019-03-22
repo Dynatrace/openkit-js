@@ -16,6 +16,7 @@
 
 import { Configuration } from '../config/Configuration';
 import { ActionImpl } from '../impl/ActionImpl';
+import { Payload } from '../payload.v2/Payload';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
@@ -23,7 +24,7 @@ import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
 
 export class PayloadBuilder {
     public static reportCrash(errorName: string, reason: string, stacktrace: string,
-                              sequenceNumber: number, sessionStartTime: number, currentTime: number): string {
+                              sequenceNumber: number, sessionStartTime: number, currentTime: number): Payload {
         return PayloadBuilder
             .basicEventData(EventType.Crash, errorName)
             .add(PayloadKey.ParentActionId, 0)
@@ -33,7 +34,7 @@ export class PayloadBuilder {
             .add(PayloadKey.Stacktrace, stacktrace)
             .build();
     }
-    public static startSession(sequenceNumber: number): string {
+    public static startSession(sequenceNumber: number): Payload {
         return PayloadBuilder
             .basicEventData(EventType.SessionStart)
             .add(PayloadKey.ParentActionId, 0)
@@ -42,7 +43,7 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static endSession(sequenceNumber: number, duration: number): string {
+    public static endSession(sequenceNumber: number, duration: number): Payload {
         return PayloadBuilder
             .basicEventData(EventType.SessionEnd)
             .add(PayloadKey.ParentActionId, 0)
@@ -51,7 +52,7 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static action(action: ActionImpl, sessionStartTime: number): string {
+    public static action(action: ActionImpl, sessionStartTime: number): Payload {
         return PayloadBuilder
             .basicEventData(EventType.ManualAction, action.name)
             .add(PayloadKey.ActionId, action.actionId)
@@ -68,7 +69,7 @@ export class PayloadBuilder {
         parentActionId: number,
         startSequenceNumber: number,
         timeSinceSessionStart: number,
-    ): string {
+    ): Payload {
         return PayloadBuilder
             .basicEventData(EventType.NamedEvent, name)
             .add(PayloadKey.ParentActionId, parentActionId)
@@ -77,7 +78,7 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static prefix(config: Configuration, sessionId: number, clientIpAddress: string): string {
+    public static prefix(config: Configuration, sessionId: number, clientIpAddress: string): Payload {
         return new PayloadQueryBuilder()
             .add(PayloadKey.ProtocolVersion, protocolVersion)
             .add(PayloadKey.OpenKitVersion, openKitVersion)
@@ -104,7 +105,7 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static mutable(sessionStartTime: number, multiplicity: number, transmissionTime: number): string {
+    public static mutable(sessionStartTime: number, multiplicity: number, transmissionTime: number): Payload {
         return new PayloadQueryBuilder()
             .add(PayloadKey.SessionStartTime, sessionStartTime)
             .add(PayloadKey.Multiplicity, multiplicity)
@@ -119,7 +120,7 @@ export class PayloadBuilder {
         sequenceNumber: number,
         timestamp: number,
         sessionStartTime: number,
-    ): string {
+    ): Payload {
         const eventType = typeof value === 'number' ? EventType.ValueDouble : EventType.ValueString;
 
         return PayloadBuilder
@@ -138,7 +139,7 @@ export class PayloadBuilder {
         timeSinceSessionStart: number,
         reason: string,
         errorValue: number,
-    ): string {
+    ): Payload {
         return PayloadBuilder
             .basicEventData(EventType.Error, name)
             .add(PayloadKey.ParentActionId, parentActionId)
@@ -153,7 +154,7 @@ export class PayloadBuilder {
         userTag: string,
         sequenceNumber: number,
         timestamp: number,
-        sessionStartTime: number): string {
+        sessionStartTime: number): Payload {
         return PayloadBuilder
             .basicEventData(EventType.IdentifyUser, userTag)
             .add(PayloadKey.ParentActionId, 0)
@@ -172,7 +173,7 @@ export class PayloadBuilder {
         bytesSent: number,
         bytesReceived: number,
         responseCode: number,
-    ): string {
+    ): Payload {
         return PayloadBuilder.basicEventData(EventType.WebRequest, url)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
