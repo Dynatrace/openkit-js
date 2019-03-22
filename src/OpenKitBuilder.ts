@@ -23,7 +23,9 @@ import {
     LogLevel,
     OpenKit,
     Orientation,
-    RandomNumberProvider, StatusRequest, StatusResponse,
+    RandomNumberProvider,
+    StatusRequest,
+    StatusResponse,
 } from './api';
 import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
