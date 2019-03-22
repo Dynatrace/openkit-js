@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../api';
+import { CaptureMode, CommunicationChannel } from '../../api';
 import { Configuration } from '../config/Configuration';
+import { SessionCommunicationProperties } from '../impl/OpenKitImpl';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { Payload } from '../payload.v2/Payload';
+import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
+import { defaultTimestampProvider } from '../provider/TimestampProvider';
 import { removeElement, timeout } from '../utils/Utils';
 
 const DEFAULT_SERVER_ID = 1;
@@ -26,8 +29,9 @@ const DEFAULT_SERVER_ID = 1;
 export interface SessionInformation {
     session: SessionImpl;
     initialized: boolean;
-    serverId: number;
     prefix: string;
+    props: SessionCommunicationProperties;
+    builder: PayloadBuilder;
 }
 // tslint:disable
 export class BeaconSender {
@@ -64,12 +68,15 @@ export class BeaconSender {
         }
     }
 
-    public addSession(session: SessionImpl, prefix: string): void {
+    public addSession(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, sessionProperties: SessionCommunicationProperties): void {
+        sessionProperties.serverId = this.okSessionId;
+
         this.sessions.push({
             session,
             initialized: false,
-            serverId: 1,
             prefix,
+            props: sessionProperties,
+            builder: payloadBuilder,
         });
     }
 
@@ -84,11 +91,12 @@ export class BeaconSender {
     }
 
     private async sendNewSessionRequest(session: SessionInformation) {
-        const response = await this.channel.sendNewSessionRequest(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.serverId));
+        const response = await this.channel.sendNewSessionRequest(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.props.serverId));
 
         if (response.valid) {
             session.initialized = true;
-            session.serverId = response.serverId || session.serverId;
+            session.props.serverId = response.serverId || session.props.serverId;
+            session.props.isCaptureEnabled = response.captureMode === CaptureMode.Off;
         }
     }
 
@@ -112,12 +120,10 @@ export class BeaconSender {
     }
 
     private async sendPayload(session: SessionInformation) {
-        const pl = session.session.payloadData;
-
         let payload: Payload | undefined;
         // noinspection JSAssignmentUsedAsCondition
-        while (payload = pl.getNextPayload(session.prefix)) {
-            const request = StatusRequestImpl.create(this.config.applicationId, session.serverId);
+        while (payload = session.builder.getNextPayload(session.prefix, defaultTimestampProvider.getCurrentTimestamp())) {
+            const request = StatusRequestImpl.create(this.config.applicationId, session.props.serverId);
 
             await this.channel.sendPayloadData(this.config.beaconURL, request, payload);
         }

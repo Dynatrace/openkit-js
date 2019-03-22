@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
+export interface SessionCommunicationProperties {
+    serverId: number;
+    isCaptureEnabled: boolean;
+    maxBeaconSize: number;
+}
+
 import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon.v2/BeaconSender';
-import { PayloadBuilder } from '../beacon/PayloadBuilder';
+import { PayloadBuilder as StaticPayloadBuilder } from '../beacon/PayloadBuilder';
 import { Configuration } from '../config/Configuration';
+import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
+import { PayloadQueue } from '../payload.v2/PayloadQueue';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
+import { defaultTimestampProvider } from '../provider/TimestampProvider';
 import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
 
@@ -77,11 +86,20 @@ export class OpenKitImpl implements OpenKit {
             return defaultNullSession;
         }
 
-        const sessionId = this.createSessionId();
-        const session = new SessionImpl(this.config, sessionId);
-        const prefix = PayloadBuilder.prefix(this.config, sessionId, clientIP);
+        const sessionProperties: SessionCommunicationProperties = {
+            serverId: 1,
+            isCaptureEnabled: true,
+            maxBeaconSize: 10240,
+        };
 
-        this.beaconSender.addSession(session, prefix);
+        const sessionId = this.createSessionId();
+        const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
+        const prefix = StaticPayloadBuilder.prefix(this.config, sessionId, clientIP, sessionStartTime);
+
+        const payloadBuilder = new PayloadBuilder(sessionProperties);
+        const session = new SessionImpl(this.config, sessionId, payloadBuilder, sessionStartTime);
+
+        this.beaconSender.addSession(session, prefix, payloadBuilder, sessionProperties);
 
         return session;
     }

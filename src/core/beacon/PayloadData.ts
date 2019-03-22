@@ -19,9 +19,10 @@ import { ActionImpl } from '../impl/ActionImpl';
 import { State } from '../impl/State';
 import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';
 import { Payload } from '../payload.v2/Payload';
+import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
-import { PayloadBuilder } from './PayloadBuilder';
+import { PayloadBuilder as StaticPayloadBuilder } from './PayloadBuilder';
 
 /**
  * Responsible for creating and holding all payload data for a session.
@@ -35,14 +36,14 @@ export class PayloadData {
     private readonly nextId = new SequenceIdProvider();
     private readonly timestampProvider: TimestampProvider;
 
-    private readonly sessionStartTime: number;
 
     constructor(
         state: State,
+        private readonly payloadBuilder: PayloadBuilder,
+        private readonly sessionStartTime: number,
         timestampProvider: TimestampProvider = defaultTimestampProvider) {
         this.state = state;
         this.timestampProvider = timestampProvider;
-        this.sessionStartTime = timestampProvider.getCurrentTimestamp();
     }
 
     public createId(): number {
@@ -54,20 +55,20 @@ export class PayloadData {
     }
 
     public startSession(): void {
-        this.addPayload(PayloadBuilder.startSession(this.createSequenceNumber()));
+        this.addPayload(StaticPayloadBuilder.startSession(this.createSequenceNumber()));
     }
 
     public endSession(): void {
         const duration = this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime;
-        this.addPayload(PayloadBuilder.endSession(this.createSequenceNumber(), duration));
+        this.addPayload(StaticPayloadBuilder.endSession(this.createSequenceNumber(), duration));
     }
 
     public addAction(action: ActionImpl): void {
-        this.addPayload(PayloadBuilder.action(action, this.sessionStartTime));
+        this.addPayload(StaticPayloadBuilder.action(action, this.sessionStartTime));
     }
 
     public reportValue(action: ActionImpl, name: string, value: number | string | null | undefined): void {
-        this.addPayload(PayloadBuilder.reportValue(
+        this.addPayload(StaticPayloadBuilder.reportValue(
             action,
             name,
             value,
@@ -77,7 +78,7 @@ export class PayloadData {
     }
 
     public identifyUser(userTag: string): void {
-        this.addPayload(PayloadBuilder.identifyUser(
+        this.addPayload(StaticPayloadBuilder.identifyUser(
             userTag,
             this.createSequenceNumber(),
             this.timestampProvider.getCurrentTimestamp(),
@@ -85,7 +86,7 @@ export class PayloadData {
     }
 
     public reportError(parentActionId: number, name: string, code: number, message: string): void {
-        this.addPayload(PayloadBuilder.reportError(
+        this.addPayload(StaticPayloadBuilder.reportError(
             name,
             parentActionId,
             this.createSequenceNumber(),
@@ -96,7 +97,7 @@ export class PayloadData {
     }
 
     public reportCrash(errorName: string, reason: string, stacktrace: string): void {
-        this.addPayload(PayloadBuilder.reportCrash(
+        this.addPayload(StaticPayloadBuilder.reportCrash(
             errorName,
             reason,
             stacktrace,
@@ -107,7 +108,7 @@ export class PayloadData {
     }
 
     public reportEvent(actionId: number, name: string): void {
-        this.addPayload(PayloadBuilder.reportNamedEvent(
+        this.addPayload(StaticPayloadBuilder.reportNamedEvent(
             name,
             actionId,
             this.createSequenceNumber(),
@@ -141,7 +142,7 @@ export class PayloadData {
             return;
         }
 
-        this.addPayload(PayloadBuilder.webRequest(
+        this.addPayload(StaticPayloadBuilder.webRequest(
             webRequest.getUrl(),
             parentActionId,
             webRequest.getStartSequenceNumber(),
@@ -159,13 +160,12 @@ export class PayloadData {
     }
 
     private getCompletePayloadPrefix(prefix: string): Payload {
-        const mutablePart = PayloadBuilder.mutable(
-            this.sessionStartTime, this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
+        const mutablePart = StaticPayloadBuilder.mutable(this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
 
         return `${prefix}&${mutablePart}`;
     }
 
     private addPayload(payload: Payload): void {
-        this.payloadQueue.push(payload);
+        this.payloadBuilder.push_unchecked(payload);
     }
 }

@@ -78,7 +78,7 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static prefix(config: Configuration, sessionId: number, clientIpAddress: string): Payload {
+    public static prefix(config: Configuration, sessionId: number, clientIpAddress: string, sessionStartTime: number): Payload {
         return new PayloadQueryBuilder()
             .add(PayloadKey.ProtocolVersion, protocolVersion)
             .add(PayloadKey.OpenKitVersion, openKitVersion)
@@ -92,6 +92,7 @@ export class PayloadBuilder {
             .add(PayloadKey.VisitorId, config.deviceId)
             .add(PayloadKey.SessionNumber, sessionId)
             .add(PayloadKey.ClientIpAddress, clientIpAddress)
+            .add(PayloadKey.SessionStartTime, sessionStartTime)
 
             .add(PayloadKey.DataCollectionLevel, config.dataCollectionLevel)
             .add(PayloadKey.CrashReportingLevel, config.crashReportingLevel)
@@ -105,9 +106,8 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static mutable(sessionStartTime: number, multiplicity: number, transmissionTime: number): Payload {
+    public static mutable(multiplicity: number, transmissionTime: number): Payload {
         return new PayloadQueryBuilder()
-            .add(PayloadKey.SessionStartTime, sessionStartTime)
             .add(PayloadKey.Multiplicity, multiplicity)
             .add(PayloadKey.TransmissionTime, transmissionTime)
             .build();

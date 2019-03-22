@@ -82,7 +82,7 @@ describe('SessionImpl', () => {
     const buildSession = (clientIp: string = '', id: number = 0) => {
         const openKit = instance(mockOpenKitImpl);
 
-        const session: SessionImpl = new SessionImpl(openKit, clientIp, id);
+        const session: SessionImpl = new SessionImpl(openKit, clientIp, id, sessionStartTime);
 
         const anySession = session as any;
         const payloadData: PayloadData = anySession.payloadData;

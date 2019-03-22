@@ -25,6 +25,7 @@ import {
 } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
 import { Configuration } from '../config/Configuration';
+import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
@@ -44,13 +45,13 @@ export class SessionImpl implements Session {
 
     private readonly logger: Logger;
 
-    constructor(config: Configuration, sessionId: number) {
+    constructor(config: Configuration, sessionId: number, payloadBuilder: PayloadBuilder, sessionStartTime: number) {
         this.state = new StateImpl(config);
         this.logger = config.loggerFactory.createLogger('SessionImpl');
 
         this.sessionId = sessionId;
 
-        this.payloadData = new PayloadData(this.state);
+        this.payloadData = new PayloadData(this.state, payloadBuilder, sessionStartTime);
 
         this.payloadData.startSession();
 
