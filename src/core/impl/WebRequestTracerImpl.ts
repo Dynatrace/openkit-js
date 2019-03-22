@@ -21,7 +21,7 @@ import { protocolVersion } from '../PlatformConstants';
 const tagPrefix = 'MT';
 
 // We do not need to percent encode, because the device id and application id are only [0-9a-fA-F-]
-const createTag =
+export const createTag =
     (actionId: number, sessionNumber: number, sequenceNumber: number, serverId: number, deviceId: string, appId: string): string =>
         [
             tagPrefix,
@@ -55,7 +55,6 @@ export class WebRequestTracerImpl implements WebRequestTracer {
         actionId: number,
         url: string,
         logFactory: LoggerFactory,
-        serverId: number,
         deviceId: string,
         appId: string,
         sessionNumber: number,
@@ -72,7 +71,8 @@ export class WebRequestTracerImpl implements WebRequestTracer {
         // if start is not called before using the setters the start time (e.g. load time) is not in 1970
         this.startTime = payload.currentTimestamp();
 
-        this.tag = createTag(this.parentActionId, sessionNumber, this.startSequenceNumber, serverId, deviceId, appId);
+        this.tag =
+            payload.payloadBuilder.getWebRequestTracerTag(actionId, sessionNumber, this.startSequenceNumber, deviceId, appId);
 
         this.logger.debug('create');
     }

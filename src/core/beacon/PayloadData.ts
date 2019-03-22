@@ -15,8 +15,8 @@
  */
 
 import { DataCollectionLevel } from '../../api';
+import { PrivacyConfiguration } from '../config/Configuration';
 import { ActionImpl } from '../impl/ActionImpl';
-import { State } from '../impl/State';
 import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';
 import { Payload } from '../payload.v2/Payload';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
@@ -28,21 +28,15 @@ import { PayloadBuilder as StaticPayloadBuilder } from './PayloadBuilder';
  * Responsible for creating and holding all payload data for a session.
  */
 export class PayloadData {
-    private readonly payloadQueue: Payload[] = [];
-
-    private readonly state: State;
-
     private readonly sequenceId = new SequenceIdProvider();
     private readonly nextId = new SequenceIdProvider();
     private readonly timestampProvider: TimestampProvider;
 
-
     constructor(
-        state: State,
-        private readonly payloadBuilder: PayloadBuilder,
+        private readonly config: PrivacyConfiguration,
+        public readonly payloadBuilder: PayloadBuilder,
         private readonly sessionStartTime: number,
         timestampProvider: TimestampProvider = defaultTimestampProvider) {
-        this.state = state;
         this.timestampProvider = timestampProvider;
     }
 
@@ -115,30 +109,12 @@ export class PayloadData {
             this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime));
     }
 
-    public getNextPayload(prefix: string): Payload | undefined {
-        if (this.payloadQueue.length === 0) {
-            return undefined;
-        }
-
-        const maxLength = this.state.maxBeaconSize;
-        let currentPayload = this.getCompletePayloadPrefix(prefix);
-
-        let remainingLength;
-        do {
-            currentPayload += `&${this.payloadQueue.shift()}`;
-
-            remainingLength = maxLength - currentPayload.length;
-        } while (this.payloadQueue.length !== 0 && (remainingLength - this.payloadQueue[0].length) > 0);
-
-        return currentPayload;
-    }
-
     public currentTimestamp(): number {
         return this.timestampProvider.getCurrentTimestamp();
     }
 
     public addWebRequest(webRequest: WebRequestTracerImpl, parentActionId: number): void {
-        if (this.state.isCaptureDisabled() || this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return;
         }
 
@@ -153,16 +129,6 @@ export class PayloadData {
             webRequest.getBytesReceived(),
             webRequest.getResponseCode(),
         ));
-    }
-
-    public hasPayloadsLeft(): boolean {
-        return this.payloadQueue.length > 0;
-    }
-
-    private getCompletePayloadPrefix(prefix: string): Payload {
-        const mutablePart = StaticPayloadBuilder.mutable(this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
-
-        return `${prefix}&${mutablePart}`;
     }
 
     private addPayload(payload: Payload): void {

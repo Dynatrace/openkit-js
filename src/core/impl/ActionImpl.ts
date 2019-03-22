@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { Action, CaptureMode, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
+import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
+import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
 import { SessionImpl } from './SessionImpl';
@@ -43,9 +44,10 @@ export class ActionImpl implements Action {
         session: SessionImpl,
         name: string,
         beacon: PayloadData,
+        private config: PrivacyConfiguration & OpenKitConfiguration,
         timestampProvider: TimestampProvider = defaultTimestampProvider) {
 
-        this.logger = session.state.config.loggerFactory.createLogger('ActionImpl');
+        this.logger = config.loggerFactory.createLogger('ActionImpl');
 
         this.session = session;
         this.name = name;
@@ -129,14 +131,13 @@ export class ActionImpl implements Action {
             return defaultNullWebRequestTracer;
         }
 
-        const { serverId, config: {deviceId, applicationId, loggerFactory }} = this.session.state;
+        const {deviceId, applicationId, loggerFactory } = this.config;
 
         return new WebRequestTracerImpl(
             this.beacon,
             this.actionId,
             url,
             loggerFactory,
-            serverId,
             deviceId,
             applicationId,
             this.session.sessionId,
@@ -163,12 +164,8 @@ export class ActionImpl implements Action {
             return false;
         }
 
-        if (this.session.state.isCaptureDisabled()) {
-            return false;
-        }
-
         // We only report values iff DCL = UserBehavior
-        if (this.session.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
             return false;
         }
 
@@ -177,15 +174,12 @@ export class ActionImpl implements Action {
 
     private mayReportEvent(): boolean {
         return !this.isActionLeft() &&
-            !this.session.state.isCaptureDisabled() &&
-            this.session.state.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
+            this.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
     }
 
     private mayReportError(): boolean {
         return !this.isActionLeft() &&
-            !this.session.state.isCaptureDisabled() &&
-            this.session.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
-            this.session.state.captureErrors === CaptureMode.On;
+            this.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 
     private isActionLeft(): boolean {

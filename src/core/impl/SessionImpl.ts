@@ -16,7 +16,6 @@
 
 import {
     Action,
-    CaptureMode,
     CrashReportingLevel,
     DataCollectionLevel,
     Logger,
@@ -24,34 +23,33 @@ import {
     WebRequestTracer,
 } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
-import { Configuration } from '../config/Configuration';
+import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
-import { State } from './State';
-import { StateImpl } from './StateImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class SessionImpl implements Session {
     public readonly payloadData: PayloadData;
-    public readonly sessionId: number;
-    public readonly state: State;
+
+    private readonly openActions: Action[] = [];
+    private readonly logger: Logger;
 
     private _isShutdown = false;
 
-    private readonly openActions: Action[] = [];
-
-    private readonly logger: Logger;
-
-    constructor(config: Configuration, sessionId: number, payloadBuilder: PayloadBuilder, sessionStartTime: number) {
-        this.state = new StateImpl(config);
+    constructor(
+        public readonly sessionId: number,
+        payloadBuilder: PayloadBuilder,
+        sessionStartTime: number,
+        private readonly config: PrivacyConfiguration & OpenKitConfiguration,
+    ) {
         this.logger = config.loggerFactory.createLogger('SessionImpl');
 
         this.sessionId = sessionId;
 
-        this.payloadData = new PayloadData(this.state, payloadBuilder, sessionStartTime);
+        this.payloadData = new PayloadData(this.config, payloadBuilder, sessionStartTime);
 
         this.payloadData.startSession();
 
@@ -71,7 +69,7 @@ export class SessionImpl implements Session {
     public identifyUser(userTag: string): void {
         // Only capture userTag if we track everything.
         if (this.isShutdown() ||
-            this.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+            this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
 
             return;
         }
@@ -93,7 +91,7 @@ export class SessionImpl implements Session {
             return defaultNullAction;
         }
 
-        const action = new ActionImpl(this, actionName, this.payloadData);
+        const action = new ActionImpl(this, actionName, this.payloadData, this.config);
 
         this.openActions.push(action);
 
@@ -159,14 +157,14 @@ export class SessionImpl implements Session {
             return defaultNullWebRequestTracer;
         }
 
-        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return defaultNullWebRequestTracer;
         }
 
-        const { serverId, config: {deviceId, loggerFactory, applicationId} } = this.state;
+        const { deviceId, applicationId, loggerFactory } = this.config;
 
         return new WebRequestTracerImpl(
-            this.payloadData, 0, url, loggerFactory, serverId, deviceId, applicationId, this.sessionId,
+            this.payloadData, 0, url, loggerFactory, deviceId, applicationId, this.sessionId,
         );
     }
 
@@ -176,15 +174,11 @@ export class SessionImpl implements Session {
 
     private mayReportCrash(): boolean {
         return !this.isShutdown() &&
-            !this.state.isCaptureDisabled() &&
-            this.state.config.crashReportingLevel === CrashReportingLevel.OptInCrashes &&
-            this.state.captureCrashes === CaptureMode.On;
+            this.config.crashReportingLevel === CrashReportingLevel.OptInCrashes;
     }
 
     private mayEnterAction(): boolean {
-        return !this.isShutdown() &&
-            this.state.isCaptureDisabled() === false &&
-            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off;
+        return !this.isShutdown() && this.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 
     /**
@@ -192,14 +186,14 @@ export class SessionImpl implements Session {
      * If the session is initialized, all data is flushed before shutting the session down.
      */
     private endSession(): void {
-        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             // We only send the end-session event if the user enabled monitoring.
             return;
         }
 
         this.logger.debug(`Ending Session (${this.sessionId})`);
 
-        this.openActions.slice().forEach((action) => action.leaveAction());
+        this.openActions.slice(0).forEach((action) => action.leaveAction());
 
         this.payloadData.endSession();
 
@@ -208,8 +202,6 @@ export class SessionImpl implements Session {
 
     private mayReportError(): boolean {
         return !this.isShutdown() &&
-            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
-            !this.state.isCaptureDisabled() &&
-            this.state.captureErrors === CaptureMode.On;
+            this.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 }

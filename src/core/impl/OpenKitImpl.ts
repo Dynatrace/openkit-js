@@ -25,7 +25,6 @@ import { BeaconSender } from '../beacon.v2/BeaconSender';
 import { PayloadBuilder as StaticPayloadBuilder } from '../beacon/PayloadBuilder';
 import { Configuration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
-import { PayloadQueue } from '../payload.v2/PayloadQueue';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
@@ -97,7 +96,7 @@ export class OpenKitImpl implements OpenKit {
         const prefix = StaticPayloadBuilder.prefix(this.config, sessionId, clientIP, sessionStartTime);
 
         const payloadBuilder = new PayloadBuilder(sessionProperties);
-        const session = new SessionImpl(this.config, sessionId, payloadBuilder, sessionStartTime);
+        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.config);
 
         this.beaconSender.addSession(session, prefix, payloadBuilder, sessionProperties);
 
