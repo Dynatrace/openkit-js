@@ -24,12 +24,11 @@ import {
     WebRequestTracer,
 } from '../../api';
 import { PayloadData } from '../beacon/PayloadData';
+import { Configuration } from '../config/Configuration';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
-import { OpenKitImpl } from './OpenKitImpl';
-import { Status } from './OpenKitObject';
 import { State } from './State';
 import { StateImpl } from './StateImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
@@ -39,24 +38,23 @@ export class SessionImpl implements Session {
     public readonly sessionId: number;
     public readonly state: State;
 
-    public status: Status = Status.Idle;
-    private readonly openKit: OpenKitImpl;
+    private _isShutdown = false;
+
     private readonly openActions: Action[] = [];
 
     private readonly logger: Logger;
 
-    constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
-        this.state = new StateImpl(openKit.state.config);
-        this.logger = openKit.state.config.loggerFactory.createLogger('SessionImpl');
+    constructor(config: Configuration, sessionId: number) {
+        this.state = new StateImpl(config);
+        this.logger = config.loggerFactory.createLogger('SessionImpl');
 
         this.sessionId = sessionId;
-        this.openKit = openKit;
 
-        this.payloadData = new PayloadData(this.state, clientIp, sessionId);
+        this.payloadData = new PayloadData(this.state);
 
         this.payloadData.startSession();
 
-        this.logger.debug(`Created Session id=${sessionId} with ip=${clientIp}`);
+        this.logger.debug(`Created Session id=${sessionId}`);
     }
 
     /**
@@ -71,7 +69,7 @@ export class SessionImpl implements Session {
      */
     public identifyUser(userTag: string): void {
         // Only capture userTag if we track everything.
-        if (this.status === Status.Shutdown ||
+        if (this.isShutdown() ||
             this.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
 
             return;
@@ -156,7 +154,7 @@ export class SessionImpl implements Session {
             return defaultNullWebRequestTracer;
         }
 
-        if (this.status === Status.Shutdown) {
+        if (this.isShutdown()) {
             return defaultNullWebRequestTracer;
         }
 
@@ -171,15 +169,19 @@ export class SessionImpl implements Session {
         );
     }
 
+    public isShutdown(): boolean {
+        return this._isShutdown === true;
+    }
+
     private mayReportCrash(): boolean {
-        return this.status !== Status.Shutdown &&
+        return !this.isShutdown() &&
             !this.state.isCaptureDisabled() &&
             this.state.config.crashReportingLevel === CrashReportingLevel.OptInCrashes &&
             this.state.captureCrashes === CaptureMode.On;
     }
 
     private mayEnterAction(): boolean {
-        return this.status !== Status.Shutdown &&
+        return !this.isShutdown() &&
             this.state.isCaptureDisabled() === false &&
             this.state.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
@@ -200,11 +202,11 @@ export class SessionImpl implements Session {
 
         this.payloadData.endSession();
 
-        this.status = Status.Shutdown;
+        this._isShutdown = true;
     }
 
     private mayReportError(): boolean {
-        return this.status !== Status.Shutdown &&
+        return !this.isShutdown() &&
             this.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
             !this.state.isCaptureDisabled() &&
             this.state.captureErrors === CaptureMode.On;

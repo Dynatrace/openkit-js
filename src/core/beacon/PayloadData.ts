@@ -35,18 +35,13 @@ export class PayloadData {
     private readonly timestampProvider: TimestampProvider;
 
     private readonly sessionStartTime: number;
-    private readonly payloadPrefix: string;
 
     constructor(
         state: State,
-        clientIp: string,
-        sessionId: number,
         timestampProvider: TimestampProvider = defaultTimestampProvider) {
         this.state = state;
         this.timestampProvider = timestampProvider;
         this.sessionStartTime = timestampProvider.getCurrentTimestamp();
-
-        this.payloadPrefix = PayloadBuilder.prefix(this.state.config, sessionId, clientIp);
     }
 
     public createId(): number {
@@ -118,13 +113,13 @@ export class PayloadData {
             this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime));
     }
 
-    public getNextPayload(): string | undefined {
+    public getNextPayload(prefix: string): string | undefined {
         if (this.payloadQueue.length === 0) {
             return undefined;
         }
 
         const maxLength = this.state.maxBeaconSize;
-        let currentPayload = this.getCompletePayloadPrefix();
+        let currentPayload = this.getCompletePayloadPrefix(prefix);
 
         let remainingLength;
         do {
@@ -162,11 +157,11 @@ export class PayloadData {
         return this.payloadQueue.length > 0;
     }
 
-    private getCompletePayloadPrefix(): string {
+    private getCompletePayloadPrefix(prefix: string): string {
         const mutablePart = PayloadBuilder.mutable(
             this.sessionStartTime, this.state.multiplicity, this.timestampProvider.getCurrentTimestamp());
 
-        return `${this.payloadPrefix}&${mutablePart}`;
+        return `${prefix}&${mutablePart}`;
     }
 
     private addPayload(payload: string): void {

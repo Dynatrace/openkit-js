@@ -14,45 +14,37 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel, DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
+import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon.v2/BeaconSender';
+import { PayloadBuilder } from '../beacon/PayloadBuilder';
 import { Configuration } from '../config/Configuration';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
 import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
-import { State } from './State';
-import { StateImpl } from './StateImpl';
 
 /**
  * Implementation of the {@link OpenKit} interface.
  */
 export class OpenKitImpl implements OpenKit {
-    public readonly state: State;
-    public readonly logger: Logger;
+    private readonly sessionIdProvider: IdProvider;
+    private readonly beaconSender: BeaconSender;
+    private readonly logger: Logger;
 
     private isShutdown = false;
-
-    private readonly sessionIdProvider: IdProvider;
-    private readonly communicationChannel: CommunicationChannel;
-
-    private readonly beaconSender: BeaconSender;
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
      * @param config The app configuration.
      */
-    constructor(config: Configuration) {
-        this.state = new StateImpl(config);
+    constructor(private readonly config: Configuration) {
         this.logger = config.loggerFactory.createLogger('OpenKitImpl');
-
-        this.communicationChannel = config.communicationChannel;
 
         this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
 
-        this.beaconSender = new BeaconSender(this.communicationChannel, config);
+        this.beaconSender = new BeaconSender(config.communicationChannel, config);
 
     }
 
@@ -81,14 +73,20 @@ export class OpenKitImpl implements OpenKit {
         // We always send the createSession-request to the server, even when DataCollectionLevel = Off, but no user
         // activity is recorded.
 
-        if (this.isShutdown || this.state.isCaptureDisabled()) {
+        if (this.isShutdown) {
             return defaultNullSession;
         }
 
-        const session = new SessionImpl(this, clientIP, this.sessionIdProvider.next());
+        const sessionId = this.createSessionId();
+        const session = new SessionImpl(this.config, sessionId);
+        const prefix = PayloadBuilder.prefix(this.config, sessionId, clientIP);
 
-        this.beaconSender.addSession(session);
+        this.beaconSender.addSession(session, prefix);
 
         return session;
+    }
+
+    private createSessionId(): number {
+        return this.sessionIdProvider.next();
     }
 }

@@ -15,8 +15,8 @@
  */
 
 import { CommunicationChannel } from '../../api';
-import { OpenKitConfiguration } from '../config/Configuration';
-import { Status } from '../impl/OpenKitObject';
+import { PayloadBuilder } from '../beacon/PayloadBuilder';
+import { Configuration } from '../config/Configuration';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { removeElement, timeout } from '../utils/Utils';
@@ -27,15 +27,18 @@ export interface SessionInformation {
     session: SessionImpl;
     initialized: boolean;
     serverId: number;
+    prefix: string;
 }
 // tslint:disable
 export class BeaconSender {
     private sessions: SessionInformation[] = [];
     private okSessionId: number = DEFAULT_SERVER_ID;
 
+    private isShutdown = false;
+
     constructor(
         private channel: CommunicationChannel,
-        private config: OpenKitConfiguration) {
+        private config: Configuration) {
     }
 
     public async init(): Promise<void> {
@@ -49,9 +52,9 @@ export class BeaconSender {
         }
     }
 
-    private async loop () {
-        while(true) {
-            console.warn("wup")
+    private async loop() {
+        while (!this.isShutdown) {
+            console.warn("loop");
 
             await this.sendNewSessionRequests();
             await this.finishSessions();
@@ -61,11 +64,12 @@ export class BeaconSender {
         }
     }
 
-    public addSession(session: SessionImpl): void {
+    public addSession(session: SessionImpl, prefix: string): void {
         this.sessions.push({
             session,
             initialized: false,
             serverId: 1,
+            prefix,
         });
     }
 
@@ -73,7 +77,7 @@ export class BeaconSender {
     private async sendNewSessionRequests() {
         const newSessions = this.sessions.filter((session) => session.initialized === false);
 
-        for(const session of newSessions) {
+        for (const session of newSessions) {
             await this.sendNewSessionRequest(session);
         }
 
@@ -82,7 +86,7 @@ export class BeaconSender {
     private async sendNewSessionRequest(session: SessionInformation) {
         const response = await this.channel.sendNewSessionRequest(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.serverId));
 
-        if(response.valid) {
+        if (response.valid) {
             session.initialized = true;
             session.serverId = response.serverId || session.serverId;
         }
@@ -90,9 +94,9 @@ export class BeaconSender {
 
     private async finishSessions() {
         const sessionsToFinish = this.sessions
-            .filter(session => session.initialized && session.session.status === Status.Shutdown);
+            .filter(session => session.initialized && session.session.isShutdown());
 
-        for(const session of sessionsToFinish) {
+        for (const session of sessionsToFinish) {
             await this.sendPayload(session);
 
             removeElement(this.sessions, session);
@@ -102,7 +106,7 @@ export class BeaconSender {
     private async sendPayloadDatas() {
         const openSessions = this.sessions.filter(session => session.initialized);
 
-        for(const session of openSessions) {
+        for (const session of openSessions) {
             await this.sendPayload(session);
         }
     }
@@ -111,19 +115,21 @@ export class BeaconSender {
         const pl = session.session.payloadData;
 
         let x: string | undefined;
-        while(x = pl.getNextPayload()) {
+        while (x = pl.getNextPayload(session.prefix)) {
             await this.channel.sendPayloadData(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.serverId), x);
         }
     }
 
     public async shutdown() {
+        this.isShutdown = true;
+
         // immediately close all sessions to set the end timestamp
         this.sessions.forEach(session => session.session.end());
 
         const sessions = this.sessions.splice(0);
 
         // Now send all data immediately
-        for(const session of sessions) {
+        for (const session of sessions) {
             await this.sendPayload(session);
         }
 
