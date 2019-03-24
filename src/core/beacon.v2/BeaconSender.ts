@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CaptureMode, CommunicationChannel } from '../../api';
+import { CommunicationChannel } from '../../api';
 import { Configuration } from '../config/Configuration';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
@@ -51,6 +51,8 @@ export class BeaconSender {
 
         if (response.valid) {
             this.okSessionId = response.serverId || DEFAULT_SERVER_ID;
+
+            this.sessions.forEach(s => s.props.setServerId(this.okSessionId));
 
             this.loop();
         }
@@ -95,6 +97,7 @@ export class BeaconSender {
 
         if (response.valid) {
             session.props.updateFromResponse(response);
+            session.props.setServerIdLocked();
             session.initialized = true;
         }
     }

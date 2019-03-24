@@ -367,12 +367,16 @@ const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: R
 
 // tslint:disable
 class TestCommunicationChannel implements CommunicationChannel {
-    private static async getValidStatusResponse(...args: any[]): Promise<StatusResponse> {
-        console.warn(...args);
 
+    private static async getValidStatusResponse(...args: any[]): Promise<StatusResponse> {
         await timeout(100);
 
-        return { valid: true };
+        const r: StatusResponse = {
+            valid: true,
+            serverId: new DefaultRandomNumberProvider().nextPositiveInteger() % 20 + 5,
+        };
+
+        return r;
     }
 
     public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
