@@ -136,10 +136,6 @@ export class PayloadBuilder {
         this.queue.push(p);
     }
 
-    public push_unchecked(payload: Payload): void {
-        this.queue.push(payload);
-    }
-
     public getNextPayload(prefix: Payload, transmissionTime: number): Payload | undefined {
         if (this.queue.isEmpty()) {
             return undefined;

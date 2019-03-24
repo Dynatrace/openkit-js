@@ -18,7 +18,7 @@ import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon.v2/BeaconSender';
 import { CommunicationStateImpl } from '../beacon.v2/CommunicationStateImpl';
 import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
-import { Configuration } from '../config/Configuration';
+import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
@@ -35,6 +35,8 @@ export class OpenKitImpl implements OpenKit {
     private readonly beaconSender: BeaconSender;
     private readonly logger: Logger;
 
+    private readonly sessionConfig: PrivacyConfiguration & OpenKitConfiguration;
+
     private isShutdown = false;
 
     /**
@@ -47,8 +49,9 @@ export class OpenKitImpl implements OpenKit {
         this.sessionIdProvider = config.privacy.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
 
-        this.beaconSender = new BeaconSender(config.openKit);
+        this.beaconSender = new BeaconSender(this, config.openKit);
 
+        this.sessionConfig = {...config.privacy, ...config.openKit};
     }
 
     /**
@@ -63,6 +66,10 @@ export class OpenKitImpl implements OpenKit {
      * @inheritDoc
      */
     public shutdown(): void {
+        if (this.isShutdown) {
+            return;
+        }
+
         this.logger.debug('Shutting down');
         this.isShutdown = true;
 
@@ -89,7 +96,7 @@ export class OpenKitImpl implements OpenKit {
         const payloadBuilder = new PayloadBuilder(sessionProperties);
 
         const session = new SessionImpl(
-            sessionId, payloadBuilder, sessionStartTime, {...this.config.privacy, ...this.config.openKit});
+            sessionId, payloadBuilder, sessionStartTime, this.sessionConfig);
         this.beaconSender.addSession(session, prefix, payloadBuilder, sessionProperties);
 
         return session;

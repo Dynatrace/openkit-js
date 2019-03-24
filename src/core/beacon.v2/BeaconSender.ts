@@ -16,6 +16,7 @@
 
 import { CommunicationChannel } from '../../api';
 import { OpenKitConfiguration } from '../config/Configuration';
+import { OpenKitImpl } from '../impl/OpenKitImpl';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { Payload } from '../payload.v2/Payload';
@@ -40,8 +41,12 @@ export class BeaconSender {
     private okSessionId: number = DEFAULT_SERVER_ID;
 
     private isShutdown = false;
+    private initialized = false;
 
-    constructor(private readonly config: OpenKitConfiguration) {
+    constructor(
+        private readonly openKit: OpenKitImpl,
+        private readonly config: OpenKitConfiguration,
+    ) {
         this.channel = config.communicationChannel;
     }
 
@@ -51,11 +56,14 @@ export class BeaconSender {
                 this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, this.okSessionId));
 
         if (response.valid) {
+            this.initialized = true;
             this.okSessionId = response.serverId || DEFAULT_SERVER_ID;
 
             this.sessions.forEach((s) => s.props.setServerId(this.okSessionId));
 
             this.loop();
+        } else {
+            this.shutdown();
         }
     }
 
@@ -71,20 +79,32 @@ export class BeaconSender {
         });
     }
 
+    public isInitialized(): boolean {
+        return this.initialized;
+    }
+
     public async shutdown(): Promise<void> {
+        if (this.isShutdown) {
+            return;
+        }
         this.isShutdown = true;
+
+        // Mark OpenKit to no accept sessions anymore
+        this.openKit.shutdown();
 
         // immediately close all sessions to set the end timestamp
         this.sessions.forEach((session) => session.session.end());
 
         const sessions = this.sessions.splice(0);
 
+        if (!this.isInitialized()) {
+            return;
+        }
+
         // Now send all data immediately
         for (const session of sessions) {
             await this.sendPayload(session);
         }
-
-        this.sessions.splice(0);
     }
 
     private async loop(): Promise<void> {

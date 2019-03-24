@@ -45,7 +45,8 @@ export class ActionImpl implements Action {
         name: string,
         beacon: PayloadBuilderHelper,
         private config: PrivacyConfiguration & OpenKitConfiguration,
-        timestampProvider: TimestampProvider = defaultTimestampProvider) {
+        timestampProvider: TimestampProvider = defaultTimestampProvider,
+    ) {
 
         this.logger = config.loggerFactory.createLogger('ActionImpl');
 
@@ -165,11 +166,7 @@ export class ActionImpl implements Action {
         }
 
         // We only report values iff DCL = UserBehavior
-        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
-            return false;
-        }
-
-        return true;
+        return this.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
     }
 
     private mayReportEvent(): boolean {

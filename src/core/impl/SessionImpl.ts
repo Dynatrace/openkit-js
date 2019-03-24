@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { Action, CrashReportingLevel, DataCollectionLevel, Logger, Session, WebRequestTracer } from '../../api';
+import {
+    Action,
+    CrashReportingLevel,
+    DataCollectionLevel,
+    Logger,
+    LoggerFactory,
+    Session,
+    WebRequestTracer,
+} from '../../api';
 import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
