@@ -85,30 +85,32 @@ export class StaticPayloadBuilder {
     }
 
     public static prefix(config: Configuration, sessionId: number, clientIpAddress: string, sessionStartTime: number): Payload {
+        const {openKit, device, privacy, meta} = config;
+
         return new PayloadQueryBuilder()
             .add(PayloadKey.ProtocolVersion, protocolVersion)
             .add(PayloadKey.OpenKitVersion, openKitVersion)
-            .add(PayloadKey.ApplicationId, config.applicationId)
-            .add(PayloadKey.ApplicationName, config.applicationName === undefined ? '' : config.applicationName)
-            .addIfDefined(PayloadKey.ApplicationVersion, config.applicationVersion)
-            .addIfDefined(PayloadKey.DeviceOs, config.operatingSystem)
+            .add(PayloadKey.ApplicationId, openKit.applicationId)
+            .add(PayloadKey.ApplicationName, meta.applicationName === undefined ? '' : meta.applicationName)
+            .addIfDefined(PayloadKey.ApplicationVersion, meta.applicationVersion)
+            .addIfDefined(PayloadKey.DeviceOs, meta.operatingSystem)
             .add(PayloadKey.PlatformType, platformTypeOpenKit)
             .add(PayloadKey.AgentTechnologyType, agentTechnologyType)
 
-            .add(PayloadKey.VisitorId, config.deviceId)
+            .add(PayloadKey.VisitorId, openKit.deviceId)
             .add(PayloadKey.SessionNumber, sessionId)
             .add(PayloadKey.ClientIpAddress, clientIpAddress)
             .add(PayloadKey.SessionStartTime, sessionStartTime)
 
-            .add(PayloadKey.DataCollectionLevel, config.dataCollectionLevel)
-            .add(PayloadKey.CrashReportingLevel, config.crashReportingLevel)
+            .add(PayloadKey.DataCollectionLevel, privacy.dataCollectionLevel)
+            .add(PayloadKey.CrashReportingLevel, privacy.crashReportingLevel)
 
-            .addIfDefined(PayloadKey.DeviceManufacturer, config.manufacturer)
-            .addIfDefined(PayloadKey.DeviceModel, config.modelId)
-            .addIfDefined(PayloadKey.ScreenWidth, config.screenWidth)
-            .addIfDefined(PayloadKey.ScreenHeight, config.screenHeight)
-            .addIfDefined(PayloadKey.UserLanguage, config.userLanguage)
-            .addIfDefined(PayloadKey.Orientation, config.orientation)
+            .addIfDefined(PayloadKey.DeviceManufacturer, device.manufacturer)
+            .addIfDefined(PayloadKey.DeviceModel, device.modelId)
+            .addIfDefined(PayloadKey.ScreenWidth, device.screenWidth)
+            .addIfDefined(PayloadKey.ScreenHeight, device.screenHeight)
+            .addIfDefined(PayloadKey.UserLanguage, device.userLanguage)
+            .addIfDefined(PayloadKey.Orientation, device.orientation)
             .build();
     }
 

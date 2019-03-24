@@ -15,7 +15,7 @@
  */
 
 import { CommunicationChannel } from '../../api';
-import { Configuration } from '../config/Configuration';
+import { OpenKitConfiguration } from '../config/Configuration';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { Payload } from '../payload.v2/Payload';
@@ -33,40 +33,29 @@ export interface SessionInformation {
     props: CommunicationState;
     builder: PayloadBuilder;
 }
-// tslint:disable
 export class BeaconSender {
+    private readonly channel: CommunicationChannel;
+
     private sessions: SessionInformation[] = [];
     private okSessionId: number = DEFAULT_SERVER_ID;
 
     private isShutdown = false;
 
-    constructor(
-        private channel: CommunicationChannel,
-        private config: Configuration) {
+    constructor(private readonly config: OpenKitConfiguration) {
+        this.channel = config.communicationChannel;
     }
 
     public async init(): Promise<void> {
         const response =
-            await this.channel.sendStatusRequest(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, this.okSessionId));
+            await this.channel.sendStatusRequest(
+                this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, this.okSessionId));
 
         if (response.valid) {
             this.okSessionId = response.serverId || DEFAULT_SERVER_ID;
 
-            this.sessions.forEach(s => s.props.setServerId(this.okSessionId));
+            this.sessions.forEach((s) => s.props.setServerId(this.okSessionId));
 
             this.loop();
-        }
-    }
-
-    private async loop() {
-        while (!this.isShutdown) {
-            console.warn("loop");
-
-            await this.sendNewSessionRequests();
-            await this.finishSessions();
-            await this.sendPayloadData();
-
-            await timeout(1000);
         }
     }
 
@@ -82,60 +71,11 @@ export class BeaconSender {
         });
     }
 
-
-    private async sendNewSessionRequests() {
-        const newSessions = this.sessions.filter((session) => session.initialized === false);
-
-        for (const session of newSessions) {
-            await this.sendNewSessionRequest(session);
-        }
-
-    }
-
-    private async sendNewSessionRequest(session: SessionInformation) {
-        const response = await this.channel.sendNewSessionRequest(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.props.serverId));
-
-        if (response.valid) {
-            session.props.updateFromResponse(response);
-            session.props.setServerIdLocked();
-            session.initialized = true;
-        }
-    }
-
-    private async finishSessions() {
-        const sessionsToFinish = this.sessions
-            .filter(session => session.initialized && session.session.isShutdown());
-
-        for (const session of sessionsToFinish) {
-            await this.sendPayload(session);
-
-            removeElement(this.sessions, session);
-        }
-    }
-
-    private async sendPayloadData() {
-        const openSessions = this.sessions.filter(session => session.initialized);
-
-        for (const session of openSessions) {
-            await this.sendPayload(session);
-        }
-    }
-
-    private async sendPayload(session: SessionInformation) {
-        let payload: Payload | undefined;
-        // noinspection JSAssignmentUsedAsCondition
-        while (payload = session.builder.getNextPayload(session.prefix, defaultTimestampProvider.getCurrentTimestamp())) {
-            const request = StatusRequestImpl.create(this.config.applicationId, session.props.serverId);
-
-            await this.channel.sendPayloadData(this.config.beaconURL, request, payload);
-        }
-    }
-
-    public async shutdown() {
+    public async shutdown(): Promise<void> {
         this.isShutdown = true;
 
         // immediately close all sessions to set the end timestamp
-        this.sessions.forEach(session => session.session.end());
+        this.sessions.forEach((session) => session.session.end());
 
         const sessions = this.sessions.splice(0);
 
@@ -145,5 +85,64 @@ export class BeaconSender {
         }
 
         this.sessions.splice(0);
+    }
+
+    private async loop(): Promise<void> {
+        while (!this.isShutdown) {
+            await this.sendNewSessionRequests();
+            await this.finishSessions();
+            await this.sendPayloadData();
+
+            await timeout(1000);
+        }
+    }
+
+    private async sendNewSessionRequests(): Promise<void> {
+        const newSessions = this.sessions.filter((session) => session.initialized === false);
+
+        for (const session of newSessions) {
+            await this.sendNewSessionRequest(session);
+        }
+
+    }
+
+    private async sendNewSessionRequest(session: SessionInformation): Promise<void> {
+        const response = await this.channel.sendNewSessionRequest(
+            this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.props.serverId));
+
+        if (response.valid) {
+            session.props.updateFromResponse(response);
+            session.props.setServerIdLocked();
+            session.initialized = true;
+        }
+    }
+
+    private async finishSessions(): Promise<void> {
+        const sessionsToFinish = this.sessions
+            .filter((session) => session.initialized && session.session.isShutdown());
+
+        for (const session of sessionsToFinish) {
+            await this.sendPayload(session);
+
+            removeElement(this.sessions, session);
+        }
+    }
+
+    private async sendPayloadData(): Promise<void> {
+        const openSessions = this.sessions.filter((session) => session.initialized);
+
+        for (const session of openSessions) {
+            await this.sendPayload(session);
+        }
+    }
+
+    private async sendPayload(session: SessionInformation): Promise<void> {
+        let payload: Payload | undefined;
+        // tslint:disable-next-line
+        while (payload = session.builder.getNextPayload(session.prefix, defaultTimestampProvider.getCurrentTimestamp())) {
+            const request = StatusRequestImpl.create(this.config.applicationId, session.props.serverId);
+
+            await this.channel.sendPayloadData(this.config.beaconURL, request, payload);
+        }
     }
 }

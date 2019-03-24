@@ -53,4 +53,9 @@ export interface OpenKitConfiguration {
     readonly random: RandomNumberProvider;
 }
 
-export type Configuration =  OpenKitConfiguration & PrivacyConfiguration & Partial<DeviceMetadata> & Partial<ApplicationMetadata>;
+export interface Configuration {
+    openKit: OpenKitConfiguration;
+    privacy: PrivacyConfiguration;
+    device: Partial<DeviceMetadata>;
+    meta: Partial<ApplicationMetadata>;
+}

@@ -312,7 +312,7 @@ export class OpenKitBuilder {
     }
 
     private buildConfig(): Readonly<Configuration> {
-        this.withCommunicationChannel(new TestCommunicationChannel());
+        // this.withCommunicationChannel(new TestCommunicationChannel());
 
         const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
 
@@ -324,27 +324,34 @@ export class OpenKitBuilder {
         // user does not allow data tracking
         const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random);
         return {
-            beaconURL: this.beaconUrl,
-            deviceId,
-            applicationId: this.applicationId,
+            openKit: {
+                beaconURL: this.beaconUrl,
+                deviceId,
+                applicationId: this.applicationId,
+                communicationChannel,
+                random,
+                loggerFactory,
+            },
 
-            applicationName: this.applicationName,
-            applicationVersion: this.applicationVersion,
-            operatingSystem: this.operatingSystem,
+            privacy: {
+                dataCollectionLevel: this.dataCollectionLevel,
+                crashReportingLevel: this.crashReportingLevel,
+            },
 
-            dataCollectionLevel: this.dataCollectionLevel,
-            crashReportingLevel: this.crashReportingLevel,
+            meta: {
+                applicationName: this.applicationName,
+                applicationVersion: this.applicationVersion,
+                operatingSystem: this.operatingSystem,
+            },
 
-            communicationChannel,
-            random,
-            loggerFactory,
-
-            manufacturer: this.manufacturer,
-            modelId: this.modelId,
-            userLanguage: this.userLanguage,
-            screenWidth: this.screenWidth,
-            screenHeight: this.screenHeight,
-            orientation: this.orientation,
+            device: {
+                manufacturer: this.manufacturer,
+                modelId: this.modelId,
+                userLanguage: this.userLanguage,
+                screenWidth: this.screenWidth,
+                screenHeight: this.screenHeight,
+                orientation: this.orientation,
+            },
         };
     }
 }
@@ -369,6 +376,8 @@ const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: R
 class TestCommunicationChannel implements CommunicationChannel {
 
     private static async getValidStatusResponse(...args: any[]): Promise<StatusResponse> {
+        console.warn(...args);
+
         await timeout(100);
 
         const r: StatusResponse = {

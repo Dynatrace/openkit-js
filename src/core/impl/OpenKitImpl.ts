@@ -42,12 +42,12 @@ export class OpenKitImpl implements OpenKit {
      * @param config The app configuration.
      */
     constructor(private readonly config: Configuration) {
-        this.logger = config.loggerFactory.createLogger('OpenKitImpl');
+        this.logger = config.openKit.loggerFactory.createLogger('OpenKitImpl');
 
-        this.sessionIdProvider = config.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
+        this.sessionIdProvider = config.privacy.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
             new SequenceIdProvider() : new SingleIdProvider(1);
 
-        this.beaconSender = new BeaconSender(config.communicationChannel, config);
+        this.beaconSender = new BeaconSender(config.openKit);
 
     }
 
@@ -88,7 +88,8 @@ export class OpenKitImpl implements OpenKit {
         const prefix = StaticPayloadBuilder.prefix(this.config, sessionId, clientIP, sessionStartTime);
         const payloadBuilder = new PayloadBuilder(sessionProperties);
 
-        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.config);
+        const session = new SessionImpl(
+            sessionId, payloadBuilder, sessionStartTime, {...this.config.privacy, ...this.config.openKit});
         this.beaconSender.addSession(session, prefix, payloadBuilder, sessionProperties);
 
         return session;
