@@ -15,7 +15,7 @@
  */
 
 import { Logger, LoggerFactory, WebRequestTracer } from '../../api';
-import { PayloadData } from '../beacon/PayloadData';
+import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
 import { protocolVersion } from '../PlatformConstants';
 
 const tagPrefix = 'MT';
@@ -36,7 +36,7 @@ export const createTag =
         ].join('_');
 
 export class WebRequestTracerImpl implements WebRequestTracer {
-    private readonly payload: PayloadData;
+    private readonly payload: PayloadBuilderHelper;
     private readonly parentActionId: number;
     private readonly url: string;
     private readonly startSequenceNumber: number;
@@ -51,7 +51,7 @@ export class WebRequestTracerImpl implements WebRequestTracer {
     private bytesReceived: number = -1;
 
     constructor(
-        payload: PayloadData,
+        payload: PayloadBuilderHelper,
         actionId: number,
         url: string,
         logFactory: LoggerFactory,

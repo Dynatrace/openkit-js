@@ -15,7 +15,7 @@
  */
 
 import { CommunicationState } from '../beacon.v2/CommunicationState';
-import { PayloadBuilder as StaticPayloadBuilder } from '../beacon/PayloadBuilder';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
@@ -28,13 +28,112 @@ export class PayloadBuilder {
     ) {}
 
     public reportNamedEvent(name: string, actionId: number, sequenceNumber: number, timeSinceSessionStart: number): void {
-        if (!this.commState.capture) {
+        if (this.isCaptureDisabled()) {
             return;
         }
 
         const payload = StaticPayloadBuilder.reportNamedEvent(name, actionId, sequenceNumber, timeSinceSessionStart);
 
         this.queue.push(payload);
+    }
+
+    public reportCrash(errorName: string, reason: string, stacktrace: string, startSequenceNumber: number, timeSinceSessionStart: number): void {
+        if (this.isCaptureCrashesDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.reportCrash(errorName, reason, stacktrace, startSequenceNumber, timeSinceSessionStart);
+
+        this.queue.push(payload);
+    }
+
+    public reportError(name: string, reason: string, errorValue: number, parentActionId: number, startSequenceNumber: number, timeSinceSessionStart: number): void {
+        if (this.isCaptureErrorsDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.reportError(name, parentActionId, startSequenceNumber, timeSinceSessionStart, reason, errorValue);
+
+        this.queue.push(payload);
+    }
+
+    public reportValue(name: string, value: number | string | null | undefined, actionId: number, sequenceNumber: number, timeSinceSessionStart: number): void {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.reportValue(actionId, name, value, sequenceNumber, timeSinceSessionStart);
+
+        this.queue.push(payload);
+    }
+
+    public identifyUser(userTag: string, startSequenceNumber: number, timeSinceSessionStart: number): void {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.identifyUser(userTag, startSequenceNumber, timeSinceSessionStart);
+
+        this.queue.push(payload);
+    }
+
+    public action(
+        name: string,
+        actionId: number,
+        startSequenceNumber: number,
+        endSequenceNumber: number,
+        timeSinceSessionStart: number,
+        duration: number,
+    ): void {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.action(
+            name, actionId, startSequenceNumber, endSequenceNumber, timeSinceSessionStart, duration);
+
+        this.queue.push(payload);
+    }
+
+    public startSession(startSequenceNumber: number): void {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.startSession(startSequenceNumber);
+
+        this.queue.push(payload);
+    }
+
+    public endSession(startSequenceNumber: number, duration: number): void {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        const payload = StaticPayloadBuilder.endSession(startSequenceNumber, duration);
+
+        this.queue.push(payload);
+    }
+
+    public webRequest(
+        url: string,
+        parentActionId: number,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+        endSequenceNumber: number,
+        duration: number,
+        bytesSent: number,
+        bytesReceived: number,
+        responseCode: number,
+    ): void {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        const p = StaticPayloadBuilder.webRequest(url, parentActionId, startSequenceNumber, timeSinceSessionStart,
+            endSequenceNumber, duration, bytesSent, bytesReceived, responseCode);
+
+        this.queue.push(p);
     }
 
     public push_unchecked(payload: Payload): void {
@@ -69,5 +168,17 @@ export class PayloadBuilder {
         const mutable = StaticPayloadBuilder.mutable(1, transmissionTime);
 
         return [prefix, mutable].join('&');
+    }
+
+    private isCaptureDisabled(): boolean {
+        return !this.commState.capture;
+    }
+
+    private isCaptureErrorsDisabled(): boolean {
+        return !this.commState.captureErrors || this.isCaptureDisabled();
+    }
+
+    private isCaptureCrashesDisabled(): boolean {
+        return !this.commState.captureCrashes || this.isCaptureDisabled();
     }
 }

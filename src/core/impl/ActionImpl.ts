@@ -15,7 +15,7 @@
  */
 
 import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
-import { PayloadData } from '../beacon/PayloadData';
+import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
@@ -30,7 +30,7 @@ export class ActionImpl implements Action {
     public endSequenceNumber?: number;
 
     private readonly session: SessionImpl;
-    private readonly beacon: PayloadData;
+    private readonly beacon: PayloadBuilderHelper;
     private readonly timestampProvider: TimestampProvider;
 
     private readonly logger: Logger;
@@ -43,7 +43,7 @@ export class ActionImpl implements Action {
     constructor(
         session: SessionImpl,
         name: string,
-        beacon: PayloadData,
+        beacon: PayloadBuilderHelper,
         private config: PrivacyConfiguration & OpenKitConfiguration,
         timestampProvider: TimestampProvider = defaultTimestampProvider) {
 
@@ -54,7 +54,7 @@ export class ActionImpl implements Action {
         this.beacon = beacon;
         this.startTime = timestampProvider.getCurrentTimestamp();
         this.startSequenceNumber = this.beacon.createSequenceNumber();
-        this.actionId = this.beacon.createId();
+        this.actionId = this.beacon.createActionId();
         this.timestampProvider = timestampProvider;
 
         this.logger.debug(`Created action id=${this.actionId} with name='${name}' in session=${session.sessionId}`);

@@ -17,7 +17,7 @@
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
 import { DataCollectionLevel } from '../../../src';
 import { CaptureMode } from '../../../src/api';
-import { PayloadData } from '../../../src/core/beacon/PayloadData';
+import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
@@ -30,7 +30,7 @@ import { TimestampProvider } from '../../../src/core/provider/TimestampProvider'
 
 describe('ActionImpl', () => {
     const sessionMock = mock(SessionImpl);
-    const payloadDataMock = mock(PayloadData);
+    const payloadDataMock = mock(PayloadBuilderHelper);
     const timestampProviderMock = mock(TimestampProvider);
 
     let state: CommunicationState;
@@ -50,7 +50,7 @@ describe('ActionImpl', () => {
         reset(timestampProviderMock);
 
         when(payloadDataMock.createSequenceNumber()).thenReturn(5, 6, 7);
-        when(payloadDataMock.createId()).thenReturn(3);
+        when(payloadDataMock.createActionId()).thenReturn(3);
         when(timestampProviderMock.getCurrentTimestamp()).thenReturn(1, 2, 3);
         when(sessionMock.state).thenReturn(state);
 

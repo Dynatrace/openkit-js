@@ -15,7 +15,7 @@
  */
 
 import { Action, CrashReportingLevel, DataCollectionLevel, Logger, Session, WebRequestTracer } from '../../api';
-import { PayloadData } from '../beacon/PayloadData';
+import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { removeElement } from '../utils/Utils';
@@ -25,7 +25,7 @@ import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class SessionImpl implements Session {
-    public readonly payloadData: PayloadData;
+    public readonly payloadData: PayloadBuilderHelper;
 
     private readonly openActions: Action[] = [];
     private readonly logger: Logger;
@@ -42,7 +42,7 @@ export class SessionImpl implements Session {
 
         this.sessionId = sessionId;
 
-        this.payloadData = new PayloadData(this.config, payloadBuilder, sessionStartTime);
+        this.payloadData = new PayloadBuilderHelper(payloadBuilder, sessionStartTime);
 
         this.payloadData.startSession();
 
@@ -80,7 +80,7 @@ export class SessionImpl implements Session {
      * @inheritDoc
      */
     public enterAction(actionName: string): Action {
-        if (!this.mayEnterAction()) {
+        if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return defaultNullAction;
         }
 
@@ -95,7 +95,7 @@ export class SessionImpl implements Session {
      * @inheritDoc
      */
     public reportError(name: string, code: number, message: string): void {
-        if (!this.mayReportError()) {
+        if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return;
         }
 
@@ -131,8 +131,7 @@ export class SessionImpl implements Session {
             return;
         }
 
-        if (!this.mayReportCrash() || name.length === 0) {
-
+        if (this.isShutdown() || this.config.crashReportingLevel !== CrashReportingLevel.OptInCrashes || name.length === 0) {
             return;
         }
 
@@ -165,15 +164,6 @@ export class SessionImpl implements Session {
         return this._isShutdown === true;
     }
 
-    private mayReportCrash(): boolean {
-        return !this.isShutdown() &&
-            this.config.crashReportingLevel === CrashReportingLevel.OptInCrashes;
-    }
-
-    private mayEnterAction(): boolean {
-        return !this.isShutdown() && this.config.dataCollectionLevel !== DataCollectionLevel.Off;
-    }
-
     /**
      * Ends the session.
      * If the session is initialized, all data is flushed before shutting the session down.
@@ -191,10 +181,5 @@ export class SessionImpl implements Session {
         this.payloadData.endSession();
 
         this._isShutdown = true;
-    }
-
-    private mayReportError(): boolean {
-        return !this.isShutdown() &&
-            this.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 }

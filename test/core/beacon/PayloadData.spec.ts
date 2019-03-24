@@ -16,8 +16,8 @@
 
 import { instance, mock, when } from 'ts-mockito';
 import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
-import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
-import { PayloadData } from '../../../src/core/beacon/PayloadData';
+import { StaticPayloadBuilder } from '../../../src/core/beacon/StaticPayloadBuilder';
+import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
@@ -56,21 +56,21 @@ describe('PayloadData', () => {
     });
 
     it('should create', () => {
-        expect(new PayloadData(state, '', 5, defaultTimestampProvider)).toBeTruthy();
+        expect(new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider)).toBeTruthy();
     });
 
     it('should create the prefix after creation', () => {
-        const prefixSpy = jest.spyOn(PayloadBuilder, 'prefix');
-        new PayloadData(state, '', 5, defaultTimestampProvider);
+        const prefixSpy = jest.spyOn(StaticPayloadBuilder, 'prefix');
+        new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
 
         expect(prefixSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should fetch the payload after a created session', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
-        const startSessionSpy = jest.spyOn(PayloadBuilder, 'startSession');
+        const startSessionSpy = jest.spyOn(StaticPayloadBuilder, 'startSession');
 
         // when
         payloadData.startSession();
@@ -82,9 +82,9 @@ describe('PayloadData', () => {
 
     it('should fetch the payload after a ending a session', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
-        const endSessionSpy = jest.spyOn(PayloadBuilder, 'endSession');
+        const endSessionSpy = jest.spyOn(StaticPayloadBuilder, 'endSession');
 
         // when
         payloadData.endSession();
@@ -96,9 +96,9 @@ describe('PayloadData', () => {
 
     it('should fetch the payload after adding an action', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
-        const addActionSpy = jest.spyOn(PayloadBuilder, 'action');
+        const addActionSpy = jest.spyOn(StaticPayloadBuilder, 'action');
 
         // when
         payloadData.addAction(actionInstance);
@@ -110,9 +110,9 @@ describe('PayloadData', () => {
 
     it('should fetch the payload after identifying a user', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
-        const identifyUserSpy = jest.spyOn(PayloadBuilder, 'identifyUser');
+        const identifyUserSpy = jest.spyOn(StaticPayloadBuilder, 'identifyUser');
 
         // when
         payloadData.identifyUser('userTag');
@@ -124,9 +124,9 @@ describe('PayloadData', () => {
 
     it('should fetch the payload after reporting a value', () => {
         // given
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
         const spiedPayloads = (payloadData as any).payloadQueue;
-        const reportValueSpy = jest.spyOn(PayloadBuilder, 'reportValue');
+        const reportValueSpy = jest.spyOn(StaticPayloadBuilder, 'reportValue');
 
         // when
         payloadData.reportValue(actionInstance, 'name', 'value');
@@ -137,13 +137,13 @@ describe('PayloadData', () => {
     });
 
     it('should return undefined if getNextPayload is called without any payloads', () => {
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
 
         expect(payloadData.getNextPayload()).toBeUndefined();
     });
 
     it('should not have payloads left if queue is empty', () => {
-        const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+        const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
 
         expect(payloadData.hasPayloadsLeft()).toBeFalsy();
     });
@@ -151,14 +151,14 @@ describe('PayloadData', () => {
     describe('getNextPayload', () => {
 
         it('should return undefined if queue is empty', () => {
-            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
 
             expect(payloadData.getNextPayload()).toBeUndefined();
         });
 
         it('should return a payload', () => {
             // given
-            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
             payloadData.startSession();
 
             // when
@@ -171,8 +171,8 @@ describe('PayloadData', () => {
 
         it('should have created the prefix with mutable part', () => {
             // given
-            const mutableSpy = jest.spyOn(PayloadBuilder, 'mutable');
-            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            const mutableSpy = jest.spyOn(StaticPayloadBuilder, 'mutable');
+            const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
             payloadData.startSession();
 
             // when
@@ -186,7 +186,7 @@ describe('PayloadData', () => {
         it('should split up payloads in multiple if maxBeaconSize is to small', () => {
             // given
             state.updateFromResponse({ valid: true, maxBeaconSizeInKb: 0 });
-            const payloadData = new PayloadData(state, '', 5, defaultTimestampProvider);
+            const payloadData = new PayloadBuilderHelper(state, '', 5, defaultTimestampProvider);
             payloadData.startSession();
             payloadData.identifyUser('userTag');
 

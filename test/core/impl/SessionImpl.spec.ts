@@ -23,7 +23,7 @@ import {
     StatusRequest,
     StatusResponse,
 } from '../../../src/api';
-import { PayloadData } from '../../../src/core/beacon/PayloadData';
+import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
 import { PayloadSender } from '../../../src/core/beacon/PayloadSender';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
@@ -85,7 +85,7 @@ describe('SessionImpl', () => {
         const session: SessionImpl = new SessionImpl(openKit, clientIp, id, sessionStartTime);
 
         const anySession = session as any;
-        const payloadData: PayloadData = anySession.payloadData;
+        const payloadData: PayloadBuilderHelper = anySession.payloadData;
         const payloadSender: PayloadSender = anySession.payloadSender;
         const openActions: Action[] = anySession.openActions;
 

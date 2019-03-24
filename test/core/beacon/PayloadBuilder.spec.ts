@@ -16,7 +16,7 @@
 
 import { instance, mock, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
-import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
+import { StaticPayloadBuilder } from '../../../src/core/beacon/StaticPayloadBuilder';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { EventType } from '../../../src/core/protocol/EventType';
@@ -40,7 +40,7 @@ const payloadExpect = (pairs: {[key: string]: string}, key: string, expected: st
 describe('PayloadBuilder', () => {
     describe('startSession', () => {
         it('should build the correct payload', () => {
-            const payload = PayloadBuilder.startSession(5);
+            const payload = StaticPayloadBuilder.startSession(5);
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.ThreadId]));
@@ -54,7 +54,7 @@ describe('PayloadBuilder', () => {
 
     describe('endSession', () => {
         it('should build the correct payload', () => {
-            const payload = PayloadBuilder.endSession(6000, 50000000);
+            const payload = StaticPayloadBuilder.endSession(6000, 50000000);
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.ThreadId, PayloadKey.Time0]));
@@ -78,7 +78,7 @@ describe('PayloadBuilder', () => {
         const actionInstance = instance(actionMock);
 
         it('should build the correct payload', () => {
-            const payload = PayloadBuilder.action(actionInstance, 123);
+            const payload = StaticPayloadBuilder.action(actionInstance, 123);
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.KeyName, PayloadKey.ThreadId, PayloadKey.ActionId, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.EndSequenceNumber, PayloadKey.Time0, PayloadKey.Time1]));
@@ -112,7 +112,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build the correct payload', () => {
-            const payload = PayloadBuilder.prefix(config, 678, '');
+            const payload = StaticPayloadBuilder.prefix(config, 678, '');
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.ProtocolVersion, PayloadKey.OpenKitVersion, PayloadKey.ApplicationId, PayloadKey.ApplicationName, PayloadKey.PlatformType, PayloadKey.AgentTechnologyType, PayloadKey.VisitorId, PayloadKey.SessionNumber, PayloadKey.ClientIpAddress, PayloadKey.DataCollectionLevel, PayloadKey.CrashReportingLevel]));
@@ -132,7 +132,7 @@ describe('PayloadBuilder', () => {
 
     describe('mutable', () => {
         it('should build the correct payload', () => {
-            const payload = PayloadBuilder.mutable(123456, 765, 98765);
+            const payload = StaticPayloadBuilder.mutable(123456, 765, 98765);
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.SessionStartTime, PayloadKey.Multiplicity, PayloadKey.TransmissionTime]));
@@ -144,7 +144,7 @@ describe('PayloadBuilder', () => {
 
     describe('identifyUser', () => {
         it('should build the correct payload', () => {
-            const payload = PayloadBuilder.identifyUser('Dynatrace Power User', 6, 100, 40);
+            const payload = StaticPayloadBuilder.identifyUser('Dynatrace Power User', 6, 100, 40);
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0]));
@@ -170,7 +170,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct string-reportValue', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My String Value', 'Some String value', 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My String Value', 'Some String value', 6, 600, 100);
 
             const {keys, pairs} = parse(payload);
 
@@ -187,7 +187,7 @@ describe('PayloadBuilder', () => {
 
 
         it('should build a correct double-reportValue', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', 456.321, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', 456.321, 6, 600, 100);
 
             const {keys, pairs} = parse(payload);
 
@@ -203,7 +203,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct double-reportValue with +Inf', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', +Infinity, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', +Infinity, 6, 600, 100);
 
             const {pairs} = parse(payload);
 
@@ -211,7 +211,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct double-reportValue with -Inf', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', -Infinity, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', -Infinity, 6, 600, 100);
 
             const {pairs} = parse(payload);
 
@@ -219,7 +219,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct double-reportValue with NaN', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', NaN, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', NaN, 6, 600, 100);
 
             const {pairs} = parse(payload);
 
@@ -227,7 +227,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct string-reportValue with empty-string', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', '', 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', '', 6, 600, 100);
             const {pairs} = parse(payload);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -235,7 +235,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct string-reportValue with null', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', null, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', null, 6, 600, 100);
             const {pairs} = parse(payload);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -243,7 +243,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build a correct string-reportValue with undefined', () => {
-            const payload = PayloadBuilder.reportValue(action, 'My int value', undefined, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'My int value', undefined, 6, 600, 100);
             const {pairs} = parse(payload);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -253,7 +253,7 @@ describe('PayloadBuilder', () => {
         it('should truncate a key longer than 250 characters', () => {
             const str = str250 + 'z'; // 251 characters
 
-            const payload = PayloadBuilder.reportValue(action, str, '', 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, str, '', 6, 600, 100);
             const {pairs} = parse(payload);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -263,7 +263,7 @@ describe('PayloadBuilder', () => {
         it('should truncate a value longer than 250 characters', () => {
             const str = str250 + 'z'; // 251 characters
 
-            const payload = PayloadBuilder.reportValue(action, 'Key', str, 6, 600, 100);
+            const payload = StaticPayloadBuilder.reportValue(action, 'Key', str, 6, 600, 100);
             const {pairs} = parse(payload);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -273,7 +273,7 @@ describe('PayloadBuilder', () => {
 
     describe('reportCrash', () => {
        it('should build the correct payload', () => {
-          const payload = PayloadBuilder.reportCrash('errorName', 'reason', 'stacktrace', 6, 10, 4000);
+          const payload = StaticPayloadBuilder.reportCrash('errorName', 'reason', 'stacktrace', 6, 10, 4000);
 
           const {keys, pairs} = parse(payload);
           expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.Stacktrace]));
@@ -291,7 +291,7 @@ describe('PayloadBuilder', () => {
 
     describe('reportEvent', () => {
        it('should build the payload', () => {
-           const payload = PayloadBuilder.reportNamedEvent('Name', 5, 8, 5431);
+           const payload = StaticPayloadBuilder.reportNamedEvent('Name', 5, 8, 5431);
            const {keys, pairs} = parse(payload);
 
            expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.KeyName, PayloadKey.ThreadId, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0]));
@@ -307,7 +307,7 @@ describe('PayloadBuilder', () => {
 
     describe('webRequest', () => {
        it('should build the payload with all optional values', () => {
-           const payload = PayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, 1400, 5430, 200);
+           const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, 1400, 5430, 200);
            const {keys, pairs} = parse(payload);
 
            expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
@@ -327,7 +327,7 @@ describe('PayloadBuilder', () => {
            payloadExpect(pairs, PayloadKey.ResponseCode, '200');
        });
        it('should build the payload without optional values', () => {
-           const payload = PayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, -1, -1, -1);
+           const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, -1, -1, -1);
            const {keys, pairs} = parse(payload);
 
            expect(keys).toEqual(arrayContaining([PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,

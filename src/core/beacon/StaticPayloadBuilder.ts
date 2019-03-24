@@ -15,27 +15,26 @@
  */
 
 import { Configuration } from '../config/Configuration';
-import { ActionImpl } from '../impl/ActionImpl';
 import { Payload } from '../payload.v2/Payload';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
 import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
 
-export class PayloadBuilder {
+export class StaticPayloadBuilder {
     public static reportCrash(errorName: string, reason: string, stacktrace: string,
-                              sequenceNumber: number, sessionStartTime: number, currentTime: number): Payload {
-        return PayloadBuilder
+                              sequenceNumber: number, timeSinceSessionStart: number): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.Crash, errorName)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.Time0, currentTime - sessionStartTime)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
             .add(PayloadKey.Reason, reason)
             .add(PayloadKey.Stacktrace, stacktrace)
             .build();
     }
     public static startSession(sequenceNumber: number): Payload {
-        return PayloadBuilder
+        return StaticPayloadBuilder
             .basicEventData(EventType.SessionStart)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
@@ -44,7 +43,7 @@ export class PayloadBuilder {
     }
 
     public static endSession(sequenceNumber: number, duration: number): Payload {
-        return PayloadBuilder
+        return StaticPayloadBuilder
             .basicEventData(EventType.SessionEnd)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
@@ -52,15 +51,22 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static action(action: ActionImpl, sessionStartTime: number): Payload {
-        return PayloadBuilder
-            .basicEventData(EventType.ManualAction, action.name)
-            .add(PayloadKey.ActionId, action.actionId)
+    public static action(
+        name: string,
+        actionId: number,
+        startSequenceNumber: number,
+        endSequenceNumber: number,
+        timeSinceSessionStart: number,
+        duration: number,
+    ): Payload {
+        return StaticPayloadBuilder
+            .basicEventData(EventType.ManualAction, name)
+            .add(PayloadKey.ActionId, actionId)
             .add(PayloadKey.ParentActionId, 0)
-            .add(PayloadKey.StartSequenceNumber, action.startSequenceNumber)
-            .add(PayloadKey.EndSequenceNumber, action.endSequenceNumber!)
-            .add(PayloadKey.Time0, action.startTime - sessionStartTime)
-            .add(PayloadKey.Time1, action.endTime - action.startTime)
+            .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
+            .add(PayloadKey.EndSequenceNumber, endSequenceNumber!)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
+            .add(PayloadKey.Time1, duration)
             .build();
     }
 
@@ -70,7 +76,7 @@ export class PayloadBuilder {
         startSequenceNumber: number,
         timeSinceSessionStart: number,
     ): Payload {
-        return PayloadBuilder
+        return StaticPayloadBuilder
             .basicEventData(EventType.NamedEvent, name)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
@@ -114,20 +120,19 @@ export class PayloadBuilder {
     }
 
     public static reportValue(
-        action: ActionImpl,
+        actionId: number,
         name: string,
         value: number | string | null | undefined,
         sequenceNumber: number,
-        timestamp: number,
-        sessionStartTime: number,
+        timeSinceSessionStart: number,
     ): Payload {
         const eventType = typeof value === 'number' ? EventType.ValueDouble : EventType.ValueString;
 
-        return PayloadBuilder
+        return StaticPayloadBuilder
             .basicEventData(eventType, name)
-            .add(PayloadKey.ParentActionId, action.actionId)
+            .add(PayloadKey.ParentActionId, actionId)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
             .addIfDefinedAndNotNull(PayloadKey.Value, value)
             .build();
     }
@@ -140,7 +145,7 @@ export class PayloadBuilder {
         reason: string,
         errorValue: number,
     ): Payload {
-        return PayloadBuilder
+        return StaticPayloadBuilder
             .basicEventData(EventType.Error, name)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
@@ -153,13 +158,13 @@ export class PayloadBuilder {
     public static identifyUser(
         userTag: string,
         sequenceNumber: number,
-        timestamp: number,
-        sessionStartTime: number): Payload {
-        return PayloadBuilder
+        timeSinceSessionStart: number,
+    ): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.IdentifyUser, userTag)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
             .build();
     }
 
@@ -174,7 +179,7 @@ export class PayloadBuilder {
         bytesReceived: number,
         responseCode: number,
     ): Payload {
-        return PayloadBuilder.basicEventData(EventType.WebRequest, url)
+        return StaticPayloadBuilder.basicEventData(EventType.WebRequest, url)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)

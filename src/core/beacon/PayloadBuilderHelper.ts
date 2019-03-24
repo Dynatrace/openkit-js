@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-import { DataCollectionLevel } from '../../api';
-import { PrivacyConfiguration } from '../config/Configuration';
 import { ActionImpl } from '../impl/ActionImpl';
 import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';
-import { Payload } from '../payload.v2/Payload';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
-import { PayloadBuilder as StaticPayloadBuilder } from './PayloadBuilder';
 
 /**
  * Responsible for creating and holding all payload data for a session.
  */
-export class PayloadData {
+export class PayloadBuilderHelper {
     private readonly sequenceId = new SequenceIdProvider();
     private readonly nextId = new SequenceIdProvider();
-    private readonly timestampProvider: TimestampProvider;
 
     constructor(
-        private readonly config: PrivacyConfiguration,
         public readonly payloadBuilder: PayloadBuilder,
         private readonly sessionStartTime: number,
-        timestampProvider: TimestampProvider = defaultTimestampProvider) {
-        this.timestampProvider = timestampProvider;
+        private readonly timestampProvider: TimestampProvider = defaultTimestampProvider) {
     }
 
-    public createId(): number {
+    public createActionId(): number {
         return this.nextId.next();
     }
 
@@ -49,64 +42,73 @@ export class PayloadData {
     }
 
     public startSession(): void {
-        this.addPayload(StaticPayloadBuilder.startSession(this.createSequenceNumber()));
+        this.payloadBuilder.startSession(this.createSequenceNumber());
     }
 
     public endSession(): void {
-        const duration = this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime;
-        this.addPayload(StaticPayloadBuilder.endSession(this.createSequenceNumber(), duration));
+        this.payloadBuilder.endSession(
+            this.createSequenceNumber(),
+            this.timeSinceSessionStart(),
+        );
     }
 
     public addAction(action: ActionImpl): void {
-        this.addPayload(StaticPayloadBuilder.action(action, this.sessionStartTime));
+        if (action.endSequenceNumber === undefined) {
+            return;
+        }
+
+        this.payloadBuilder.action(
+            action.name,
+            action.actionId,
+            action.startSequenceNumber,
+            action.endSequenceNumber,
+            this.currentTimestamp() - action.startTime,
+            action.endTime - action.startTime,
+        );
     }
 
     public reportValue(action: ActionImpl, name: string, value: number | string | null | undefined): void {
-        this.addPayload(StaticPayloadBuilder.reportValue(
-            action,
+        this.payloadBuilder.reportValue(
             name,
             value,
+            action.actionId,
             this.createSequenceNumber(),
-            this.timestampProvider.getCurrentTimestamp(),
-            this.sessionStartTime));
+            this.timeSinceSessionStart(),
+        );
     }
 
     public identifyUser(userTag: string): void {
-        this.addPayload(StaticPayloadBuilder.identifyUser(
-            userTag,
-            this.createSequenceNumber(),
-            this.timestampProvider.getCurrentTimestamp(),
-            this.sessionStartTime));
+        this.payloadBuilder.identifyUser(userTag, this.createSequenceNumber(), this.timeSinceSessionStart());
     }
 
     public reportError(parentActionId: number, name: string, code: number, message: string): void {
-        this.addPayload(StaticPayloadBuilder.reportError(
+        this.payloadBuilder.reportError(
             name,
-            parentActionId,
-            this.createSequenceNumber(),
-            this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime,
             message,
             code,
-        ));
+            parentActionId,
+            this.createSequenceNumber(),
+            this.timeSinceSessionStart(),
+        );
     }
 
     public reportCrash(errorName: string, reason: string, stacktrace: string): void {
-        this.addPayload(StaticPayloadBuilder.reportCrash(
+        this.payloadBuilder.reportCrash(
             errorName,
             reason,
             stacktrace,
             this.createSequenceNumber(),
-            this.sessionStartTime,
-            this.timestampProvider.getCurrentTimestamp(),
-        ));
+            this.timeSinceSessionStart(),
+        );
     }
 
     public reportEvent(actionId: number, name: string): void {
-        this.addPayload(StaticPayloadBuilder.reportNamedEvent(
-            name,
-            actionId,
-            this.createSequenceNumber(),
-            this.timestampProvider.getCurrentTimestamp() - this.sessionStartTime));
+        this.payloadBuilder.reportNamedEvent(
+          name,
+          actionId,
+          this.createSequenceNumber(),
+          this.timeSinceSessionStart(),
+        );
     }
 
     public currentTimestamp(): number {
@@ -114,24 +116,20 @@ export class PayloadData {
     }
 
     public addWebRequest(webRequest: WebRequestTracerImpl, parentActionId: number): void {
-        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
-            return;
-        }
-
-        this.addPayload(StaticPayloadBuilder.webRequest(
+        this.payloadBuilder.webRequest(
             webRequest.getUrl(),
             parentActionId,
             webRequest.getStartSequenceNumber(),
-            this.currentTimestamp() - webRequest.getStart(),
+            this.timeSinceSessionStart(),
             webRequest.getEndSequenceNumber(),
             webRequest.getDuration(),
             webRequest.getBytesSent(),
             webRequest.getBytesReceived(),
             webRequest.getResponseCode(),
-        ));
+        );
     }
 
-    private addPayload(payload: Payload): void {
-        this.payloadBuilder.push_unchecked(payload);
+    private timeSinceSessionStart(): number {
+        return this.currentTimestamp() - this.sessionStartTime;
     }
 }

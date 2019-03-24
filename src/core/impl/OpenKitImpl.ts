@@ -17,7 +17,7 @@
 import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon.v2/BeaconSender';
 import { CommunicationStateImpl } from '../beacon.v2/CommunicationStateImpl';
-import { PayloadBuilder as StaticPayloadBuilder } from '../beacon/PayloadBuilder';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
 import { Configuration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
