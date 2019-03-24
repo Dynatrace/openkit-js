@@ -15,8 +15,7 @@
  */
 
 import { CaptureMode, StatusResponse } from '../../api';
-import { Configuration } from '../config/Configuration';
-import { State } from './State';
+import { CommunicationState } from './CommunicationState';
 
 const defaultServerId = 1;
 const defaultMaxBeaconSize = 30720; // 30 * 1024
@@ -24,39 +23,22 @@ const defaultMultiplicity = 1;
 const defaultCaptureErrors = CaptureMode.On;
 const defaultCrashReportingMode = CaptureMode.On;
 
-export class StateImpl implements State {
-    public readonly config: Readonly<Configuration>;
-
+export class CommunicationStateImpl implements CommunicationState {
     public serverId: number = defaultServerId;
     public maxBeaconSize: number = defaultMaxBeaconSize;
     public multiplicity: number = defaultMultiplicity;
     public captureCrashes: CaptureMode = defaultCrashReportingMode;
     public captureErrors: CaptureMode = defaultCaptureErrors;
+    public capture: CaptureMode = CaptureMode.On;
 
-    private isCaptureEnabled = true;
     private serverIdLocked = false;
-
-    constructor(config: Readonly<Configuration>) {
-        this.config = config;
-    }
 
     public setServerIdLocked(): void {
         this.serverIdLocked = true;
     }
 
-    public isCaptureDisabled(): boolean {
-        return !this.isCaptureEnabled;
-    }
-
     public disableCapture(): void {
-        this.isCaptureEnabled = false;
-    }
-
-    public clone(): State {
-        const clonedState = new StateImpl(this.config);
-        clonedState.updateFromState(this);
-
-        return clonedState;
+        this.capture = CaptureMode.Off;
     }
 
     public updateFromResponse(response: StatusResponse): void {
@@ -98,12 +80,18 @@ export class StateImpl implements State {
         }
     }
 
-    public updateFromState(state: State): void {
+    public updateFromState(state: CommunicationState): void {
         if (this.serverIdLocked === false) {
             this.serverId = state.serverId;
         }
 
         this.multiplicity = state.multiplicity;
         this.maxBeaconSize = state.maxBeaconSize;
+    }
+
+    public setServerId(id: number): void {
+        if (!this.serverIdLocked) {
+            this.serverId = id;
+        }
     }
 }

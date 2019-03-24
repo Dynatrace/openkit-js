@@ -20,8 +20,8 @@ import { PayloadBuilder } from '../../../src/core/beacon/PayloadBuilder';
 import { PayloadData } from '../../../src/core/beacon/PayloadData';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
-import { State } from '../../../src/core/impl/State';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { defaultTimestampProvider } from '../../../src/core/provider/TimestampProvider';
@@ -49,10 +49,10 @@ when(actionMock.endTime).thenReturn(545);
 const actionInstance = instance(actionMock);
 
 describe('PayloadData', () => {
-    let state: State;
+    let state: CommunicationState;
 
     beforeEach(() => {
-        state = new StateImpl(baseConfiguration);
+        state = new CommunicationStateImpl(baseConfiguration);
     });
 
     it('should create', () => {

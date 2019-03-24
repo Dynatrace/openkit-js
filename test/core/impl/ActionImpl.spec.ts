@@ -22,8 +22,8 @@ import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
-import { State } from '../../../src/core/impl/State';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
@@ -33,7 +33,7 @@ describe('ActionImpl', () => {
     const payloadDataMock = mock(PayloadData);
     const timestampProviderMock = mock(TimestampProvider);
 
-    let state: State;
+    let state: CommunicationState;
     let action: ActionImpl;
     let config: Partial<Configuration>;
 
@@ -43,7 +43,7 @@ describe('ActionImpl', () => {
             dataCollectionLevel: DataCollectionLevel.UserBehavior,
         };
 
-        state = new StateImpl(config as Configuration);
+        state = new CommunicationStateImpl(config as Configuration);
 
         reset(sessionMock);
         reset(payloadDataMock);

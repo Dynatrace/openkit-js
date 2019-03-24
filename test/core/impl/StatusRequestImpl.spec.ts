@@ -16,7 +16,7 @@
 
 import { StatusRequest } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
 import { StatusRequestImpl } from '../../../src/core/impl/StatusRequestImpl';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src/core/PlatformConstants';
 
@@ -48,7 +48,7 @@ describe('StatusRequestImpl', () => {
     });
 
     it('should create the request from a state', () => {
-       const state = new StateImpl({applicationId: '1.2.3'} as Configuration);
+       const state = new CommunicationStateImpl({applicationId: '1.2.3'} as Configuration);
        state.updateFromResponse({valid: true, serverId: 8});
 
        const request = StatusRequestImpl.from(state);

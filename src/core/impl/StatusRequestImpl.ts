@@ -16,12 +16,8 @@
 
 import { StatusRequest } from '../../api';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../PlatformConstants';
-import { State } from './State';
 
 export class StatusRequestImpl implements StatusRequest {
-    public static from(state: State): StatusRequestImpl {
-        return StatusRequestImpl.create(state.config.applicationId, state.serverId);
-    }
 
     public static create(appId: string, serverId: number): StatusRequestImpl {
         return new StatusRequestImpl(

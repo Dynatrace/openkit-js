@@ -20,12 +20,7 @@ import { Configuration } from '../config/Configuration';
 /**
  * Represents the state of the current OpenKit Object.
  */
-export interface State {
-    /**
-     * Readonly reference to the OpenKit configuration
-     */
-    readonly config: Readonly<Configuration>;
-
+export interface CommunicationState {
     /**
      * The server id which should be used for the next request.
      */
@@ -51,17 +46,12 @@ export interface State {
      */
     readonly captureCrashes: CaptureMode;
 
+    readonly capture: CaptureMode;
+
     /**
      * Locks the server id so it can't change.
      */
     setServerIdLocked(): void;
-
-    /**
-     * Update the state with the values from another state.
-     *
-     * @param state The state which properties should be copied.
-     */
-    updateFromState(state: State): void;
 
     /**
      * Update the state with a status response.
@@ -76,12 +66,7 @@ export interface State {
     disableCapture(): void;
 
     /**
-     * Checks if capturing is enabled
+     * setServerId:
      */
-    isCaptureDisabled(): boolean;
-
-    /**
-     * Clones the object. Does not clone whether the server id is locked or not, or if capturing is disabled.
-     */
-    clone(): State;
+    setServerId(id: number): void;
 }

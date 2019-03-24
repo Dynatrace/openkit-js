@@ -32,8 +32,8 @@ import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWeb
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
-import { State } from '../../../src/core/impl/State';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
@@ -54,7 +54,7 @@ describe('SessionImpl', () => {
     let config: Partial<Configuration>;
     let mockCommunicationChannel: CommunicationChannel = mock(StubCommunicationChannel);
     let mockOpenKitImpl = mock(OpenKitImpl);
-    let state: State;
+    let state: CommunicationState;
 
     beforeEach(() => {
         reset(mockCommunicationChannel);
@@ -74,7 +74,7 @@ describe('SessionImpl', () => {
             communicationChannel: communicationChannelInstance,
         };
 
-        state = new StateImpl(config as Configuration);
+        state = new CommunicationStateImpl(config as Configuration);
 
         when(mockOpenKitImpl.state).thenReturn(state);
     });

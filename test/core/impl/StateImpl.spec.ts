@@ -16,8 +16,8 @@
 
 import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
-import { State } from '../../../src/core/impl/State';
-import { StateImpl } from '../../../src/core/impl/StateImpl';
+import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 
@@ -35,10 +35,10 @@ const config: Readonly<Configuration> = {
 };
 
 describe('StateImpl', () => {
-    let state: State;
+    let state: CommunicationState;
 
     beforeEach(() => {
-       state = new StateImpl(config);
+       state = new CommunicationStateImpl(config);
     });
 
     it('should contain default configuration', () => {
@@ -86,7 +86,7 @@ describe('StateImpl', () => {
     });
 
     describe('updateState with another state', () => {
-        const otherState = new StateImpl({} as Configuration);
+        const otherState = new CommunicationStateImpl({} as Configuration);
 
         it('should update the server-id', () => {
             // given

@@ -16,13 +16,13 @@
 
 import { CaptureMode, CommunicationChannel } from '../../api';
 import { Configuration } from '../config/Configuration';
-import { SessionCommunicationProperties } from '../impl/OpenKitImpl';
 import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { Payload } from '../payload.v2/Payload';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
 import { removeElement, timeout } from '../utils/Utils';
+import { CommunicationState } from './CommunicationState';
 
 const DEFAULT_SERVER_ID = 1;
 
@@ -30,7 +30,7 @@ export interface SessionInformation {
     session: SessionImpl;
     initialized: boolean;
     prefix: string;
-    props: SessionCommunicationProperties;
+    props: CommunicationState;
     builder: PayloadBuilder;
 }
 // tslint:disable
@@ -68,14 +68,14 @@ export class BeaconSender {
         }
     }
 
-    public addSession(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, sessionProperties: SessionCommunicationProperties): void {
-        sessionProperties.serverId = this.okSessionId;
+    public addSession(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, state: CommunicationState): void {
+        state.setServerId(this.okSessionId);
 
         this.sessions.push({
             session,
             initialized: false,
             prefix,
-            props: sessionProperties,
+            props: state,
             builder: payloadBuilder,
         });
     }
@@ -94,9 +94,8 @@ export class BeaconSender {
         const response = await this.channel.sendNewSessionRequest(this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.props.serverId));
 
         if (response.valid) {
+            session.props.updateFromResponse(response);
             session.initialized = true;
-            session.props.serverId = response.serverId || session.props.serverId;
-            session.props.isCaptureEnabled = response.captureMode === CaptureMode.Off;
         }
     }
 

@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-export interface SessionCommunicationProperties {
-    serverId: number;
-    isCaptureEnabled: boolean;
-    maxBeaconSize: number;
-}
-
 import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon.v2/BeaconSender';
+import { CommunicationStateImpl } from '../beacon.v2/CommunicationStateImpl';
 import { PayloadBuilder as StaticPayloadBuilder } from '../beacon/PayloadBuilder';
 import { Configuration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
@@ -85,19 +80,15 @@ export class OpenKitImpl implements OpenKit {
             return defaultNullSession;
         }
 
-        const sessionProperties: SessionCommunicationProperties = {
-            serverId: 1,
-            isCaptureEnabled: true,
-            maxBeaconSize: 10240,
-        };
+        const sessionProperties = new CommunicationStateImpl();
 
         const sessionId = this.createSessionId();
         const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
+
         const prefix = StaticPayloadBuilder.prefix(this.config, sessionId, clientIP, sessionStartTime);
-
         const payloadBuilder = new PayloadBuilder(sessionProperties);
-        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.config);
 
+        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.config);
         this.beaconSender.addSession(session, prefix, payloadBuilder, sessionProperties);
 
         return session;

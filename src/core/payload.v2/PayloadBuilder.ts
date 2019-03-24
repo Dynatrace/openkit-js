@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import { CommunicationState } from '../beacon.v2/CommunicationState';
 import { PayloadBuilder as StaticPayloadBuilder } from '../beacon/PayloadBuilder';
-import { SessionCommunicationProperties } from '../impl/OpenKitImpl';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
@@ -24,11 +24,11 @@ export class PayloadBuilder {
     private readonly queue = new PayloadQueue();
 
     constructor(
-        private readonly properties: SessionCommunicationProperties,
+        private readonly commState: CommunicationState,
     ) {}
 
     public reportNamedEvent(name: string, actionId: number, sequenceNumber: number, timeSinceSessionStart: number): void {
-        if (!this.properties.isCaptureEnabled) {
+        if (!this.commState.capture) {
             return;
         }
 
@@ -48,12 +48,12 @@ export class PayloadBuilder {
 
         let payload = this.getCompletePrefix(prefix, transmissionTime);
 
-        let remainingBeaconSize = this.properties.maxBeaconSize - payload.length;
+        let remainingBeaconSize = this.commState.maxBeaconSize - payload.length;
 
         let next: Payload | undefined = this.queue.peek();
         while (next !== undefined && remainingBeaconSize - next.length > 0) {
             payload += '&' + this.queue.pop();
-            remainingBeaconSize = this.properties.maxBeaconSize - payload.length;
+            remainingBeaconSize = this.commState.maxBeaconSize - payload.length;
 
             next = this.queue.peek();
         }
@@ -62,7 +62,7 @@ export class PayloadBuilder {
     }
 
     public getWebRequestTracerTag(actionId: number, sessionNumber: number, sequenceNumber: number, deviceId: string, appId: string): string {
-        return createTag(actionId, sessionNumber, sequenceNumber, this.properties.serverId, deviceId, appId);
+        return createTag(actionId, sessionNumber, sequenceNumber, this.commState.serverId, deviceId, appId);
     }
 
     private getCompletePrefix(prefix: Payload, transmissionTime: number): Payload {
