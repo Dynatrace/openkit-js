@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { ActionImpl } from './ActionImpl';
-import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
+import { ActionImpl } from './ActionImpl';
+import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 /**
  * Responsible for creating and holding all payload data for a session.

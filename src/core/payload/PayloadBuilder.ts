@@ -15,10 +15,10 @@
  */
 
 import { CommunicationState } from '../beacon/CommunicationState';
-import { StaticPayloadBuilder as StaticPayloadBuilder } from './StaticPayloadBuilder';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { combinePayloads, Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from './StaticPayloadBuilder';
 
 export class PayloadBuilder {
     private readonly queue = new PayloadQueue();

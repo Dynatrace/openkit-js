@@ -15,7 +15,6 @@
  */
 
 import { CaptureMode, StatusResponse } from '../../api';
-import { Configuration } from '../config/Configuration';
 
 /**
  * Represents the state of the current OpenKit Object.

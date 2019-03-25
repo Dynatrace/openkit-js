@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-import {
-    Action,
-    CrashReportingLevel,
-    DataCollectionLevel,
-    Logger,
-    LoggerFactory,
-    Session,
-    WebRequestTracer,
-} from '../../api';
-import { PayloadBuilderHelper } from './PayloadBuilderHelper';
+import { Action, CrashReportingLevel, DataCollectionLevel, Logger, Session, WebRequestTracer } from '../../api';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class SessionImpl implements Session {

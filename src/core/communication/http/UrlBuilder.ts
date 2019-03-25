@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { QueryBuilder } from '../../utils/QueryBuilder';
 import { QueryKey } from '../../protocol/QueryKey';
+import { QueryBuilder } from '../../utils/QueryBuilder';
 
 export class UrlBuilder extends QueryBuilder<QueryKey> {
     constructor(private readonly url: string) {
