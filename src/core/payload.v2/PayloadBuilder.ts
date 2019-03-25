@@ -183,7 +183,7 @@ export class PayloadBuilder {
     }
 
     private getCompletePrefix(prefix: Payload, transmissionTime: number): Payload {
-        const mutable = StaticPayloadBuilder.mutable(1, transmissionTime);
+        const mutable = StaticPayloadBuilder.mutable(this.commState.multiplicity, transmissionTime);
 
         return combinePayloads(prefix, mutable);
     }
