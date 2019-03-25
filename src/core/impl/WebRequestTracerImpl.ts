@@ -15,7 +15,7 @@
  */
 
 import { Logger, LoggerFactory, WebRequestTracer } from '../../api';
-import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { protocolVersion } from '../PlatformConstants';
 
 const tagPrefix = 'MT';

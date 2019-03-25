@@ -15,7 +15,7 @@
  */
 
 import { instance, mock, reset, when } from 'ts-mockito';
-import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 

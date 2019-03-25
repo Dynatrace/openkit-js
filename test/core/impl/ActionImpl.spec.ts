@@ -17,7 +17,7 @@
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
 import { DataCollectionLevel } from '../../../src';
 import { CaptureMode } from '../../../src/api';
-import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';

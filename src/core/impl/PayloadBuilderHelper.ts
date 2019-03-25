@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ActionImpl } from '../impl/ActionImpl';
-import { WebRequestTracerImpl } from '../impl/WebRequestTracerImpl';
+import { ActionImpl } from './ActionImpl';
+import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';

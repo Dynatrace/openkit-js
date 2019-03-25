@@ -15,7 +15,7 @@
  */
 
 import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
-import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';

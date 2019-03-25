@@ -23,7 +23,7 @@ import {
     StatusRequest,
     StatusResponse,
 } from '../../../src/api';
-import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { PayloadSender } from '../../../src/core/beacon/PayloadSender';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';

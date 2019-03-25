@@ -23,7 +23,7 @@ import {
     Session,
     WebRequestTracer,
 } from '../../api';
-import { PayloadBuilderHelper } from '../beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { removeElement } from '../utils/Utils';

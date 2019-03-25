@@ -17,7 +17,7 @@
 import { instance, mock, when } from 'ts-mockito';
 import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
 import { StaticPayloadBuilder } from '../../../src/core/beacon/StaticPayloadBuilder';
-import { PayloadBuilderHelper } from '../../../src/core/beacon/PayloadBuilderHelper';
+import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
