@@ -112,7 +112,7 @@ describe('PayloadBuilder', () => {
         });
 
         it('should build the correct payload', () => {
-            const payload = StaticPayloadBuilder.prefix(config, 678, '');
+            const payload = StaticPayloadBuilder.sessionPrefix(config, 678, '');
 
             const {keys, pairs} = parse(payload);
             expect(keys).toEqual(arrayContaining([PayloadKey.ProtocolVersion, PayloadKey.OpenKitVersion, PayloadKey.ApplicationId, PayloadKey.ApplicationName, PayloadKey.PlatformType, PayloadKey.AgentTechnologyType, PayloadKey.VisitorId, PayloadKey.SessionNumber, PayloadKey.ClientIpAddress, PayloadKey.DataCollectionLevel, PayloadKey.CrashReportingLevel]));

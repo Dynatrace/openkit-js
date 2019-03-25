@@ -15,7 +15,7 @@
  */
 
 import { Configuration } from '../config/Configuration';
-import { Payload } from '../payload.v2/Payload';
+import { combinePayloads, Payload } from '../payload.v2/Payload';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
@@ -84,7 +84,7 @@ export class StaticPayloadBuilder {
             .build();
     }
 
-    public static prefix(config: Configuration, sessionId: number, clientIpAddress: string, sessionStartTime: number): Payload {
+    public static applicationWidePrefix(config: Configuration): Payload{
         const {openKit, device, privacy, meta} = config;
 
         return new PayloadQueryBuilder()
@@ -98,9 +98,6 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.AgentTechnologyType, agentTechnologyType)
 
             .add(PayloadKey.VisitorId, openKit.deviceId)
-            .add(PayloadKey.SessionNumber, sessionId)
-            .add(PayloadKey.ClientIpAddress, clientIpAddress)
-            .add(PayloadKey.SessionStartTime, sessionStartTime)
 
             .add(PayloadKey.DataCollectionLevel, privacy.dataCollectionLevel)
             .add(PayloadKey.CrashReportingLevel, privacy.crashReportingLevel)
@@ -112,6 +109,16 @@ export class StaticPayloadBuilder {
             .addIfDefined(PayloadKey.UserLanguage, device.userLanguage)
             .addIfDefined(PayloadKey.Orientation, device.orientation)
             .build();
+    }
+
+    public static sessionPrefix(prefix: Payload, sessionId: number, clientIpAddress: string, sessionStartTime: number): Payload {
+        const sessionPrefix = new PayloadQueryBuilder()
+            .add(PayloadKey.SessionNumber, sessionId)
+            .add(PayloadKey.ClientIpAddress, clientIpAddress)
+            .add(PayloadKey.SessionStartTime, sessionStartTime)
+            .build();
+
+        return combinePayloads(prefix, sessionPrefix);
     }
 
     public static mutable(multiplicity: number, transmissionTime: number): Payload {

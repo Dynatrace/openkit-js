@@ -17,54 +17,71 @@
 import { CommunicationState } from '../beacon.v2/CommunicationState';
 import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
 import { createTag } from '../impl/WebRequestTracerImpl';
-import { Payload } from './Payload';
+import { combinePayloads, Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
 
 export class PayloadBuilder {
     private readonly queue = new PayloadQueue();
 
-    constructor(
-        private readonly commState: CommunicationState,
-    ) {}
+    constructor(private readonly commState: CommunicationState) {}
 
     public reportNamedEvent(name: string, actionId: number, sequenceNumber: number, timeSinceSessionStart: number): void {
         if (this.isCaptureDisabled()) {
             return;
         }
 
-        const payload = StaticPayloadBuilder.reportNamedEvent(name, actionId, sequenceNumber, timeSinceSessionStart);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.reportNamedEvent(name, actionId, sequenceNumber, timeSinceSessionStart),
+        );
     }
 
-    public reportCrash(errorName: string, reason: string, stacktrace: string, startSequenceNumber: number, timeSinceSessionStart: number): void {
+    public reportCrash(
+        errorName: string,
+        reason: string,
+        stacktrace: string,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+    ): void {
         if (this.isCaptureCrashesDisabled()) {
             return;
         }
 
-        const payload = StaticPayloadBuilder.reportCrash(errorName, reason, stacktrace, startSequenceNumber, timeSinceSessionStart);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.reportCrash(errorName, reason, stacktrace, startSequenceNumber, timeSinceSessionStart),
+        );
     }
 
-    public reportError(name: string, reason: string, errorValue: number, parentActionId: number, startSequenceNumber: number, timeSinceSessionStart: number): void {
+    public reportError(
+        name: string,
+        reason: string,
+        errorValue: number,
+        parentActionId: number,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+    ): void {
         if (this.isCaptureErrorsDisabled()) {
             return;
         }
 
-        const payload = StaticPayloadBuilder.reportError(name, parentActionId, startSequenceNumber, timeSinceSessionStart, reason, errorValue);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.reportError(name, parentActionId, startSequenceNumber, timeSinceSessionStart, reason, errorValue),
+        );
     }
 
-    public reportValue(name: string, value: number | string | null | undefined, actionId: number, sequenceNumber: number, timeSinceSessionStart: number): void {
+    public reportValue(
+        name: string,
+        value: number | string | null | undefined,
+        actionId: number,
+        sequenceNumber: number,
+        timeSinceSessionStart: number,
+    ): void {
         if (this.isCaptureDisabled()) {
             return;
         }
 
-        const payload = StaticPayloadBuilder.reportValue(actionId, name, value, sequenceNumber, timeSinceSessionStart);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.reportValue(actionId, name, value, sequenceNumber, timeSinceSessionStart),
+        );
     }
 
     public identifyUser(userTag: string, startSequenceNumber: number, timeSinceSessionStart: number): void {
@@ -72,9 +89,9 @@ export class PayloadBuilder {
             return;
         }
 
-        const payload = StaticPayloadBuilder.identifyUser(userTag, startSequenceNumber, timeSinceSessionStart);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.identifyUser(userTag, startSequenceNumber, timeSinceSessionStart),
+        );
     }
 
     public action(
@@ -89,10 +106,9 @@ export class PayloadBuilder {
             return;
         }
 
-        const payload = StaticPayloadBuilder.action(
-            name, actionId, startSequenceNumber, endSequenceNumber, timeSinceSessionStart, duration);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.action(name, actionId, startSequenceNumber, endSequenceNumber, timeSinceSessionStart, duration),
+        );
     }
 
     public startSession(startSequenceNumber: number): void {
@@ -100,9 +116,9 @@ export class PayloadBuilder {
             return;
         }
 
-        const payload = StaticPayloadBuilder.startSession(startSequenceNumber);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.startSession(startSequenceNumber),
+        );
     }
 
     public endSession(startSequenceNumber: number, duration: number): void {
@@ -110,9 +126,9 @@ export class PayloadBuilder {
             return;
         }
 
-        const payload = StaticPayloadBuilder.endSession(startSequenceNumber, duration);
-
-        this.queue.push(payload);
+        this.queue.push(
+            StaticPayloadBuilder.endSession(startSequenceNumber, duration),
+        );
     }
 
     public webRequest(
@@ -130,10 +146,10 @@ export class PayloadBuilder {
             return;
         }
 
-        const p = StaticPayloadBuilder.webRequest(url, parentActionId, startSequenceNumber, timeSinceSessionStart,
+        const payload = StaticPayloadBuilder.webRequest(url, parentActionId, startSequenceNumber, timeSinceSessionStart,
             endSequenceNumber, duration, bytesSent, bytesReceived, responseCode);
 
-        this.queue.push(p);
+        this.queue.push(payload);
     }
 
     public getNextPayload(prefix: Payload, transmissionTime: number): Payload | undefined {
@@ -156,14 +172,20 @@ export class PayloadBuilder {
         return payload;
     }
 
-    public getWebRequestTracerTag(actionId: number, sessionNumber: number, sequenceNumber: number, deviceId: string, appId: string): string {
+    public getWebRequestTracerTag(
+        actionId: number,
+        sessionNumber: number,
+        sequenceNumber: number,
+        deviceId: string,
+        appId: string,
+    ): string {
         return createTag(actionId, sessionNumber, sequenceNumber, this.commState.serverId, deviceId, appId);
     }
 
     private getCompletePrefix(prefix: Payload, transmissionTime: number): Payload {
         const mutable = StaticPayloadBuilder.mutable(1, transmissionTime);
 
-        return [prefix, mutable].join('&');
+        return combinePayloads(prefix, mutable);
     }
 
     private isCaptureDisabled(): boolean {

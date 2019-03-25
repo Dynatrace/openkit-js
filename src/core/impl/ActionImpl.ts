@@ -65,7 +65,7 @@ export class ActionImpl implements Action {
      * @inheritDoc
      */
     public reportValue(name: string, value: number | string | null | undefined): void {
-        if (!this.mayReportValue()) {
+        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior || this.isActionLeft()) {
             return;
         }
 
@@ -87,7 +87,7 @@ export class ActionImpl implements Action {
      * @inheritDoc
      */
     public reportEvent(name: string): void {
-        if (!this.mayReportEvent()) {
+        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior || this.isActionLeft()) {
             return;
         }
 
@@ -104,7 +104,7 @@ export class ActionImpl implements Action {
      * @inheritDoc
      */
     public reportError(name: string, code: number, message: string): void {
-        if (!this.mayReportError()) {
+        if (this.isActionLeft() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return;
         }
 
@@ -158,25 +158,6 @@ export class ActionImpl implements Action {
         this.session.endAction(this);
 
         return null;
-    }
-
-    private mayReportValue(): boolean {
-        if (this.isActionLeft()) {
-            return false;
-        }
-
-        // We only report values iff DCL = UserBehavior
-        return this.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
-    }
-
-    private mayReportEvent(): boolean {
-        return !this.isActionLeft() &&
-            this.config.dataCollectionLevel === DataCollectionLevel.UserBehavior;
-    }
-
-    private mayReportError(): boolean {
-        return !this.isActionLeft() &&
-            this.config.dataCollectionLevel !== DataCollectionLevel.Off;
     }
 
     private isActionLeft(): boolean {

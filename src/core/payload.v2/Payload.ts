@@ -15,3 +15,7 @@
  */
 
 export type Payload = string;
+
+export const combinePayloads = (p1: Payload, p2: Payload): Payload => {
+    return [p1, p2].join('&');
+};

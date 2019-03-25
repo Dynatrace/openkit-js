@@ -19,6 +19,7 @@ import { BeaconSender } from '../beacon.v2/BeaconSender';
 import { CommunicationStateImpl } from '../beacon.v2/CommunicationStateImpl';
 import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { Payload } from '../payload.v2/Payload';
 import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
@@ -27,6 +28,9 @@ import { defaultTimestampProvider } from '../provider/TimestampProvider';
 import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
 
+const createIdProvider = (dcl: DataCollectionLevel) =>
+    dcl === DataCollectionLevel.UserBehavior ? new SequenceIdProvider() : new SingleIdProvider(1);
+
 /**
  * Implementation of the {@link OpenKit} interface.
  */
@@ -34,6 +38,7 @@ export class OpenKitImpl implements OpenKit {
     private readonly sessionIdProvider: IdProvider;
     private readonly beaconSender: BeaconSender;
     private readonly logger: Logger;
+    private readonly applicationWidePrefix: Payload;
 
     private readonly sessionConfig: PrivacyConfiguration & OpenKitConfiguration;
 
@@ -46,12 +51,11 @@ export class OpenKitImpl implements OpenKit {
     constructor(private readonly config: Configuration) {
         this.logger = config.openKit.loggerFactory.createLogger('OpenKitImpl');
 
-        this.sessionIdProvider = config.privacy.dataCollectionLevel === DataCollectionLevel.UserBehavior ?
-            new SequenceIdProvider() : new SingleIdProvider(1);
+        this.sessionIdProvider = createIdProvider(config.privacy.dataCollectionLevel);
+        this.sessionConfig = {...config.privacy, ...config.openKit};
+        this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(this.config);
 
         this.beaconSender = new BeaconSender(this, config.openKit);
-
-        this.sessionConfig = {...config.privacy, ...config.openKit};
     }
 
     /**
@@ -87,17 +91,16 @@ export class OpenKitImpl implements OpenKit {
             return defaultNullSession;
         }
 
-        const sessionProperties = new CommunicationStateImpl();
-
         const sessionId = this.createSessionId();
         const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
+        const sessionPrefix = StaticPayloadBuilder.sessionPrefix(this.applicationWidePrefix, sessionId, clientIP, sessionStartTime);
 
-        const prefix = StaticPayloadBuilder.prefix(this.config, sessionId, clientIP, sessionStartTime);
+        const sessionProperties = new CommunicationStateImpl();
         const payloadBuilder = new PayloadBuilder(sessionProperties);
 
-        const session = new SessionImpl(
-            sessionId, payloadBuilder, sessionStartTime, this.sessionConfig);
-        this.beaconSender.addSession(session, prefix, payloadBuilder, sessionProperties);
+        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.sessionConfig);
+
+        this.beaconSender.addSession(session, sessionPrefix, payloadBuilder, sessionProperties);
 
         return session;
     }
