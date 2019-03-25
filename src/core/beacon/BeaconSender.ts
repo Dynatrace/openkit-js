@@ -35,7 +35,9 @@ export class BeaconSender {
     private readonly sendingStrategies: SendingStrategy[];
     private readonly channel: CommunicationChannel;
 
-    private okSessionId: number = defaultServerId;
+    private readonly timestampProvider = defaultTimestampProvider;
+
+    private okServerId: number = defaultServerId;
 
     private isShutdown = false;
     private initialized = false;
@@ -53,13 +55,13 @@ export class BeaconSender {
 
     public async init(): Promise<void> {
         const response =
-            await this.channel.sendStatusRequest(this.beaconUrl, StatusRequestImpl.create(this.appId, this.okSessionId));
+            await this.channel.sendStatusRequest(this.beaconUrl, StatusRequestImpl.create(this.appId, this.okServerId));
 
         if (response.valid) {
             this.initialized = true;
-            this.okSessionId = response.serverId || defaultServerId;
+            this.okServerId = response.serverId || defaultServerId;
 
-            this.cache.getEntries().forEach((entry) => entry.communicationState.setServerId(this.okSessionId));
+            this.cache.getEntries().forEach((entry) => entry.communicationState.setServerId(this.okServerId));
 
             this.sendingStrategies.forEach((strategy) => strategy.init(this, this.cache));
         }
@@ -68,7 +70,7 @@ export class BeaconSender {
     }
 
     public addSession(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, state: CommunicationState): void {
-        state.setServerId(this.okSessionId);
+        state.setServerId(this.okServerId);
 
         const entry = this.cache.register(session, prefix, payloadBuilder, state);
 
@@ -80,7 +82,7 @@ export class BeaconSender {
     }
 
     public async shutdown(): Promise<void> {
-        if (!this.isInitialized() || this.isShutdown) {
+        if (this.isShutdown) {
             return;
         }
         this.isShutdown = true;
@@ -111,50 +113,52 @@ export class BeaconSender {
     }
 
     private async sendNewSessionRequests(): Promise<void> {
-        const newSessions = this.cache.getAllUninitializedSessions();
+        const entries = this.cache.getAllUninitializedSessions();
 
-        for (const session of newSessions) {
-            await this.sendNewSessionRequest(session);
+        for (const entry of entries) {
+            await this.sendNewSessionRequest(entry);
         }
     }
 
-    private async sendNewSessionRequest(session: CacheEntry): Promise<void> {
+    private async sendNewSessionRequest(entry: CacheEntry): Promise<void> {
         const response = await this.channel.sendNewSessionRequest(
-            this.beaconUrl, StatusRequestImpl.create(this.appId, session.communicationState.serverId),
+            this.beaconUrl, StatusRequestImpl.create(this.appId, entry.communicationState.serverId),
         );
 
         if (response.valid) {
-            session.communicationState.updateFromResponse(response);
-            session.communicationState.setServerIdLocked();
-            session.initialized = true;
+            entry.communicationState.updateFromResponse(response);
+            entry.communicationState.setServerIdLocked();
+            entry.initialized = true;
         }
     }
 
     private async finishSessions(): Promise<void> {
-        const sessionsToFinish = this.cache.getAllClosedSessions();
+        const entries = this.cache.getAllClosedSessions();
 
-        for (const session of sessionsToFinish) {
-            await this.sendPayload(session);
+        for (const entry of entries) {
+            await this.sendPayload(entry);
 
-            this.cache.unregister(session);
+            this.cache.unregister(entry);
         }
     }
 
     private async sendPayloadData(): Promise<void> {
-        const openSessions = this.cache.getAllInitializedSessions();
+        const entries = this.cache.getAllInitializedSessions();
 
-        for (const session of openSessions) {
-            await this.sendPayload(session);
+        for (const entry of entries) {
+            await this.sendPayload(entry);
         }
     }
 
-    private async sendPayload(session: CacheEntry): Promise<void> {
+    private async sendPayload(entry: CacheEntry): Promise<void> {
         let payload: Payload | undefined;
         // tslint:disable-next-line
-        while (payload = session.builder.getNextPayload(session.prefix, defaultTimestampProvider.getCurrentTimestamp())) {
-            const request = StatusRequestImpl.create(this.appId, session.communicationState.serverId);
+        while (payload = entry.builder.getNextPayload(entry.prefix, this.timestampProvider.getCurrentTimestamp())) {
+            const request = StatusRequestImpl.create(this.appId, entry.communicationState.serverId);
 
-            await this.channel.sendPayloadData(this.beaconUrl, request, payload);
+            const response = await this.channel.sendPayloadData(this.beaconUrl, request, payload);
+
+            entry.communicationState.updateFromResponse(response);
         }
     }
 }

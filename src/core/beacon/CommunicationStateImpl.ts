@@ -80,15 +80,6 @@ export class CommunicationStateImpl implements CommunicationState {
         }
     }
 
-    public updateFromState(state: CommunicationState): void {
-        if (this.serverIdLocked === false) {
-            this.serverId = state.serverId;
-        }
-
-        this.multiplicity = state.multiplicity;
-        this.maxBeaconSize = state.maxBeaconSize;
-    }
-
     public setServerId(id: number): void {
         if (!this.serverIdLocked) {
             this.serverId = id;

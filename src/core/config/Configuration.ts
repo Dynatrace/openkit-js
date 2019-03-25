@@ -56,8 +56,8 @@ export interface OpenKitConfiguration {
 }
 
 export interface Configuration {
-    openKit: OpenKitConfiguration;
-    privacy: PrivacyConfiguration;
-    device: Partial<DeviceMetadata>;
-    meta: Partial<ApplicationMetadata>;
+    readonly openKit: OpenKitConfiguration;
+    readonly privacy: PrivacyConfiguration;
+    readonly device: Partial<DeviceMetadata>;
+    readonly meta: Partial<ApplicationMetadata>;
 }
