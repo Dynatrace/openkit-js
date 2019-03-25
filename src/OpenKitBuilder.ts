@@ -312,8 +312,6 @@ export class OpenKitBuilder {
     }
 
     private buildConfig(): Readonly<Configuration> {
-        // this.withCommunicationChannel(new TestCommunicationChannel());
-
         const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
 
         const communicationChannel = this.communicationChannel ||

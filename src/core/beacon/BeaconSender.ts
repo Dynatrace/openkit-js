@@ -28,10 +28,14 @@ import { BeaconCacheImpl, CacheEntry } from './strategies/BeaconCache';
 import { SendingStrategy } from './strategies/SendingStrategy';
 
 export class BeaconSender {
+    private readonly cache = new BeaconCacheImpl();
+
+    private readonly appId: string;
+    private readonly beaconUrl: string;
+    private readonly sendingStrategies: SendingStrategy[];
     private readonly channel: CommunicationChannel;
 
     private okSessionId: number = defaultServerId;
-    private readonly cache = new BeaconCacheImpl();
 
     private isShutdown = false;
     private initialized = false;
@@ -39,16 +43,17 @@ export class BeaconSender {
 
     constructor(
         private readonly openKit: OpenKitImpl,
-        private readonly config: OpenKitConfiguration,
-        private readonly sendingStrategies: SendingStrategy[],
+        config: OpenKitConfiguration,
     ) {
+        this.appId = config.applicationId;
+        this.beaconUrl = config.beaconURL;
         this.channel = config.communicationChannel;
+        this.sendingStrategies = config.sendingStrategies;
     }
 
     public async init(): Promise<void> {
         const response =
-            await this.channel.sendStatusRequest(
-                this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, this.okSessionId));
+            await this.channel.sendStatusRequest(this.beaconUrl, StatusRequestImpl.create(this.appId, this.okSessionId));
 
         if (response.valid) {
             this.initialized = true;
@@ -115,7 +120,7 @@ export class BeaconSender {
 
     private async sendNewSessionRequest(session: CacheEntry): Promise<void> {
         const response = await this.channel.sendNewSessionRequest(
-            this.config.beaconURL, StatusRequestImpl.create(this.config.applicationId, session.communicationState.serverId),
+            this.beaconUrl, StatusRequestImpl.create(this.appId, session.communicationState.serverId),
         );
 
         if (response.valid) {
@@ -147,9 +152,9 @@ export class BeaconSender {
         let payload: Payload | undefined;
         // tslint:disable-next-line
         while (payload = session.builder.getNextPayload(session.prefix, defaultTimestampProvider.getCurrentTimestamp())) {
-            const request = StatusRequestImpl.create(this.config.applicationId, session.communicationState.serverId);
+            const request = StatusRequestImpl.create(this.appId, session.communicationState.serverId);
 
-            await this.channel.sendPayloadData(this.config.beaconURL, request, payload);
+            await this.channel.sendPayloadData(this.beaconUrl, request, payload);
         }
     }
 }
