@@ -74,7 +74,7 @@ export class WebRequestTracerImpl implements WebRequestTracer {
         this.startTime = payload.currentTimestamp();
 
         this.tag =
-            payload.payloadBuilder.getWebRequestTracerTag(actionId, sessionNumber, this.startSequenceNumber, deviceId, appId);
+            payload.getWebRequestTracerTag(actionId, sessionNumber, this.startSequenceNumber, deviceId, appId);
 
         this.logger.debug('create');
     }

@@ -18,7 +18,7 @@ import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { ActionImpl } from './ActionImpl';
-import { WebRequestTracerImpl } from './WebRequestTracerImpl';
+import { createTag, WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 /**
  * Responsible for creating and holding all payload data for a session.
@@ -127,6 +127,16 @@ export class PayloadBuilderHelper {
             webRequest.getBytesReceived(),
             webRequest.getResponseCode(),
         );
+    }
+
+    public getWebRequestTracerTag(
+        actionId: number,
+        sessionNumber: number,
+        sequenceNumber: number,
+        deviceId: string,
+        appId: string,
+    ): string {
+        return this.payloadBuilder.getWebRequestTracerTag(actionId, sessionNumber, sequenceNumber, deviceId, appId);
     }
 
     private timeSinceSessionStart(): number {

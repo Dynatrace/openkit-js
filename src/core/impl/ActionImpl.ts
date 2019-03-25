@@ -17,7 +17,6 @@
 import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
-import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { isFinite } from '../utils/Utils';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
 import { PayloadBuilderHelper } from './PayloadBuilderHelper';
@@ -25,15 +24,9 @@ import { SessionImpl } from './SessionImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
 export class ActionImpl implements Action {
-    public readonly name: string;
-    public readonly startTime: number;
     public readonly startSequenceNumber: number;
     public readonly actionId: number;
     public endSequenceNumber?: number;
-
-    private readonly session: SessionImpl;
-    private readonly beacon: PayloadBuilderHelper;
-    private readonly timestampProvider: TimestampProvider;
 
     private readonly logger: Logger;
 
@@ -43,19 +36,14 @@ export class ActionImpl implements Action {
     }
 
     constructor(
-        session: SessionImpl,
-        name: string,
-        beacon: PayloadBuilderHelper,
-        private config: PrivacyConfiguration & OpenKitConfiguration,
-        timestampProvider: TimestampProvider = defaultTimestampProvider,
+        public readonly name: string,
+        public readonly startTime: number,
+        private readonly session: SessionImpl,
+        private readonly payloadBuilder: PayloadBuilderHelper,
+        private readonly config: PrivacyConfiguration & OpenKitConfiguration,
     ) {
-        this.session = session;
-        this.name = name;
-        this.beacon = beacon;
-        this.startTime = timestampProvider.getCurrentTimestamp();
-        this.startSequenceNumber = this.beacon.createSequenceNumber();
-        this.actionId = this.beacon.createActionId();
-        this.timestampProvider = timestampProvider;
+        this.startSequenceNumber = this.payloadBuilder.createSequenceNumber();
+        this.actionId = this.payloadBuilder.createActionId();
 
         this.logger = config.loggerFactory.createLogger(`ActionImpl (sessionId=${session.sessionId}, actionId=${this.actionId})`);
 
@@ -86,7 +74,7 @@ export class ActionImpl implements Action {
 
         this.logger.debug('reportValue', {name, value});
 
-        this.beacon.reportValue(this, name, value);
+        this.payloadBuilder.reportValue(this, name, value);
     }
 
     /**
@@ -106,7 +94,7 @@ export class ActionImpl implements Action {
 
         this.logger.debug('reportEvent', {name});
 
-        this.beacon.reportEvent(this.actionId, name);
+        this.payloadBuilder.reportEvent(this.actionId, name);
     }
 
     /**
@@ -133,7 +121,7 @@ export class ActionImpl implements Action {
 
         this.logger.debug('reportError', {name, code, message});
 
-        this.beacon.reportError(this.actionId, name, code, String(message));
+        this.payloadBuilder.reportError(this.actionId, name, code, String(message));
     }
 
     public traceWebRequest(url: string): WebRequestTracer {
@@ -154,7 +142,7 @@ export class ActionImpl implements Action {
         const {deviceId, applicationId, loggerFactory } = this.config;
 
         return new WebRequestTracerImpl(
-            this.beacon,
+            this.payloadBuilder,
             this.actionId,
             url,
             loggerFactory,
@@ -170,9 +158,9 @@ export class ActionImpl implements Action {
             return null;
         }
 
-        this.endSequenceNumber = this.beacon.createSequenceNumber();
-        this._endTime = this.beacon.currentTimestamp();
-        this.beacon.addAction(this);
+        this.endSequenceNumber = this.payloadBuilder.createSequenceNumber();
+        this._endTime = this.payloadBuilder.currentTimestamp();
+        this.payloadBuilder.addAction(this);
         this.session.endAction(this);
 
         this.logger.debug('leaveAction');

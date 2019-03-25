@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
+import { defaultNullWebRequestTracer } from '../../../../src/core/impl/null/NullWebRequestTracer';
 
 describe('NullWebRequestTracer', () => {
     it('should return itself on setBytesReceived', () => {

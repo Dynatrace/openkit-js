@@ -93,7 +93,12 @@ export class SessionImpl implements Session {
 
         this.logger.debug('enterAction', {actionName});
 
-        const action = new ActionImpl(this, actionName, this.payloadData, this.config);
+        const action = new ActionImpl(
+            actionName,
+            this.payloadData.currentTimestamp(),
+            this,
+            this.payloadData,
+            this.config);
         this.openActions.push(action);
         return action;
     }

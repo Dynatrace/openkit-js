@@ -21,3 +21,5 @@ export class TimestampProvider {
 }
 
 export const defaultTimestampProvider = new TimestampProvider();
+
+export const now = (): number => defaultTimestampProvider.getCurrentTimestamp();
