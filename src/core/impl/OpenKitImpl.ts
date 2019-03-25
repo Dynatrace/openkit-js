@@ -55,7 +55,7 @@ export class OpenKitImpl implements OpenKit {
         this.sessionConfig = {...config.privacy, ...config.openKit};
         this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(this.config);
 
-        this.beaconSender = new BeaconSender(this, config.openKit);
+        this.beaconSender = new BeaconSender(this, config.openKit, config.openKit.sendingStrategies);
     }
 
     /**

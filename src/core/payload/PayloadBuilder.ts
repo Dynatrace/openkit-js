@@ -20,8 +20,13 @@ import { combinePayloads, Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
 import { StaticPayloadBuilder as StaticPayloadBuilder } from './StaticPayloadBuilder';
 
+export interface PayloadBuilderListener {
+    added(payload: Payload): void;
+}
+
 export class PayloadBuilder {
     private readonly queue = new PayloadQueue();
+    private readonly listeners: PayloadBuilderListener[] = [];
 
     constructor(private readonly commState: CommunicationState) {}
 
@@ -30,7 +35,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.reportNamedEvent(name, actionId, sequenceNumber, timeSinceSessionStart),
         );
     }
@@ -46,7 +51,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.reportCrash(errorName, reason, stacktrace, startSequenceNumber, timeSinceSessionStart),
         );
     }
@@ -63,7 +68,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.reportError(name, parentActionId, startSequenceNumber, timeSinceSessionStart, reason, errorValue),
         );
     }
@@ -79,7 +84,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.reportValue(actionId, name, value, sequenceNumber, timeSinceSessionStart),
         );
     }
@@ -89,7 +94,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.identifyUser(userTag, startSequenceNumber, timeSinceSessionStart),
         );
     }
@@ -106,7 +111,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.action(name, actionId, startSequenceNumber, endSequenceNumber, timeSinceSessionStart, duration),
         );
     }
@@ -116,7 +121,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.startSession(startSequenceNumber),
         );
     }
@@ -126,7 +131,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this.queue.push(
+        this.push(
             StaticPayloadBuilder.endSession(startSequenceNumber, duration),
         );
     }
@@ -149,7 +154,7 @@ export class PayloadBuilder {
         const payload = StaticPayloadBuilder.webRequest(url, parentActionId, startSequenceNumber, timeSinceSessionStart,
             endSequenceNumber, duration, bytesSent, bytesReceived, responseCode);
 
-        this.queue.push(payload);
+        this.push(payload);
     }
 
     public getNextPayload(prefix: Payload, transmissionTime: number): Payload | undefined {
@@ -182,6 +187,10 @@ export class PayloadBuilder {
         return createTag(actionId, sessionNumber, sequenceNumber, this.commState.serverId, deviceId, appId);
     }
 
+    public register(listener: PayloadBuilderListener): void {
+        this.listeners.push(listener);
+    }
+
     private getCompletePrefix(prefix: Payload, transmissionTime: number): Payload {
         const mutable = StaticPayloadBuilder.mutable(this.commState.multiplicity, transmissionTime);
 
@@ -198,5 +207,13 @@ export class PayloadBuilder {
 
     private isCaptureCrashesDisabled(): boolean {
         return !this.commState.captureCrashes || this.isCaptureDisabled();
+    }
+
+    private push(payload: Payload): void {
+        this.queue.push(payload);
+
+        this.listeners.forEach(
+            (listener) => listener.added(payload),
+        );
     }
 }

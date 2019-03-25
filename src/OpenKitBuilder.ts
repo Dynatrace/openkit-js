@@ -27,6 +27,10 @@ import {
     StatusRequest,
     StatusResponse,
 } from './api';
+import { FlushLeftoversStrategy } from './core/beacon/strategies/FlushLeftoversStrategy';
+import { ImmediateSendingStrategy } from './core/beacon/strategies/ImmediateSendingStrategy';
+import { IntervalSendingStrategy } from './core/beacon/strategies/IntervalSendingStrategy';
+import { SendingStrategy } from './core/beacon/strategies/SendingStrategy';
 import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
 import { Configuration } from './core/config/Configuration';
@@ -68,7 +72,6 @@ export class OpenKitBuilder {
     private userLanguage?: string;
     private screenWidth?: number;
     private screenHeight?: number;
-    private screenDensity?: number;
     private orientation?: Orientation;
 
     /**
@@ -323,6 +326,8 @@ export class OpenKitBuilder {
 
         // user does not allow data tracking
         const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random);
+        const sendingStrategies = getContextBasedSendingStrategies();
+
         return {
             openKit: {
                 beaconURL: this.beaconUrl,
@@ -331,6 +336,7 @@ export class OpenKitBuilder {
                 communicationChannel,
                 random,
                 loggerFactory,
+                sendingStrategies,
             },
 
             privacy: {
@@ -372,32 +378,12 @@ const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: R
     return id;
 };
 
-// tslint:disable
-class TestCommunicationChannel implements CommunicationChannel {
+const isNodeJs = (): boolean => typeof process !== 'undefined' && process.release && process.release.name === 'node';
 
-    private static async getValidStatusResponse(...args: any[]): Promise<StatusResponse> {
-        console.warn(...args);
-
-        await timeout(100);
-
-        const r: StatusResponse = {
-            valid: true,
-            serverId: new DefaultRandomNumberProvider().nextPositiveInteger() % 20 + 5,
-        };
-
-        return r;
+const getContextBasedSendingStrategies = (): SendingStrategy[] => {
+    if (isNodeJs()) {
+        return [new IntervalSendingStrategy()];
+    } else {
+        return [new ImmediateSendingStrategy()];
     }
-
-    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return TestCommunicationChannel.getValidStatusResponse('new session request', url, request);
-    }
-
-    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
-        return TestCommunicationChannel.getValidStatusResponse('payload data', url, request, query);
-    }
-
-    public sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return TestCommunicationChannel.getValidStatusResponse('status request', url, request);
-    }
-}
-// tslint:enable
+};

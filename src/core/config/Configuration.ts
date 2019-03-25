@@ -22,6 +22,7 @@ import {
     Orientation,
     RandomNumberProvider,
 } from '../../api';
+import { SendingStrategy } from '../beacon/strategies/SendingStrategy';
 
 export interface PrivacyConfiguration {
     readonly dataCollectionLevel: DataCollectionLevel;
@@ -48,6 +49,7 @@ export interface OpenKitConfiguration {
     readonly applicationId: string;
     readonly deviceId: string;
 
+    readonly sendingStrategies: SendingStrategy[];
     readonly communicationChannel: CommunicationChannel;
     readonly loggerFactory: LoggerFactory;
     readonly random: RandomNumberProvider;
