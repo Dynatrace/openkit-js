@@ -20,7 +20,14 @@ import { EventType } from '../../protocol/EventType';
 import { CacheEntry } from './BeaconCache';
 import { FlushLeftoversStrategy } from './FlushLeftoversStrategy';
 
+const defaultFlushEventTypes = [EventType.Crash, EventType.Error, EventType.ManualAction, EventType.IdentifyUser,
+    EventType.SessionStart, EventType.SessionEnd, EventType.WebRequest];
+
 export class ImmediateSendingStrategy extends FlushLeftoversStrategy implements PayloadBuilderListener {
+
+    constructor(private flushEventTypes: EventType[] = defaultFlushEventTypes) {
+        super();
+    }
 
     public afterInit(): void {
         this.flush();
@@ -33,19 +40,16 @@ export class ImmediateSendingStrategy extends FlushLeftoversStrategy implements 
 
         const et = getEventType(payload);
 
-        switch (et) {
-            case EventType.Crash:
-            case EventType.Error:
-            case EventType.ManualAction:
-            case EventType.IdentifyUser:
-            case EventType.SessionStart:
-            case EventType.SessionEnd:
-            case EventType.WebRequest:
-                this.flush();
+        if (et && this.shouldFlush(et)) {
+            this.flush();
         }
     }
 
     public entryAdded(entry: CacheEntry): void {
         entry.builder.register(this);
+    }
+
+    private shouldFlush(eventType: EventType): boolean {
+        return this.flushEventTypes.indexOf(eventType) !== -1;
     }
 }
