@@ -153,7 +153,7 @@ export class ActionImpl implements Action {
         this.logger.debug(`Leaving action id=${this.actionId}`);
 
         this.endSequenceNumber = this.beacon.createSequenceNumber();
-        this._endTime = this.timestampProvider.getCurrentTimestamp();
+        this._endTime = this.beacon.currentTimestamp();
         this.beacon.addAction(this);
         this.session.endAction(this);
 

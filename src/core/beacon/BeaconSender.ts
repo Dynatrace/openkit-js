@@ -21,11 +21,12 @@ import { SessionImpl } from '../impl/SessionImpl';
 import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
+import { defaultServerId } from '../PlatformConstants';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
 import { removeElement, timeout } from '../utils/Utils';
 import { CommunicationState } from './CommunicationState';
 
-const DEFAULT_SERVER_ID = 1;
+const defaultLoopTimeout = 1000;
 
 export interface SessionInformation {
     session: SessionImpl;
@@ -34,11 +35,12 @@ export interface SessionInformation {
     props: CommunicationState;
     builder: PayloadBuilder;
 }
+
 export class BeaconSender {
     private readonly channel: CommunicationChannel;
 
     private sessions: SessionInformation[] = [];
-    private okSessionId: number = DEFAULT_SERVER_ID;
+    private okSessionId: number = defaultServerId;
 
     private isShutdown = false;
     private initialized = false;
@@ -57,7 +59,7 @@ export class BeaconSender {
 
         if (response.valid) {
             this.initialized = true;
-            this.okSessionId = response.serverId || DEFAULT_SERVER_ID;
+            this.okSessionId = response.serverId || defaultServerId;
 
             this.sessions.forEach((s) => s.props.setServerId(this.okSessionId));
 
@@ -113,7 +115,7 @@ export class BeaconSender {
             await this.finishSessions();
             await this.sendPayloadData();
 
-            await timeout(1000);
+            await timeout(defaultLoopTimeout);
         }
     }
 

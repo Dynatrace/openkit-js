@@ -34,3 +34,5 @@ export const platformTypeOpenKit = 1;
  * The OpenKit-JavaScript agent technology type constant.
  */
 export const agentTechnologyType = 'okjs';
+
+export const defaultServerId = 1;

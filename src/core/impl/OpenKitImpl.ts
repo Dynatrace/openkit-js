@@ -17,10 +17,10 @@
 import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
-import { StaticPayloadBuilder as StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';

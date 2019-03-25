@@ -62,7 +62,7 @@ export class PayloadBuilderHelper {
             action.actionId,
             action.startSequenceNumber,
             action.endSequenceNumber,
-            this.currentTimestamp() - action.startTime,
+            action.startTime - this.sessionStartTime,
             action.endTime - action.startTime,
         );
     }

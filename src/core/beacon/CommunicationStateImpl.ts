@@ -15,9 +15,9 @@
  */
 
 import { CaptureMode, StatusResponse } from '../../api';
+import { defaultServerId } from '../PlatformConstants';
 import { CommunicationState } from './CommunicationState';
 
-const defaultServerId = 1;
 const defaultMaxBeaconSize = 30720; // 30 * 1024
 const defaultMultiplicity = 1;
 const defaultCaptureErrors = CaptureMode.On;
