@@ -16,6 +16,7 @@
 
 import { Action, CrashReportingLevel, DataCollectionLevel, Logger, Session, WebRequestTracer } from '../../api';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { validationFailed } from '../logging/LoggingUtils';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
@@ -38,21 +39,25 @@ export class SessionImpl implements Session {
         sessionStartTime: number,
         private readonly config: PrivacyConfiguration & OpenKitConfiguration,
     ) {
-        this.logger = config.loggerFactory.createLogger('SessionImpl');
-
         this.sessionId = sessionId;
-
         this.payloadData = new PayloadBuilderHelper(payloadBuilder, sessionStartTime);
-
         this.payloadData.startSession();
 
-        this.logger.debug(`Created Session id=${sessionId}`);
+        this.logger = config.loggerFactory.createLogger(`SessionImpl (sessionId=${this.sessionId})`);
+        this.logger.debug('created');
     }
 
     /**
      * @inheritDoc
      */
     public end(): void {
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off || this.isShutdown()) {
+            // We only send the end-session event if the user enabled monitoring.
+            return;
+        }
+
+        this.logger.debug('end');
+
         this.endSession();
     }
 
@@ -61,18 +66,20 @@ export class SessionImpl implements Session {
      */
     public identifyUser(userTag: string): void {
         // Only capture userTag if we track everything.
-        if (this.isShutdown() ||
-            this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+        if (this.isShutdown() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
 
             return;
         }
 
         // Only allow non-empty strings as userTag
         if (typeof userTag !== 'string' || userTag.length === 0) {
+            validationFailed(this.logger, 'identifyUser', 'userTag must be a non empty string');
+
             return;
         }
 
-        this.logger.debug(`Identify User ${userTag} in session`, this.sessionId);
+        this.logger.debug('identifyUser', {userTag});
+
         this.payloadData.identifyUser(userTag);
     }
 
@@ -84,10 +91,10 @@ export class SessionImpl implements Session {
             return defaultNullAction;
         }
 
+        this.logger.debug('enterAction', {actionName});
+
         const action = new ActionImpl(this, actionName, this.payloadData, this.config);
-
         this.openActions.push(action);
-
         return action;
     }
 
@@ -96,27 +103,27 @@ export class SessionImpl implements Session {
      */
     public reportError(name: string, code: number, message: string): void {
         if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid name', name);
+            validationFailed(this.logger, 'reportError', 'Name must be a non empty string', {name});
+
             return;
         }
 
-        if (typeof code !== 'number') {
-            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid error code', name);
+        if (!isFinite(code)) {
+            validationFailed(this.logger, 'reportError', 'Code must be a finite number', {code});
+
             return;
         }
 
-        this.logger.debug('reportError', `session id=${this.sessionId}`, {name, code, message});
+        this.logger.debug('reportError', {name, code, message});
 
         this.payloadData.reportError(0, name, code, String(message));
     }
 
-    /**
-     * @inheritDoc
-     */
     public endAction(action: Action): void {
         removeElement(this.openActions, action);
     }
@@ -125,33 +132,35 @@ export class SessionImpl implements Session {
      * @inheritDoc
      */
     public reportCrash(name: string, message: string, stacktrace: string): void {
-        if (typeof name !== 'string') {
-            this.logger.warn('reportCrash', 'name is not a string', name);
+        if (this.isShutdown() || this.config.crashReportingLevel !== CrashReportingLevel.OptInCrashes) {
 
             return;
         }
 
-        if (this.isShutdown() || this.config.crashReportingLevel !== CrashReportingLevel.OptInCrashes || name.length === 0) {
+        if (typeof name !== 'string' || name.length === 0) {
+            validationFailed(this.logger, 'reportCrash', 'name must be a non empty string', {name});
+
             return;
         }
 
-        this.logger.debug('reportCrash', {name, reason: message, stacktrace});
+        this.logger.debug('reportCrash', {name, message, stacktrace});
 
         this.payloadData.reportCrash(name, String(message), String(stacktrace));
     }
 
     public traceWebRequest(url: string): WebRequestTracer {
+        if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+
+            return defaultNullWebRequestTracer;
+        }
+
         if (typeof url !== 'string' || url.length === 0) {
+            validationFailed(this.logger, 'traceWebRequest', 'url must be a non empty string', {url});
+
             return defaultNullWebRequestTracer;
         }
 
-        if (this.isShutdown()) {
-            return defaultNullWebRequestTracer;
-        }
-
-        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
-            return defaultNullWebRequestTracer;
-        }
+        this.logger.debug('traceWebRequest', {url});
 
         const { deviceId, applicationId, loggerFactory } = this.config;
 
@@ -169,17 +178,10 @@ export class SessionImpl implements Session {
      * If the session is initialized, all data is flushed before shutting the session down.
      */
     private endSession(): void {
-        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
-            // We only send the end-session event if the user enabled monitoring.
-            return;
-        }
+        this._isShutdown = true;
 
-        this.logger.debug(`Ending Session (${this.sessionId})`);
-
-        this.openActions.slice(0).forEach((action) => action.leaveAction());
+        this.openActions.splice(0).forEach((action) => action.leaveAction());
 
         this.payloadData.endSession();
-
-        this._isShutdown = true;
     }
 }

@@ -19,6 +19,7 @@ import { BeaconSender } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
 import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { validationFailed } from '../logging/LoggingUtils';
 import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { StaticPayloadBuilder as StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
@@ -69,6 +70,8 @@ export class OpenKitImpl implements OpenKit {
      * If an invalid response is sent back, we shutdown.
      */
     public async initialize(): Promise<void> {
+        this.logger.debug('initialize');
+
         this.beaconSender.init();
     }
 
@@ -79,9 +82,9 @@ export class OpenKitImpl implements OpenKit {
         if (this.isShutdown) {
             return;
         }
-
-        this.logger.debug('Shutting down');
         this.isShutdown = true;
+
+        this.logger.debug('shutdown');
 
         this.beaconSender.shutdown();
     }
@@ -94,8 +97,12 @@ export class OpenKitImpl implements OpenKit {
         // activity is recorded.
 
         if (this.isShutdown) {
+            validationFailed(this.logger, 'createSession', 'OpenKit is already shutdown');
+
             return defaultNullSession;
         }
+
+        this.logger.debug('createSession', {clientIP});
 
         const sessionId = this.createSessionId();
         const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();

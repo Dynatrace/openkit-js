@@ -17,7 +17,7 @@
 import { StatusRequest } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { CommunicationStateImpl } from '../../../src/core/beacon/CommunicationStateImpl';
-import { StatusRequestImpl } from '../../../src/core/impl/StatusRequestImpl';
+import { StatusRequestImpl } from '../../../src/core/beacon/StatusRequestImpl';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src/core/PlatformConstants';
 
 describe('StatusRequestImpl', () => {

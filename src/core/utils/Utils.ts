@@ -44,4 +44,4 @@ export const timeout = (milliseconds: number): Promise<void> => {
    });
 };
 
-export const isFinite = (n: number) => n !== Infinity && n !== -Infinity && !isNaN(n);
+export const isFinite = (n: number) => typeof n === 'number' && n !== Infinity && n !== -Infinity && !isNaN(n);

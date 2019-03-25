@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel } from '../../api';
+import { CommunicationChannel, Logger } from '../../api';
 import { OpenKitConfiguration } from '../config/Configuration';
 import { OpenKitImpl } from '../impl/OpenKitImpl';
-import { SessionImpl } from '../impl/SessionImpl';
-import { StatusRequestImpl } from '../impl/StatusRequestImpl';
 import { Payload } from '../payload/Payload';
-import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { defaultServerId } from '../PlatformConstants';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
-import { CommunicationState } from './CommunicationState';
+import { StatusRequestImpl } from './StatusRequestImpl';
 import { BeaconCacheImpl, CacheEntry } from './strategies/BeaconCache';
 import { SendingStrategy } from './strategies/SendingStrategy';
 
@@ -34,6 +31,8 @@ export class BeaconSender {
     private readonly channel: CommunicationChannel;
 
     private readonly timestampProvider = defaultTimestampProvider;
+
+    private readonly logger: Logger;
 
     private okServerId: number = defaultServerId;
 
@@ -50,9 +49,13 @@ export class BeaconSender {
         this.beaconUrl = config.beaconURL;
         this.channel = config.communicationChannel;
         this.sendingStrategies = config.sendingStrategies;
+
+        this.logger = config.loggerFactory.createLogger('BeaconSender');
     }
 
     public async init(): Promise<void> {
+        this.logger.debug('init');
+
         const response =
             await this.channel.sendStatusRequest(this.beaconUrl, StatusRequestImpl.create(this.appId, this.okServerId));
 
@@ -83,6 +86,8 @@ export class BeaconSender {
             return;
         }
         this.isShutdown = true;
+
+        this.logger.debug('shutdown');
 
         // Close all sessions
         this.cache.getEntries().forEach((entry) => entry.session.end());

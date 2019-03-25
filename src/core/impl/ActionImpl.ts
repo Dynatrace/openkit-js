@@ -16,7 +16,9 @@
 
 import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { validationFailed } from '../logging/LoggingUtils';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
+import { isFinite } from '../utils/Utils';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
 import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { SessionImpl } from './SessionImpl';
@@ -47,9 +49,6 @@ export class ActionImpl implements Action {
         private config: PrivacyConfiguration & OpenKitConfiguration,
         timestampProvider: TimestampProvider = defaultTimestampProvider,
     ) {
-
-        this.logger = config.loggerFactory.createLogger('ActionImpl');
-
         this.session = session;
         this.name = name;
         this.beacon = beacon;
@@ -58,27 +57,34 @@ export class ActionImpl implements Action {
         this.actionId = this.beacon.createActionId();
         this.timestampProvider = timestampProvider;
 
-        this.logger.debug(`Created action id=${this.actionId} with name='${name}' in session=${session.sessionId}`);
+        this.logger = config.loggerFactory.createLogger(`ActionImpl (sessionId=${session.sessionId}, actionId=${this.actionId})`);
+
+        this.logger.debug('created', {name});
     }
 
     /**
      * @inheritDoc
      */
     public reportValue(name: string, value: number | string | null | undefined): void {
-        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior || this.isActionLeft()) {
+        if (this.isActionLeft() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
+            validationFailed(this.logger, 'reportValue', 'Name must be a non empty string', {name});
+
             return;
         }
 
         const type = typeof value;
         if (type !== 'string' && type !== 'number' && value !== null && value !== undefined) {
+            validationFailed(this.logger, 'reportValue', 'Value is not a valid type', {value});
+
             return;
         }
 
-        this.logger.debug(`Report value in action id=${this.actionId} with name=${name} and value=${value}`);
+        this.logger.debug('reportValue', {name, value});
 
         this.beacon.reportValue(this, name, value);
     }
@@ -87,15 +93,18 @@ export class ActionImpl implements Action {
      * @inheritDoc
      */
     public reportEvent(name: string): void {
-        if (this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior || this.isActionLeft()) {
+        if (this.isActionLeft() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-           return;
+            validationFailed(this.logger, 'reportEvent', 'Name must be a non empty string', {name});
+
+            return;
         }
 
-        this.logger.debug(`reportEvent, action id=${this.actionId}`, {name});
+        this.logger.debug('reportEvent', {name});
 
         this.beacon.reportEvent(this.actionId, name);
     }
@@ -104,33 +113,43 @@ export class ActionImpl implements Action {
      * @inheritDoc
      */
     public reportError(name: string, code: number, message: string): void {
-        if (this.isActionLeft() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+        if (this.isActionLeft()) {
+            validationFailed(this.logger, 'reportError', 'Action is already closed');
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid name', name);
+            validationFailed(this.logger, 'reportError', 'Name must be a non empty string', {name});
+
             return;
         }
 
-        if (typeof code !== 'number') {
-            this.logger.warn('reportError', `action id=${this.actionId}`, 'Invalid error code', name);
+        if (!isFinite(code)) {
+            validationFailed(this.logger, 'reportError', 'Code must be a finite number', {code});
+
             return;
         }
 
-        this.logger.debug('reportError', `action id=${this.actionId}`, {name, code, message});
+        this.logger.debug('reportError', {name, code, message});
 
         this.beacon.reportError(this.actionId, name, code, String(message));
     }
 
     public traceWebRequest(url: string): WebRequestTracer {
-        if (typeof url !== 'string' || url.length === 0) {
+        if (this.isActionLeft()) {
+            validationFailed(this.logger, 'traceWebRequest', 'Action is already closed');
+
             return defaultNullWebRequestTracer;
         }
 
-        if (this.isActionLeft()) {
+        if (typeof url !== 'string' || url.length === 0) {
+            validationFailed(this.logger, 'traceWebRequest', 'Url must be a non empty string', {url});
+
             return defaultNullWebRequestTracer;
         }
+
+        this.logger.debug('traceWebRequest', {url});
 
         const {deviceId, applicationId, loggerFactory } = this.config;
 
@@ -147,15 +166,16 @@ export class ActionImpl implements Action {
 
     public leaveAction(): null {
         if (this.isActionLeft()) {
+
             return null;
         }
-
-        this.logger.debug(`Leaving action id=${this.actionId}`);
 
         this.endSequenceNumber = this.beacon.createSequenceNumber();
         this._endTime = this.beacon.currentTimestamp();
         this.beacon.addAction(this);
         this.session.endAction(this);
+
+        this.logger.debug('leaveAction');
 
         return null;
     }
