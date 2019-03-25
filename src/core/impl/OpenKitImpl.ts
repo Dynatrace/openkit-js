@@ -17,6 +17,7 @@
 import { DataCollectionLevel, InitCallback, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
+import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
@@ -44,6 +45,7 @@ export class OpenKitImpl implements OpenKit {
     private readonly applicationWidePrefix: Payload;
 
     private readonly sessionConfig: PrivacyConfiguration & OpenKitConfiguration;
+    private readonly cache = new BeaconCacheImpl();
 
     private initialized = false;
     private isShutdown = false;
@@ -59,7 +61,7 @@ export class OpenKitImpl implements OpenKit {
         this.sessionConfig = {...config.privacy, ...config.openKit};
         this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(this.config);
 
-        this.beaconSender = new BeaconSender(this, config.openKit);
+        this.beaconSender = new BeaconSender(this, this.cache, config.openKit);
     }
 
     /**
@@ -99,12 +101,14 @@ export class OpenKitImpl implements OpenKit {
         const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
         const sessionPrefix = StaticPayloadBuilder.sessionPrefix(this.applicationWidePrefix, sessionId, clientIP, sessionStartTime);
 
-        const sessionProperties = new CommunicationStateImpl();
-        const payloadBuilder = new PayloadBuilder(sessionProperties);
+        const communicationState = new CommunicationStateImpl();
+        const payloadBuilder = new PayloadBuilder(communicationState);
 
         const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.sessionConfig);
 
-        this.beaconSender.addSession(session, sessionPrefix, payloadBuilder, sessionProperties);
+        const cacheEntry = this.cache.register(session, sessionPrefix, payloadBuilder, communicationState);
+
+        this.beaconSender.sessionAdded(cacheEntry);
 
         return session;
     }

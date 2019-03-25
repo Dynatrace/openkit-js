@@ -28,8 +28,6 @@ import { BeaconCacheImpl, CacheEntry } from './strategies/BeaconCache';
 import { SendingStrategy } from './strategies/SendingStrategy';
 
 export class BeaconSender {
-    private readonly cache = new BeaconCacheImpl();
-
     private readonly appId: string;
     private readonly beaconUrl: string;
     private readonly sendingStrategies: SendingStrategy[];
@@ -45,6 +43,7 @@ export class BeaconSender {
 
     constructor(
         private readonly openKit: OpenKitImpl,
+        private readonly cache: BeaconCacheImpl,
         config: OpenKitConfiguration,
     ) {
         this.appId = config.applicationId;
@@ -69,12 +68,10 @@ export class BeaconSender {
         this.openKit.notifyInitialized(response.valid);
     }
 
-    public addSession(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, state: CommunicationState): void {
-        state.setServerId(this.okServerId);
+    public sessionAdded(entry: CacheEntry): void {
+        entry.communicationState.setServerId(this.okServerId);
 
-        const entry = this.cache.register(session, prefix, payloadBuilder, state);
-
-        this.sendingStrategies.forEach((strategies) => strategies.entryAdded(entry));
+        this.sendingStrategies.forEach((strategy) => strategy.entryAdded(entry));
     }
 
     public isInitialized(): boolean {
