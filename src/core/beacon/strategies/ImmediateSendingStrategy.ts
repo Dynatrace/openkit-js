@@ -40,6 +40,7 @@ export class ImmediateSendingStrategy extends FlushLeftoversStrategy implements 
             case EventType.IdentifyUser:
             case EventType.SessionStart:
             case EventType.SessionEnd:
+            case EventType.WebRequest:
                 this.flush();
         }
     }

@@ -93,8 +93,6 @@ export class BeaconSender {
         for (const strategy of this.sendingStrategies) {
             await strategy.shutdown();
         }
-
-        this.cache.clear();
     }
 
     public async flush(): Promise<void> {

@@ -120,7 +120,7 @@ export class PayloadBuilderHelper {
             webRequest.getUrl(),
             parentActionId,
             webRequest.getStartSequenceNumber(),
-            this.timeSinceSessionStart(),
+            webRequest.getStart() - this.sessionStartTime,
             webRequest.getEndSequenceNumber(),
             webRequest.getDuration(),
             webRequest.getBytesSent(),
