@@ -57,9 +57,9 @@ export class BeaconSender {
             this.cache.getEntries().forEach((entry) => entry.communicationState.setServerId(this.okSessionId));
 
             this.sendingStrategies.forEach((strategy) => strategy.init(this, this.cache));
-        } else {
-            this.shutdown();
         }
+
+        this.openKit.notifyInitialized(response.valid);
     }
 
     public addSession(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, state: CommunicationState): void {
@@ -82,9 +82,6 @@ export class BeaconSender {
 
         // Close all sessions
         this.cache.getEntries().forEach((entry) => entry.session.end());
-
-        // Mark OpenKit to no accept sessions anymore
-        this.openKit.shutdown();
 
         for (const strategy of this.sendingStrategies) {
             await strategy.shutdown();

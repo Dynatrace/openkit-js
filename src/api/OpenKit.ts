@@ -24,11 +24,29 @@ export type InitCallback = (success: boolean) => void;
  */
 export interface OpenKit {
     /**
+     * Checks if OpenKit has successfully initialized.
+     *
+     * @return true if OpenKit initialized successfully, false otherwise.
+     */
+    isInitialized(): boolean;
+
+    /**
      * Creates a new session and returns its instance.
      *
      * @param clientIp the client's ip
      */
     createSession(clientIp?: string): Session;
+
+    /**
+     * Waits for the initialization of OpenKit and calls the callback after it finished, or the timeout runs out.
+     * If not timeout is passed, it runs until the initialization finished.<br>
+     * If OpenKit already initialized, the callback runs synchronously.<br>
+     * The callback is called with {@code true} iff OpenKit initialized successfully and is not Shutdown.
+     *
+     * @param callback The callback which is executed after initialization, or after the timeout runs out.
+     * @param timeout The timeout for the initialization
+     */
+    waitForInit(callback: InitCallback, timeout?: number): void;
 
     /**
      * Shutdown OpenKit.

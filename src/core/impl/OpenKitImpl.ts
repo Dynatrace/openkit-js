@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
+import { DataCollectionLevel, InitCallback, Logger, OpenKit, Session } from '../../api';
 import { BeaconSender } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
@@ -25,6 +25,7 @@ import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
+import { CallbackHolder } from '../utils/CallbackHolder';
 import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
 
@@ -35,6 +36,8 @@ const createIdProvider = (dcl: DataCollectionLevel) =>
  * Implementation of the {@link OpenKit} interface.
  */
 export class OpenKitImpl implements OpenKit {
+    private readonly initCallbackHolder = new CallbackHolder<boolean>();
+
     private readonly sessionIdProvider: IdProvider;
     private readonly beaconSender: BeaconSender;
     private readonly logger: Logger;
@@ -42,6 +45,7 @@ export class OpenKitImpl implements OpenKit {
 
     private readonly sessionConfig: PrivacyConfiguration & OpenKitConfiguration;
 
+    private initialized = false;
     private isShutdown = false;
 
     /**
@@ -103,6 +107,45 @@ export class OpenKitImpl implements OpenKit {
         this.beaconSender.addSession(session, sessionPrefix, payloadBuilder, sessionProperties);
 
         return session;
+    }
+
+    public notifyInitialized(successfully: boolean): void {
+        this.initialized = true;
+        this.initCallbackHolder.resolve(successfully);
+
+        if (!successfully) {
+            this.shutdown();
+        }
+    }
+
+    public isInitialized(): boolean {
+        return this.initialized;
+    }
+
+    public waitForInit(callback: InitCallback, timeout?: number): void {
+        // Trivial case: We already initialized and the waitForInit comes after initialization. We can resolve
+        // immediately and synchronous.
+        if (this.initialized) {
+            callback(this.initialized);
+            return;
+        }
+
+        if (timeout !== undefined) {
+            // Init with timeout: We setup a timeout which resolves after X milliseconds. If the callback triggers,
+            // we clear it, and check if the callback is still in the callback holder. If it is, it was not resolved,
+            // so we can execute it, and remove it from the callback holder, so it can't get executed again.
+            const wait = setTimeout(() => {
+                if (this.initCallbackHolder.contains(callback)) {
+                    clearTimeout(wait);
+                    callback(false);
+                    this.initCallbackHolder.remove(callback);
+                }
+            }, timeout);
+        }
+
+        // Add the callback to the initCallbackHolder, so it gets resolved once the initialization fails or succeeds,
+        // for both cases with and without timeout.
+        this.initCallbackHolder.add(callback);
     }
 
     private createSessionId(): number {
