@@ -15,11 +15,11 @@
  */
 
 import { Configuration } from '../config/Configuration';
-import { combinePayloads, Payload } from '../payload.v2/Payload';
+import { combinePayloads, Payload } from './Payload';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
-import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
+import { PayloadQueryBuilder } from '../utils/PayloadQueryBuilder';
 
 export class StaticPayloadBuilder {
     public static reportCrash(errorName: string, reason: string, stacktrace: string,

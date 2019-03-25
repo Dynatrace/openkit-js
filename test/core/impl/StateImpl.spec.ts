@@ -16,8 +16,8 @@
 
 import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
 import { Configuration } from '../../../src/core/config/Configuration';
-import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
-import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
+import { CommunicationState } from '../../../src/core/beacon/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon/CommunicationStateImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 

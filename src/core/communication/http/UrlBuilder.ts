@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { QueryBuilder } from '../../beacon/builder/QueryBuilder';
+import { QueryBuilder } from '../../utils/QueryBuilder';
 import { QueryKey } from '../../protocol/QueryKey';
 
 export class UrlBuilder extends QueryBuilder<QueryKey> {

@@ -16,7 +16,7 @@
 
 import { instance, mock, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
-import { StaticPayloadBuilder } from '../../../src/core/beacon/StaticPayloadBuilder';
+import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { EventType } from '../../../src/core/protocol/EventType';

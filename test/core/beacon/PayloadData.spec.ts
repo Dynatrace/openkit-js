@@ -16,12 +16,12 @@
 
 import { instance, mock, when } from 'ts-mockito';
 import { CommunicationChannel, CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
-import { StaticPayloadBuilder } from '../../../src/core/beacon/StaticPayloadBuilder';
+import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
 import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { Configuration } from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
-import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
-import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
+import { CommunicationState } from '../../../src/core/beacon/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon/CommunicationStateImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { defaultTimestampProvider } from '../../../src/core/provider/TimestampProvider';

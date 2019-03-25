@@ -25,7 +25,7 @@ import {
 } from '../../api';
 import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
-import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
+import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';

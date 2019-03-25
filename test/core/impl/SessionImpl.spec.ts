@@ -32,8 +32,8 @@ import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWeb
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
-import { CommunicationState } from '../../../src/core/beacon.v2/CommunicationState';
-import { CommunicationStateImpl } from '../../../src/core/beacon.v2/CommunicationStateImpl';
+import { CommunicationState } from '../../../src/core/beacon/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon/CommunicationStateImpl';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 

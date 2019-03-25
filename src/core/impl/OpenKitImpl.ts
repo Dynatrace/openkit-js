@@ -15,12 +15,12 @@
  */
 
 import { DataCollectionLevel, Logger, OpenKit, Session } from '../../api';
-import { BeaconSender } from '../beacon.v2/BeaconSender';
-import { CommunicationStateImpl } from '../beacon.v2/CommunicationStateImpl';
-import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
+import { BeaconSender } from '../beacon/BeaconSender';
+import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
-import { Payload } from '../payload.v2/Payload';
-import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
+import { Payload } from '../payload/Payload';
+import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';

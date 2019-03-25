@@ -16,7 +16,7 @@
 
 import { ActionImpl } from './ActionImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
-import { PayloadBuilder } from '../payload.v2/PayloadBuilder';
+import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 

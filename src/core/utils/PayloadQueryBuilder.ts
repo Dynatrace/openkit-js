@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PayloadKey } from '../../protocol/PayloadKey';
+import { PayloadKey } from '../protocol/PayloadKey';
 import { QueryBuilder } from './QueryBuilder';
 
 export class PayloadQueryBuilder extends QueryBuilder<PayloadKey> {}

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { CommunicationState } from '../beacon.v2/CommunicationState';
-import { StaticPayloadBuilder as StaticPayloadBuilder } from '../beacon/StaticPayloadBuilder';
+import { CommunicationState } from '../beacon/CommunicationState';
+import { StaticPayloadBuilder as StaticPayloadBuilder } from './StaticPayloadBuilder';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { combinePayloads, Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
