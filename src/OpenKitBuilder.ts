@@ -24,10 +24,7 @@ import {
     OpenKit,
     Orientation,
     RandomNumberProvider,
-    StatusRequest,
-    StatusResponse,
 } from './api';
-import { FlushLeftoversStrategy } from './core/beacon/strategies/FlushLeftoversStrategy';
 import { ImmediateSendingStrategy } from './core/beacon/strategies/ImmediateSendingStrategy';
 import { IntervalSendingStrategy } from './core/beacon/strategies/IntervalSendingStrategy';
 import { SendingStrategy } from './core/beacon/strategies/SendingStrategy';
@@ -37,7 +34,7 @@ import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
-import { isFinite, timeout, truncate } from './core/utils/Utils';
+import { isFinite, truncate } from './core/utils/Utils';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
