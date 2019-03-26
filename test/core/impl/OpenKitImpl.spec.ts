@@ -60,13 +60,9 @@ describe('OpenKitImpl', () => {
         when(comm.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
         when(comm.sendPayloadData(anything(), anything(), anything())).thenResolve({valid: true});
 
-        init();
+        ok = new OpenKitImpl(config);
     });
     
-    const init = () => {
-        ok = new OpenKitImpl(config);
-    };
-
     describe('initial', () => {
         it('should be not initialized and not shutdown', () => {
             expect(ok.isInitialized()).toBeFalsy();

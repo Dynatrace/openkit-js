@@ -161,9 +161,9 @@ describe('OpenKitBuilder', () => {
             builder.withLogLevel(LogLevel.Warn);
 
             const config = builder.getConfig();
-            const factory = config.openKit.loggerFactory as any;
+            const factory = config.openKit.loggerFactory as ConsoleLoggerFactory;
 
-            expect(factory.logLevel).toBe(LogLevel.Warn);
+            expect(factory._logLevel).toBe(LogLevel.Warn);
         });
     });
 
