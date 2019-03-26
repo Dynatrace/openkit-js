@@ -14,238 +14,192 @@
  * limitations under the License.
  */
 
-import { instance, mock, reset, when } from 'ts-mockito';
+import { anything, instance, mock, reset, when } from 'ts-mockito';
 import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
-import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
+import { createTag, WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
+import { defaultNullLogger } from '../../../src/core/logging/NullLogger';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
 describe('WebRequestTracerImpl', () => {
-    let payloadDataMock = mock(PayloadBuilderHelper);
+    let payloadBuilder = mock(PayloadBuilderHelper);
+    let webRequest: WebRequestTracerImpl;
 
     beforeEach(() => {
-        reset(payloadDataMock);
+        reset(payloadBuilder);
 
-        when(payloadDataMock.createSequenceNumber()).thenReturn(6, 9);
-        when(payloadDataMock.currentTimestamp()).thenReturn(500, 800, 1400);
+        when(payloadBuilder.createSequenceNumber()).thenReturn(6, 9);
+        when(payloadBuilder.currentTimestamp()).thenReturn(500, 800, 1400);
+        when(payloadBuilder.getWebRequestTracerTag(anything(), anything(), anything(), anything(), anything()))
+            .thenCall((actionId: number,sessionNumber: number, sequenceNumber: number,deviceId: string,appId: string,) =>
+                createTag(actionId, sessionNumber, sequenceNumber, 5, deviceId, appId),
+        );
+
+        webRequest = new WebRequestTracerImpl(
+            instance(payloadBuilder),
+            70,
+            'https://example.com',
+            defaultNullLoggerFactory,
+            '123456',
+            '1234-65434-86123',
+            98765,
+        );
     });
-
-    const build = () => new WebRequestTracerImpl(
-        instance(payloadDataMock),
-        70,
-        'https://example.com',
-        defaultNullLoggerFactory,
-        5,
-        '123456',
-        '1234-65434-86123',
-        98765
-    );
 
     describe('setBytesReceived', () => {
         it('should not update bytesReceived if the request is stopped', () => {
             // given
-            const wr = build();
-            wr.setBytesReceived(1000);
-            wr.stop();
+            webRequest.setBytesReceived(1000);
+            webRequest.stop();
 
             // when
-            wr.setBytesReceived(2000);
+            webRequest.setBytesReceived(2000);
 
             // then
-            expect(wr.getBytesReceived()).toBe(1000);
+            expect(webRequest.getBytesReceived()).toBe(1000);
         });
 
         it('should have a default value of -1', () => {
-            // given
-            const wr = build();
-
             // then
-            expect(wr.getBytesReceived()).toBe(-1);
+            expect(webRequest.getBytesReceived()).toBe(-1);
         });
 
         it('should update bytesReceived if the request is not stopped', () => {
-            // given
-            const wr = build();
-
             // when
-            wr.setBytesReceived(400);
+            webRequest.setBytesReceived(400);
 
             // then
-            expect(wr.getBytesReceived()).toBe(400);
+            expect(webRequest.getBytesReceived()).toBe(400);
         });
     });
 
     describe('setBytesSent', () => {
         it('should not update bytesSent if the request is stopped', () => {
             // given
-            const wr = build();
-            wr.setBytesSent(1000);
-            wr.stop();
+            webRequest.setBytesSent(1000);
+            webRequest.stop();
 
             // when
-            wr.setBytesSent(2000);
+            webRequest.setBytesSent(2000);
 
             // then
-            expect(wr.getBytesSent()).toBe(1000);
+            expect(webRequest.getBytesSent()).toBe(1000);
         });
 
         it('should have a default value of -1', () => {
-            // given
-            const wr = build();
-
             // then
-            expect(wr.getBytesSent()).toBe(-1);
+            expect(webRequest.getBytesSent()).toBe(-1);
         });
 
         it('should update bytesSent if the request is not stopped', () => {
-            // given
-            const wr = build();
-
             // when
-            wr.setBytesSent(400);
+            webRequest.setBytesSent(400);
 
             // then
-            expect(wr.getBytesSent()).toBe(400);
+            expect(webRequest.getBytesSent()).toBe(400);
         });
     });
 
     describe('start', () => {
        it('should have the sequenceNumber and startTime without call of start()', () => {
-            // given, when
-           const wr = build();
-
            // then
-           expect(wr.getStart()).toBe(500);
-           expect(wr.getStartSequenceNumber()).toBe(6);
+           expect(webRequest.getStart()).toBe(500);
+           expect(webRequest.getStartSequenceNumber()).toBe(6);
        });
 
        it('should set update startTime after a call to start()', () => {
-           // given
-           const wr = build();
-
            // when
-           wr.start();
+           webRequest.start();
 
            // then
-           expect(wr.getStart()).toBe(800);
-           expect(wr.getStartSequenceNumber()).toBe(6);
+           expect(webRequest.getStart()).toBe(800);
+           expect(webRequest.getStartSequenceNumber()).toBe(6);
        });
 
-       it('should not update startTime if the webrequest is stopped', () => {
-           // given
-           const wr = build();
-
+       it('should not update startTime if the webRequest is stopped', () => {
            // when
-           wr.stop();
-           wr.start();
+           webRequest.stop();
+           webRequest.start();
 
            // then
-           expect(wr.getStart()).toBe(500);
-           expect(wr.getStartSequenceNumber()).toBe(6);
+           expect(webRequest.getStart()).toBe(500);
+           expect(webRequest.getStartSequenceNumber()).toBe(6);
        });
 
        it('should return itself as return value', () => {
-           // given
-           const wr = build();
-
            // then
-           expect(wr.start()).toBe(wr);
+           expect(webRequest.start()).toBe(webRequest);
        });
     });
 
     describe('stop', () => {
         it('should set the duration after stop has been called', () => {
-            // given
-            const wr = build();
-
             // when
-            wr.stop();
+            webRequest.stop();
 
             // then
-            expect(wr.getDuration()).toBe(300);
+            expect(webRequest.getDuration()).toBe(300);
         });
 
         it('should set the end sequence number after stop has been called', () => {
-            // given
-            const wr = build();
-
             // when
-            wr.stop();
+            webRequest.stop();
 
             // then
-            expect(wr.getEndSequenceNumber()).toBe(9);
+            expect(webRequest.getEndSequenceNumber()).toBe(9);
         });
 
         it('should set the response code if one is passed', () => {
-            // given
-            const wr = build();
-
             // when
-            wr.stop(404);
+            webRequest.stop(404);
 
             // then
-            expect(wr.getResponseCode()).toBe(404);
+            expect(webRequest.getResponseCode()).toBe(404);
         });
 
         it('should have a default response code of -1', () => {
-            // given
-            const wr = build();
-
             // when
-            wr.stop();
+            webRequest.stop();
 
             // then
-            expect(wr.getResponseCode()).toBe(-1);
+            expect(webRequest.getResponseCode()).toBe(-1);
         });
 
         it('should not update the response code if it is already stopped', () => {
             // given
-            const wr = build();
-            wr.stop();
+            webRequest.stop();
 
             // when
-            wr.stop(300);
+            webRequest.stop(300);
 
             // then
-            expect(wr.getResponseCode()).toBe(-1);
+            expect(webRequest.getResponseCode()).toBe(-1);
         });
     });
 
     describe('duration', () => {
-        it('should return -1 if the webrequest is not stopped', () =>{
-            // given
-            const wr = build();
-
+        it('should return -1 if the webRequest is not stopped', () =>{
             // then
-            expect(wr.getDuration()).toBe(-1);
+            expect(webRequest.getDuration()).toBe(-1);
         });
 
-        it('should return the duration if the webrequest is stopped', () =>{
-            // given
-            const wr = build();
-
+        it('should return the duration if the webRequest is stopped', () =>{
             // when
-            wr.stop();
+            webRequest.stop();
 
             // then
-            expect(wr.getDuration()).toBe(300);
+            expect(webRequest.getDuration()).toBe(300);
         });
     });
 
     it('should return the passed url', () => {
-        // given
-        const wr = build();
-
         // then
-        expect(wr.getUrl()).toEqual('https://example.com');
+        expect(webRequest.getUrl()).toEqual('https://example.com');
     });
 
     describe('tag', () => {
        it('should build a valid tag', () => {
-            // given
-           const wr = build();
-
            // when
-           const tag = wr.getTag();
+           const tag = webRequest.getTag();
 
            // then
            expect(tag).toEqual('MT_3_5_123456_98765_1234-65434-86123_70_1_6');

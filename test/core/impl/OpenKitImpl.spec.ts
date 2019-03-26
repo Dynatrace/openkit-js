@@ -14,250 +14,272 @@
  * limitations under the License.
  */
 
-import { anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
+import { anyString, anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
-import { CaptureMode, CommunicationChannel, StatusRequest, StatusResponse } from '../../../src/api';
-import { Configuration } from '../../../src/core/config/Configuration';
+import { BeaconSender } from '../../../src/core/beacon/BeaconSender';
+import { AbstractSendingStrategy } from '../../../src/core/beacon/strategies/SendingStrategy';
+import { HttpCommunicationChannel } from '../../../src/core/communication/http/state/HttpCommunicationChannel';
+import { Configuration, OpenKitConfiguration } from '../../../src/core/config/Configuration';
 import { defaultNullSession } from '../../../src/core/impl/null/NullSession';
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
-import { Status } from '../../../src/core/impl/OpenKitObject';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
-
-class StubCommunicationChannel implements CommunicationChannel {
-    public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return { valid: false };
-    }
-    public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
-        return { valid: false };
-    }
-    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
-        return { valid: false };
-    }
-}
+import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
+import { timeout } from '../../../src/core/utils/Utils';
+import { Mutable } from '../../Helpers';
 
 describe('OpenKitImpl', () => {
-    let config: Partial<Configuration>;
-    let mockCommunicationChannel: CommunicationChannel = mock(StubCommunicationChannel);
+    let ok: OpenKitImpl;
+    let config: Mutable<Configuration>;
+
+    const random = mock(DefaultRandomNumberProvider);
+    const comm = mock(HttpCommunicationChannel);
+    const ss = mock(AbstractSendingStrategy);
 
     beforeEach(() => {
-        reset(mockCommunicationChannel);
-        const communicationChannelInstance = instance(mockCommunicationChannel);
-
         config = {
-            applicationId: 'app-id',
-            applicationName: '',
-            deviceId: '4',
-            dataCollectionLevel: DataCollectionLevel.UserBehavior,
-            crashReportingLevel: CrashReportingLevel.OptOutCrashes,
-
-            loggerFactory: defaultNullLoggerFactory,
-            communicationChannel: communicationChannelInstance,
+            openKit: {
+                loggerFactory: defaultNullLoggerFactory,
+                deviceId: '42',
+                applicationId: 'application-id',
+                random: instance(random),
+                communicationChannel: instance(comm),
+                sendingStrategies: [instance(ss)],
+                beaconURL: 'http://example.com',
+            },
+            
+            privacy: {
+                crashReportingLevel: CrashReportingLevel.OptInCrashes,
+                dataCollectionLevel: DataCollectionLevel.UserBehavior,
+            },
+            device: {},
+            meta: {},
         };
+
+        when(comm.sendStatusRequest(anything(), anything())).thenResolve({valid: true});
+        when(comm.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
+        when(comm.sendPayloadData(anything(), anything(), anything())).thenResolve({valid: true});
+
+        init();
+    });
+    
+    const init = () => {
+        ok = new OpenKitImpl(config);
+    };
+
+    describe('initial', () => {
+        it('should be not initialized and not shutdown', () => {
+            expect(ok.isInitialized()).toBeFalsy();
+            expect(ok._isShutdown()).toBeFalsy();
+        });
+
+        it('should have initialized the beaconSender', () => {
+            expect(ok._getBeaconSender()).toBeInstanceOf(BeaconSender);
+        });
     });
 
-    const buildOpenKit = () => new OpenKitImpl(config as Configuration);
+    describe('initialize', () => {
+        it('should init the beaconSender', () => {
+            // given
+            const sender = spy(ok._getBeaconSender());
 
-    it('should be idle after creation', () => {
-        const openKit = buildOpenKit();
+            // when
+            ok.initialize();
 
-        expect(openKit.isInitialized()).toBe(false);
-        expect(openKit.status).toBe(Status.Idle);
+            // then
+            verify(sender.init()).once();
+        });
+    });
+
+    describe('shutdown', () => {
+        it('should set the shutdown flag', () => {
+            // when
+            ok.shutdown();
+
+            // then
+            expect(ok._isShutdown()).toBeTruthy();
+        });
+
+        it('should notify the beaconsender to shutdown, and only once', () => {
+            // given
+            const sender = spy(ok._getBeaconSender());
+
+            // when
+            ok.shutdown();
+
+            // then
+            verify(sender.shutdown()).once();
+
+            // given
+            reset(sender);
+
+            // when
+            ok.shutdown();
+
+            // then
+            verify(sender.shutdown()).never();
+        });
+    });
+
+    describe('notifyInitialized', () => {
+        it('should set initialized to true', () =>{
+            // when
+            ok.notifyInitialized(false);
+
+            // then
+            expect(ok.isInitialized()).toBeTruthy();
+        });
+
+        it('should resolve all waiting listeners with the passed boolean value (true)', () => {
+            // given
+            let value: any;
+            const cb = (tf: any) => value = tf;
+            ok.waitForInit(cb);
+
+            // when
+            ok.notifyInitialized(true);
+
+            // then
+            expect(value).toBe(true);
+        });
+
+        it('should resolve all waiting listeners with the passed boolean value (false)', () => {
+            // given
+            let value: any;
+            const cb = (tf: any) => value = tf;
+            ok.waitForInit(cb);
+
+            // when
+            ok.notifyInitialized(false);
+
+            // then
+            expect(value).toBe(false);
+        });
+
+        it('should shutdown if the initialization was not successful', () => {
+            // given
+            const oks = spy(ok);
+
+            // when
+            ok.notifyInitialized(false);
+
+            // then
+            verify(oks.shutdown()).once();
+        });
+
+        it('should not shutdown if the initialization was successful', () => {
+            // given
+            const oks = spy(ok);
+
+            // when
+            ok.notifyInitialized(true);
+
+            // then
+            verify(oks.shutdown()).never();
+        });
     });
 
     describe('waitForInit', () => {
-        it('should timeout if the initialization does not happen and a timeout is set', (done) => {
-            const openKit = buildOpenKit();
-            openKit.waitForInit(tf => {
-                expect(tf).toBe(false);
-                done();
-            }, 100);
+        let v1: boolean | undefined;
+        let v2: boolean | undefined;
 
+        const cb1 = (tf: boolean) => v1 = tf;
+        const cb2 = (tf: boolean) => v2 = tf;
+
+        beforeEach(() => {
+            v1 = undefined;
+            v2 = undefined;
         });
 
-        it('should not timeout if the initialization does not happen and a timeout is not set', (done) => {
+        it('should call the cb immediately, if ok already initialized successfully', () => {
+            // given
+            ok.notifyInitialized(true);
+
+            // when
+            ok.waitForInit(cb1);
+
+            // then
+            expect(v1).toBe(true);
+        });
+
+        it('should call the cb immediately, if ok already initialized not successfully and is shutdown', () => {
+            // given
+            ok.notifyInitialized(false);
+
+            // when
+            ok.waitForInit(cb1);
+
+            // then
+            expect(v1).toBe(true);
+        });
+
+        it('should call the cb after ok got initialized', () => {
+            // given
+            ok.waitForInit(cb1);
+
+            // when
+            ok.notifyInitialized(true);
+
+            // then
+            expect(v1).toBe(true);
+        });
+
+        it('should wait if a timeout is passed, and fail after that amount if no initialization happened', (done) => {
+            const startTime = new Date().getTime();
+
+            // given, when
+            ok.waitForInit((cb: boolean) => {
+                const duration = new Date().getTime() - startTime;
+
+                expect(duration).toBeGreaterThanOrEqual(1000);
+                expect(cb).toBe(false);
+
+                done();
+            }, 1000);
+        });
+
+        it('should also resolve multiple callbacks', async() => {
             jest.setTimeout(5000);
-            const openKit = buildOpenKit();
-            let result: boolean | undefined = undefined;
 
-            openKit.waitForInit(tf => result = tf);
-
-            const wait = setTimeout(() => {
-                clearTimeout(wait);
-                expect(result).toBeUndefined();
-                done();
-            }, 4000);
-        });
-
-        it('should return a value after the object got initialized', (done) => {
             // given
-           when(mockCommunicationChannel.sendStatusRequest(anything(), anything()))
-               .thenResolve({valid: true});
-
-           // when
-           const openKit = buildOpenKit();
-           openKit.initialize();
-           openKit.waitForInit(tf => {
-               // then
-               expect(tf).toBe(true);
-
-               done();
-           })
-        });
-
-        it('should return a value after the object got initialized but with an invalid response', (done) => {
-            // given
-           when(mockCommunicationChannel.sendStatusRequest(anything(), anything()))
-               .thenResolve({valid: false});
-
-           // when
-           const openKit = buildOpenKit();
-           openKit.initialize();
-           openKit.waitForInit(tf => {
-               // then
-               expect(tf).toBe(false);
-               done();
-           });
-        });
-
-        it('should update the state after the initial request', (done) => {
-            when(mockCommunicationChannel.sendStatusRequest(anything(), anything()))
-                .thenResolve({valid: true, multiplicity: 6});
+            ok.waitForInit(cb1, 2000);
+            ok.waitForInit(cb2);
 
             // when
-            const openKit = buildOpenKit();
-            openKit.initialize();
+            await timeout(3000);
+            ok.notifyInitialized(true);
 
-            openKit.waitForInit(() => {
-                // then
-                expect(openKit.state.multiplicity).toBe(6);
-                done();
-            });
-        });
-
-        it('should immediately resolve if openKit already initialized', (done) => {
-            // given
-            when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenResolve({valid: true});
-
-            const openKit = buildOpenKit();
-            openKit.initialize();
-
-            openKit.waitForInit(() => {
-                // when
-                openKit.waitForInit(tf => {
-                    // then
-                    expect(tf).toBe(true);
-                    done();
-                }, 0); // 0 => force using no timeout
-            });
-        });
-
-        it('should immediately resolve if openKit already initialized and shutdown', (done) => {
-            // given
-            when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenResolve({valid: true});
-
-            const openKit = buildOpenKit();
-            openKit.initialize();
-
-            openKit.waitForInit(() => {
-                openKit.shutdown();
-
-                // when
-                openKit.waitForInit(tf => {
-                    expect(tf).toBe(false);
-
-                    done();
-                }, 0); // 0 => force using no timeout
-            });
-        });
-
-        it('should not initialize if the status request throws an error', (done) => {
-            // given
-            when(mockCommunicationChannel.sendStatusRequest(anything(), anything())).thenThrow(new Error(''));
-
-            // when
-            const openKit = buildOpenKit();
-            openKit.initialize();
-
-            openKit.waitForInit(tf => {
-                // then
-                expect(tf).toBe(false);
-
-                done();
-            });
+            // then
+            expect(v1).toBe(false);
+            expect(v2).toBe(true);
         });
     });
 
-    describe('create session', () => {
-       it('should not create if the status = Shutdown', () => {
-          const openKit = buildOpenKit();
-          openKit.shutdown();
-
-          expect(openKit.createSession()).toBe(defaultNullSession);
-       });
-
-       it('should not create if multiplicity = 0', () => {
-          const openKit = buildOpenKit();
-
-          openKit.state.updateFromResponse({valid: true, multiplicity: 0});
-
-          expect(openKit.createSession()).toBe(defaultNullSession);
-       });
-
-       it('should not create if capture is off', () => {
-          const openKit = buildOpenKit();
-
-          openKit.state.updateFromResponse({valid: true, captureMode: CaptureMode.Off});
-
-          expect(openKit.createSession()).toBe(defaultNullSession);
-       });
-
-       it('should put the created session in the openSessions - array', () => {
-           // given
-           const openKit = buildOpenKit();
-           const openSessions = (openKit as any).openSessions;
+    describe('createSession',  () => {
+        it('should return defaultNullSession if ok is shutdown', () => {
+            // given
+            ok.shutdown();
 
             // when
-           const session = openKit.createSession();
+            const session = ok.createSession();
 
             // then
-           expect(openSessions.indexOf(session)).not.toBe(-1);
-           expect(openKit.createSession()).not.toBe(defaultNullSession);
-           expect(openKit.createSession()).toBeInstanceOf(SessionImpl);
-       });
+            expect(session).toBe(defaultNullSession);
+        });
 
-       it('should put and remove the created session in the openSessions - array', () => {
-           // given
-           const openKit = buildOpenKit();
-           const openSessions = (openKit as any).openSessions;
+        it('should return a valid session', () => {
+            // given
+            const sender = spy(ok._getBeaconSender());
+            const cache = spy(ok._getPayloadCache());
 
             // when
-           const session = openKit.createSession();
-           openKit.removeSession(session as SessionImpl);
+            const session = ok.createSession() as SessionImpl;
 
-           // then
-           expect(openSessions.indexOf(session)).toBe(-1);
-       });
-
-       it('should close all open sessions after a shutdown', () => {
-           // given
-           const openKit = buildOpenKit();
-           const openSessions = (openKit as any).openSessions;
-
-           const session = openKit.createSession();
-           const session2 = openKit.createSession();
-
-           const session1Spy = spy(session);
-           const session2Spy = spy(session2);
-
-            // when
-           openKit.shutdown();
-
-           // then
-
-           verify(session1Spy.end()).once();
-           verify(session2Spy.end()).once();
-           expect(openSessions.indexOf(session)).toBe(-1);
-       });
+            // then
+            expect(session).toBeInstanceOf(SessionImpl);
+            verify(sender.sessionAdded(anything())).once();
+            verify(cache.register(session, anyString(), anything(), anything())).once();
+            expect(session.sessionId).toBe(1);
+        })
     });
 });

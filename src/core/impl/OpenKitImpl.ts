@@ -120,15 +120,6 @@ export class OpenKitImpl implements OpenKit {
         return session;
     }
 
-    public notifyInitialized(successfully: boolean): void {
-        this.initialized = true;
-        this.initCallbackHolder.resolve(successfully);
-
-        if (!successfully) {
-            this.shutdown();
-        }
-    }
-
     public isInitialized(): boolean {
         return this.initialized;
     }
@@ -136,7 +127,7 @@ export class OpenKitImpl implements OpenKit {
     public waitForInit(callback: InitCallback, timeout?: number): void {
         // Trivial case: We already initialized and the waitForInit comes after initialization. We can resolve
         // immediately and synchronous.
-        if (this.initialized) {
+        if (this.initialized || this.isShutdown) {
             callback(this.initialized);
             return;
         }
@@ -157,6 +148,27 @@ export class OpenKitImpl implements OpenKit {
         // Add the callback to the initCallbackHolder, so it gets resolved once the initialization fails or succeeds,
         // for both cases with and without timeout.
         this.initCallbackHolder.add(callback);
+    }
+
+    public notifyInitialized(successfully: boolean): void {
+        this.initialized = true;
+        this.initCallbackHolder.resolve(successfully);
+
+        if (!successfully) {
+            this.shutdown();
+        }
+    }
+
+    public _isShutdown(): boolean {
+        return this.isShutdown;
+    }
+
+    public _getBeaconSender(): BeaconSender {
+        return this.beaconSender;
+    }
+
+    public _getPayloadCache(): BeaconCacheImpl {
+        return this.cache;
     }
 
     private createSessionId(): number {
