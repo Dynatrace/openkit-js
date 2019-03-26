@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-import { EventType } from '../protocol/EventType';
+import { PayloadKey } from '../protocol/PayloadKey';
+import { QueryBuilder } from '../utils/QueryBuilder';
 
-export type Payload = string;
-
-export const combinePayloads = (p1: Payload, p2: Payload): Payload => {
-    return `${p1}&${p2}`;
-};
-
-export const getEventType = (payload: Payload): EventType | undefined => {
-    if (!payload.startsWith('et')) {
-       return undefined;
-    }
-
-    const value = payload.substring(payload.indexOf('=') + 1, payload.indexOf('&'));
-
-    return parseInt(value, 10);
-};
+export class PayloadQueryBuilder extends QueryBuilder<PayloadKey> {}

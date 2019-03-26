@@ -18,6 +18,7 @@ import { Action, CrashReportingLevel, DataCollectionLevel, Logger, Session, WebR
 import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
+import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
@@ -38,9 +39,10 @@ export class SessionImpl implements Session {
         payloadBuilder: PayloadBuilder,
         sessionStartTime: number,
         private readonly config: PrivacyConfiguration & OpenKitConfiguration,
+        timestampProvider: TimestampProvider = defaultTimestampProvider,
     ) {
         this.sessionId = sessionId;
-        this.payloadData = new PayloadBuilderHelper(payloadBuilder, sessionStartTime);
+        this.payloadData = new PayloadBuilderHelper(payloadBuilder, sessionStartTime, timestampProvider);
         this.payloadData.startSession();
 
         this.logger = config.loggerFactory.createLogger(`SessionImpl (sessionId=${this.sessionId})`);
@@ -51,14 +53,23 @@ export class SessionImpl implements Session {
      * @inheritDoc
      */
     public end(): void {
-        if (this.config.dataCollectionLevel === DataCollectionLevel.Off || this.isShutdown()) {
+        if (this._isShutdown) {
             // We only send the end-session event if the user enabled monitoring.
             return;
         }
 
+        this._isShutdown = true;
+
         this.logger.debug('end');
 
-        this.endSession();
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            return;
+        }
+
+        // If DCL = Off => no actions are spawned anyway
+        this.openActions.splice(0).forEach((action) => action.leaveAction());
+
+        this.payloadData.endSession();
     }
 
     /**
@@ -99,6 +110,7 @@ export class SessionImpl implements Session {
             this,
             this.payloadData,
             this.config);
+
         this.openActions.push(action);
         return action;
     }
@@ -127,10 +139,6 @@ export class SessionImpl implements Session {
         this.logger.debug('reportError', {name, code, message});
 
         this.payloadData.reportError(0, name, code, String(message));
-    }
-
-    public endAction(action: Action): void {
-        removeElement(this.openActions, action);
     }
 
     /**
@@ -178,15 +186,11 @@ export class SessionImpl implements Session {
         return this._isShutdown === true;
     }
 
-    /**
-     * Ends the session.
-     * If the session is initialized, all data is flushed before shutting the session down.
-     */
-    private endSession(): void {
-        this._isShutdown = true;
+    public _getOpenActions(): Action[] {
+        return this.openActions.slice(0);
+    }
 
-        this.openActions.splice(0).forEach((action) => action.leaveAction());
-
-        this.payloadData.endSession();
+    public _endAction(action: Action): void {
+        removeElement(this.openActions, action);
     }
 }

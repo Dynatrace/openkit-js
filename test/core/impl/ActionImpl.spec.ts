@@ -24,8 +24,7 @@ import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
-
-type Writeable<T> = { -readonly [P in keyof T]-?: T[P] };
+import { Mutable } from '../../Helpers';
 
 describe('ActionImpl', () => {
     const sessionMock = mock(SessionImpl);
@@ -33,7 +32,7 @@ describe('ActionImpl', () => {
     const timestampProviderMock = mock(TimestampProvider);
 
     let action: ActionImpl;
-    let config: Partial<Writeable<PrivacyConfiguration & OpenKitConfiguration>>;
+    let config: Partial<Mutable<PrivacyConfiguration & OpenKitConfiguration>>;
 
     beforeEach(() => {
         config = {
@@ -46,7 +45,6 @@ describe('ActionImpl', () => {
         reset(sessionMock);
         reset(payloadBuilder);
         reset(timestampProviderMock);
-
 
         when(payloadBuilder.createSequenceNumber()).thenReturn(5, 6, 7);
         when(payloadBuilder.createActionId()).thenReturn(3);
@@ -71,13 +69,13 @@ describe('ActionImpl', () => {
        expect(action.startTime).toEqual(1000);
     });
 
-    it('should set properties after leaving the action', () => {
+    it('should set endSequenceNumber and endTime on leaveAction call', () => {
         action.leaveAction();
 
         expect(action.endSequenceNumber).toBe(6);
         expect(action.endTime).toBe(4500);
 
-        verify(sessionMock.endAction(action)).once();
+        verify(sessionMock._endAction(action)).once();
         verify(payloadBuilder.addAction(action)).once();
     });
 
@@ -88,7 +86,7 @@ describe('ActionImpl', () => {
         expect(action.endSequenceNumber).toBe(6);
         expect(action.endTime).toBe(4500);
 
-        verify(sessionMock.endAction(action)).once();
+        verify(sessionMock._endAction(action)).once();
         verify(payloadBuilder.addAction(action)).once();
     });
 

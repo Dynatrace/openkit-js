@@ -48,13 +48,10 @@ describe('StatusRequestImpl', () => {
     });
 
     it('should create the request from a state', () => {
-       const state = new CommunicationStateImpl({applicationId: '1.2.3'} as Configuration);
-       state.updateFromResponse({valid: true, serverId: 8});
-
-       const request = StatusRequestImpl.from(state);
+       const request = StatusRequestImpl.create('app-id', 8);
 
        expect(request.agentTechnologyType).toEqual(agentTechnologyType);
-       expect(request.applicationId).toEqual('1.2.3');
+       expect(request.applicationId).toEqual('app-id');
        expect(request.openKitVersion).toEqual(openKitVersion);
        expect(request.platformType).toEqual(platformTypeOpenKit);
        expect(request.serverId).toBe(8);

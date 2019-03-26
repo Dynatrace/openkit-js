@@ -34,4 +34,8 @@ export class PayloadQueue {
     public isEmpty(): boolean {
         return this.queue.length === 0;
     }
+
+    public _getCurrentQueue(): Payload[] {
+        return this.queue.slice(0);
+    }
 }

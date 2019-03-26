@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { PayloadKey } from '../protocol/PayloadKey';
-import { QueryBuilder } from './QueryBuilder';
+import { defaultNullLogger } from '../../../src/core/logging/NullLogger';
+import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
-export class PayloadQueryBuilder extends QueryBuilder<PayloadKey> {}
+describe('NullLoggerFactory', () => {
+    it('should return defaultNullLogger on create', () => {
+        expect(defaultNullLoggerFactory.createLogger('name')).toBe(defaultNullLogger);
+    });
+});

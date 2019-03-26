@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-import { EventType } from '../protocol/EventType';
+import { defaultNullLogger } from '../../../src/core/logging/NullLogger';
 
-export type Payload = string;
+describe('NullLogger', () => {
+    it('should not crash on debug', () => {
+        defaultNullLogger.debug('something');
+    });
 
-export const combinePayloads = (p1: Payload, p2: Payload): Payload => {
-    return `${p1}&${p2}`;
-};
+    it('should not crash on info', () => {
+        defaultNullLogger.info('something');
+    });
 
-export const getEventType = (payload: Payload): EventType | undefined => {
-    if (!payload.startsWith('et')) {
-       return undefined;
-    }
+    it('should not crash on warn', () => {
+        defaultNullLogger.warn('something');
+    });
 
-    const value = payload.substring(payload.indexOf('=') + 1, payload.indexOf('&'));
-
-    return parseInt(value, 10);
-};
+    it('should not crash on error', () => {
+        defaultNullLogger.error('something');
+    });
+});

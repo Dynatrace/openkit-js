@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-import { EventType } from '../protocol/EventType';
+import { defaultTimestampProvider, TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 
-export type Payload = string;
+describe('TimestampProvider', () => {
+    it('should provide a defaultTimestampProvider', () => {
+        expect(defaultTimestampProvider).toBeInstanceOf(TimestampProvider);
+    });
 
-export const combinePayloads = (p1: Payload, p2: Payload): Payload => {
-    return `${p1}&${p2}`;
-};
+    it('should return the current timestamp', () => {
+        spyOn(Date.prototype, 'getTime').and.returnValue(5000);
 
-export const getEventType = (payload: Payload): EventType | undefined => {
-    if (!payload.startsWith('et')) {
-       return undefined;
-    }
-
-    const value = payload.substring(payload.indexOf('=') + 1, payload.indexOf('&'));
-
-    return parseInt(value, 10);
-};
+        expect(defaultTimestampProvider.getCurrentTimestamp()).toBe(5000);
+    });
+});

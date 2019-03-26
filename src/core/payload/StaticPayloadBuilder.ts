@@ -18,8 +18,8 @@ import { Configuration } from '../config/Configuration';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
-import { PayloadQueryBuilder } from '../utils/PayloadQueryBuilder';
 import { combinePayloads, Payload } from './Payload';
+import { PayloadQueryBuilder } from './PayloadQueryBuilder';
 
 export class StaticPayloadBuilder {
     public static reportCrash(errorName: string, reason: string, stacktrace: string,
@@ -84,7 +84,7 @@ export class StaticPayloadBuilder {
             .build();
     }
 
-    public static applicationWidePrefix(config: Configuration): Payload{
+    public static applicationWidePrefix(config: Configuration): Payload {
         const {openKit, device, privacy, meta} = config;
 
         return new PayloadQueryBuilder()

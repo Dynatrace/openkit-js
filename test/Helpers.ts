@@ -14,20 +14,4 @@
  * limitations under the License.
  */
 
-import { EventType } from '../protocol/EventType';
-
-export type Payload = string;
-
-export const combinePayloads = (p1: Payload, p2: Payload): Payload => {
-    return `${p1}&${p2}`;
-};
-
-export const getEventType = (payload: Payload): EventType | undefined => {
-    if (!payload.startsWith('et')) {
-       return undefined;
-    }
-
-    const value = payload.substring(payload.indexOf('=') + 1, payload.indexOf('&'));
-
-    return parseInt(value, 10);
-};
+export type Mutable<T> = { -readonly [P in keyof T]-?: T[P] };

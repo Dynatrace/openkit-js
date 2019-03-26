@@ -161,7 +161,7 @@ export class ActionImpl implements Action {
         this.endSequenceNumber = this.payloadBuilder.createSequenceNumber();
         this._endTime = this.payloadBuilder.currentTimestamp();
         this.payloadBuilder.addAction(this);
-        this.session.endAction(this);
+        this.session._endAction(this);
 
         this.logger.debug('leaveAction');
 
