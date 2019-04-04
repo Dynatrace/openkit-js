@@ -15,7 +15,7 @@
  */
 
 import { DataCollectionLevel, InitCallback, Logger, OpenKit, Session } from '../../api';
-import { BeaconSender } from '../beacon/BeaconSender';
+import { BeaconSenderImpl } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
 import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
 import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
@@ -41,7 +41,7 @@ export class OpenKitImpl implements OpenKit {
     private readonly initCallbackHolder = new CallbackHolder<boolean>();
 
     private readonly sessionIdProvider: IdProvider;
-    private readonly beaconSender: BeaconSender;
+    private readonly beaconSender: BeaconSenderImpl;
     private readonly logger: Logger;
     private readonly applicationWidePrefix: Payload;
 
@@ -62,7 +62,7 @@ export class OpenKitImpl implements OpenKit {
         this.sessionConfig = {...config.privacy, ...config.openKit};
         this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(this.config);
 
-        this.beaconSender = new BeaconSender(this, this.cache, config.openKit);
+        this.beaconSender = new BeaconSenderImpl(this, this.cache, config.openKit);
     }
 
     /**
@@ -163,7 +163,7 @@ export class OpenKitImpl implements OpenKit {
         return this.isShutdown;
     }
 
-    public _getBeaconSender(): BeaconSender {
+    public _getBeaconSender(): BeaconSenderImpl {
         return this.beaconSender;
     }
 

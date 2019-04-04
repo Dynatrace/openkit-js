@@ -16,10 +16,10 @@
 
 import { anyString, anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
-import { BeaconSender } from '../../../src/core/beacon/BeaconSender';
+import { BeaconSenderImpl } from '../../../src/core/beacon/BeaconSender';
 import { AbstractSendingStrategy } from '../../../src/core/beacon/strategies/SendingStrategy';
 import { HttpCommunicationChannel } from '../../../src/core/communication/http/state/HttpCommunicationChannel';
-import { Configuration, OpenKitConfiguration } from '../../../src/core/config/Configuration';
+import { Configuration } from '../../../src/core/config/Configuration';
 import { defaultNullSession } from '../../../src/core/impl/null/NullSession';
 import { OpenKitImpl } from '../../../src/core/impl/OpenKitImpl';
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
@@ -70,7 +70,7 @@ describe('OpenKitImpl', () => {
         });
 
         it('should have initialized the beaconSender', () => {
-            expect(ok._getBeaconSender()).toBeInstanceOf(BeaconSender);
+            expect(ok._getBeaconSender()).toBeInstanceOf(BeaconSenderImpl);
         });
     });
 

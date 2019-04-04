@@ -2,6 +2,10 @@ import { AbstractSendingStrategy } from './SendingStrategy';
 
 export class FlushLeftoversStrategy extends AbstractSendingStrategy {
     public shutdown(): Promise<void> {
-        return this.flush();
+        if (!this.sender) {
+            return Promise.resolve();
+        }
+
+        return this.sender.flushImmediate();
     }
 }

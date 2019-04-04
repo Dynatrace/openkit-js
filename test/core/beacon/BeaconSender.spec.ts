@@ -15,7 +15,7 @@
  */
 
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
-import { BeaconSender } from '../../../src/core/beacon/BeaconSender';
+import { BeaconSender, BeaconSenderImpl } from '../../../src/core/beacon/BeaconSender';
 import { BeaconCacheImpl } from '../../../src/core/beacon/strategies/BeaconCache';
 import { HttpCommunicationChannel } from '../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OpenKitConfiguration } from '../../../src/core/config/Configuration';
@@ -29,7 +29,7 @@ describe('BeaconSender', () => {
     let ok = mock(OpenKitImpl);
     let cache = mock(BeaconCacheImpl);
     let config: Partial<OpenKitConfiguration>;
-    let sender: BeaconSender;
+    let sender: BeaconSenderImpl;
 
     beforeEach(() => {
         reset(communication);
@@ -43,7 +43,7 @@ describe('BeaconSender', () => {
             communicationChannel: instance(communication),
         };
 
-        sender = new BeaconSender(
+        sender = new BeaconSenderImpl(
             instance(ok),
             instance(cache),
             config as OpenKitConfiguration,

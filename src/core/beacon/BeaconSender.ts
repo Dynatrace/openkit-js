@@ -24,7 +24,12 @@ import { StatusRequestImpl } from './StatusRequestImpl';
 import { BeaconCacheImpl, CacheEntry } from './strategies/BeaconCache';
 import { SendingStrategy } from './strategies/SendingStrategy';
 
-export class BeaconSender {
+export interface BeaconSender {
+    flush(): Promise<void>;
+    flushImmediate(): Promise<void>;
+}
+
+export class BeaconSenderImpl implements BeaconSender {
     private readonly appId: string;
     private readonly beaconUrl: string;
     private readonly sendingStrategies: SendingStrategy[];
@@ -61,7 +66,7 @@ export class BeaconSender {
 
         if (response.valid) {
             this.initialized = true;
-            this.okServerId = response.serverId || defaultServerId;
+            this.okServerId = response.serverId === undefined ? defaultServerId : response.serverId;
 
             this.cache.getEntries().forEach((entry) => entry.communicationState.setServerId(this.okServerId));
 
@@ -104,19 +109,36 @@ export class BeaconSender {
         this.flushing = true;
 
         if (this.initialized) {
-            await this.sendNewSessionRequests();
-            await this.finishSessions();
+            await this.sendNewSessionRequests(false);
             await this.sendPayloadData();
+            await this.finishSessions();
         }
 
         this.flushing = false;
     }
 
-    private async sendNewSessionRequests(): Promise<void> {
+    public async flushImmediate(): Promise<void> {
+
+        if (this.initialized) {
+            await this.sendNewSessionRequests(true);
+            await this.sendPayloadData();
+            await this.finishSessions();
+        }
+    }
+
+    private async sendNewSessionRequests(immediate: boolean): Promise<void> {
         const entries = this.cache.getAllUninitializedSessions();
 
-        for (const entry of entries) {
-            await this.sendNewSessionRequest(entry);
+        if (immediate) {
+            for (const entry of entries) {
+                entry.communicationState.setServerId(this.okServerId);
+                entry.communicationState.setServerIdLocked();
+                entry.initialized = true;
+            }
+        } else {
+            for (const entry of entries) {
+                await this.sendNewSessionRequest(entry);
+            }
         }
     }
 

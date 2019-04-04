@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { CaptureMode } from '../../api';
 import { CommunicationState } from '../beacon/CommunicationState';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { combinePayloads, Payload } from './Payload';
@@ -198,15 +199,15 @@ export class PayloadBuilder {
     }
 
     private isCaptureDisabled(): boolean {
-        return !this.commState.capture;
+        return this.commState.capture === CaptureMode.Off;
     }
 
     private isCaptureErrorsDisabled(): boolean {
-        return !this.commState.captureErrors || this.isCaptureDisabled();
+        return this.commState.captureErrors === CaptureMode.Off || this.isCaptureDisabled();
     }
 
     private isCaptureCrashesDisabled(): boolean {
-        return !this.commState.captureCrashes || this.isCaptureDisabled();
+        return this.commState.captureCrashes === CaptureMode.Off || this.isCaptureDisabled();
     }
 
     private push(payload: Payload): void {

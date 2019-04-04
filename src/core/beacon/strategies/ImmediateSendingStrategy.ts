@@ -40,7 +40,7 @@ export class ImmediateSendingStrategy extends FlushLeftoversStrategy implements 
 
         const et = getEventType(payload);
 
-        if (et && this.shouldFlush(et)) {
+        if (et !== undefined && this.shouldFlush(et)) {
             this.flush();
         }
     }
