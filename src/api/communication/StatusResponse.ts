@@ -18,8 +18,8 @@
  * Flag to check if capturing for certain parts is enabled or not.
  */
 export enum CaptureMode {
-    On = 1,
-    Off = 0,
+    On,
+    Off,
 }
 
 /**
