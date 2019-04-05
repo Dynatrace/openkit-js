@@ -69,8 +69,4 @@ export class BeaconCacheImpl {
     public getEntries(): CacheEntry[] {
         return this.entries.slice(0);
     }
-
-    public clear(): void {
-        this.entries.splice(0);
-    }
 }

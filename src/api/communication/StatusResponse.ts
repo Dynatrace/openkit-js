@@ -23,7 +23,7 @@ export enum CaptureMode {
 }
 
 /**
- * Represents a status repsponse from dynatrace which will update the state of the current OpenKit application.
+ * Represents a status response from dynatrace which will update the state of the current OpenKit application.
  */
 export interface StatusResponse {
     /**
