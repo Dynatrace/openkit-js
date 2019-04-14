@@ -136,9 +136,8 @@ export class OpenKitImpl implements OpenKit {
             // Init with timeout: We setup a timeout which resolves after X milliseconds. If the callback triggers,
             // we clear it, and check if the callback is still in the callback holder. If it is, it was not resolved,
             // so we can execute it, and remove it from the callback holder, so it can't get executed again.
-            const wait = setTimeout(() => {
+            setTimeout(() => {
                 if (this.initCallbackHolder.contains(callback)) {
-                    clearTimeout(wait);
                     callback(false);
                     this.initCallbackHolder.remove(callback);
                 }

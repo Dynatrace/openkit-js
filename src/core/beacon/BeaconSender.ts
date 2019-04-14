@@ -68,7 +68,7 @@ export class BeaconSenderImpl implements BeaconSender {
             this.initialized = true;
             this.okServerId = response.serverId === undefined ? defaultServerId : response.serverId;
 
-            this.cache.getEntries().forEach((entry) => entry.communicationState.setServerId(this.okServerId));
+            this.cache.getEntriesCopy().forEach((entry) => entry.communicationState.setServerId(this.okServerId));
 
             this.sendingStrategies.forEach((strategy) => strategy.init(this, this.cache));
         }
@@ -95,7 +95,7 @@ export class BeaconSenderImpl implements BeaconSender {
         this.logger.debug('shutdown');
 
         // Close all sessions
-        this.cache.getEntries().forEach((entry) => entry.session.end());
+        this.cache.getEntriesCopy().forEach((entry) => entry.session.end());
 
         for (const strategy of this.sendingStrategies) {
             await strategy.shutdown();

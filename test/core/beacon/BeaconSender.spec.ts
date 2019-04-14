@@ -53,7 +53,7 @@ describe('BeaconSender', () => {
     it('should send the initial request to dynatrace on init', async() => {
         // given
         when(communication.sendStatusRequest(requestUrl, anything())).thenResolve({valid: true});
-        when(cache.getEntries()).thenReturn([]);
+        when(cache.getEntriesCopy()).thenReturn([]);
 
         // when
         await sender.init();

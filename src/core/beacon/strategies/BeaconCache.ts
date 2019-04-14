@@ -29,10 +29,10 @@ export interface CacheEntry {
 }
 
 export interface BeaconCache {
-    getEntries(): CacheEntry[];
+    getEntriesCopy(): CacheEntry[];
 }
 
-export class BeaconCacheImpl {
+export class BeaconCacheImpl implements BeaconCache {
     private readonly entries: CacheEntry[] = [];
 
     public register(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, state: CommunicationState): CacheEntry {
@@ -66,7 +66,7 @@ export class BeaconCacheImpl {
         removeElement(this.entries, entry);
     }
 
-    public getEntries(): CacheEntry[] {
+    public getEntriesCopy(): CacheEntry[] {
         return this.entries.slice(0);
     }
 }
