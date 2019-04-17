@@ -18,11 +18,12 @@
  * Flag to check if capturing for certain parts is enabled or not.
  */
 export enum CaptureMode {
-    On, Off,
+    On,
+    Off,
 }
 
 /**
- * Represents a status repsponse from dynatrace which will update the state of the current OpenKit application.
+ * Represents a status response from dynatrace which will update the state of the current OpenKit application.
  */
 export interface StatusResponse {
     /**

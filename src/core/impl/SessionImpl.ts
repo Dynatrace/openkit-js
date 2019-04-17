@@ -14,59 +14,62 @@
  * limitations under the License.
  */
 
-import {
-    Action,
-    CaptureMode,
-    CommunicationChannel,
-    CrashReportingLevel,
-    DataCollectionLevel,
-    defaultInvalidStatusResponse,
-    Session,
-    StatusResponse,
-    WebRequestTracer,
-} from '../../api';
-import { PayloadData } from '../beacon/PayloadData';
-import { PayloadSender } from '../beacon/PayloadSender';
+import { Action, CrashReportingLevel, DataCollectionLevel, Logger, Session, WebRequestTracer } from '../../api';
+import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import { validationFailed } from '../logging/LoggingUtils';
+import { PayloadBuilder } from '../payload/PayloadBuilder';
+import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
 import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
-import { defaultNullAction } from './NullAction';
-import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
-import { OpenKitImpl } from './OpenKitImpl';
-import { OpenKitObject, Status } from './OpenKitObject';
-import { StatusRequestImpl } from './StatusRequestImpl';
+import { defaultNullAction } from './null/NullAction';
+import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
-export class SessionImpl extends OpenKitObject implements Session {
-    public readonly payloadData: PayloadData;
-    public readonly sessionId: number;
+export class SessionImpl implements Session {
+    public readonly payloadData: PayloadBuilderHelper;
 
-    private readonly openKit: OpenKitImpl;
     private readonly openActions: Action[] = [];
-    private readonly payloadSender: PayloadSender;
-    private readonly communicationChannel: CommunicationChannel;
+    private readonly logger: Logger;
 
-    constructor(openKit: OpenKitImpl, clientIp: string, sessionId: number) {
-        super(openKit.state.clone(), openKit.state.config.loggerFactory.createLogger(`SessionImpl`));
+    private _isShutdown = false;
 
+    constructor(
+        public readonly sessionId: number,
+        payloadBuilder: PayloadBuilder,
+        sessionStartTime: number,
+        private readonly config: PrivacyConfiguration & OpenKitConfiguration,
+        timestampProvider: TimestampProvider = defaultTimestampProvider,
+    ) {
         this.sessionId = sessionId;
-        this.openKit = openKit;
-        this.communicationChannel = this.state.config.communicationChannel;
-
-        this.payloadData = new PayloadData(this.state, clientIp, sessionId);
-        this.payloadSender = new PayloadSender(this.state, this.payloadData);
-
+        this.payloadData = new PayloadBuilderHelper(payloadBuilder, sessionStartTime, timestampProvider);
         this.payloadData.startSession();
 
-        this.logger.debug(`Created Session id=${sessionId} with ip=${clientIp}`);
+        this.logger = config.loggerFactory.createLogger(`SessionImpl (sessionId=${this.sessionId})`);
+        this.logger.debug('created');
     }
 
     /**
      * @inheritDoc
      */
     public end(): void {
-        this.waitForInit(() => {
-            this.endSession();
-        });
+        if (this._isShutdown) {
+            // We only send the end-session event if the user enabled monitoring.
+            return;
+        }
+
+        this._isShutdown = true;
+
+        this.logger.debug('end');
+
+        if (this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+            return;
+        }
+
+        // If DCL = Off => no actions are spawned anyway
+        this.openActions.splice(0).forEach((action) => action.leaveAction());
+
+        this.payloadData.endSession();
     }
 
     /**
@@ -74,36 +77,41 @@ export class SessionImpl extends OpenKitObject implements Session {
      */
     public identifyUser(userTag: string): void {
         // Only capture userTag if we track everything.
-        if (this.status === Status.Shutdown ||
-            this.state.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+        if (this.isShutdown() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
 
             return;
         }
 
         // Only allow non-empty strings as userTag
         if (typeof userTag !== 'string' || userTag.length === 0) {
+            validationFailed(this.logger, 'identifyUser', 'userTag must be a non empty string');
+
             return;
         }
 
-        this.logger.debug(`Identify User ${userTag} in session`, this.sessionId);
-        this.payloadData.identifyUser(userTag);
+        this.logger.debug('identifyUser', {userTag});
 
-        // Send immediately as we can not be sure that the session has a correct 'end'
-        this.flush();
+        this.payloadData.identifyUser(userTag);
     }
 
     /**
      * @inheritDoc
      */
     public enterAction(actionName: string): Action {
-        if (!this.mayEnterAction()) {
+        if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
             return defaultNullAction;
         }
 
-        const action = new ActionImpl(this, actionName, this.payloadData);
+        this.logger.debug('enterAction', {actionName});
+
+        const action = new ActionImpl(
+            actionName,
+            this.payloadData.currentTimestamp(),
+            this,
+            this.payloadData,
+            this.config);
 
         this.openActions.push(action);
-
         return action;
     }
 
@@ -111,21 +119,24 @@ export class SessionImpl extends OpenKitObject implements Session {
      * @inheritDoc
      */
     public reportError(name: string, code: number, message: string): void {
-        if (!this.mayReportError()) {
+        if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid name', name);
+            validationFailed(this.logger, 'reportError', 'Name must be a non empty string', {name});
+
             return;
         }
 
-        if (typeof code !== 'number') {
-            this.logger.warn('reportError', `session id=${this.sessionId}`, 'Invalid error code', name);
+        if (!isFinite(code)) {
+            validationFailed(this.logger, 'reportError', 'Code must be a finite number', {code});
+
             return;
         }
 
-        this.logger.debug('reportError', `session id=${this.sessionId}`, {name, code, message});
+        this.logger.debug('reportError', {name, code, message});
 
         this.payloadData.reportError(0, name, code, String(message));
     }
@@ -133,127 +144,53 @@ export class SessionImpl extends OpenKitObject implements Session {
     /**
      * @inheritDoc
      */
-    public endAction(action: Action): void {
-        removeElement(this.openActions, action);
-        this.flush();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public reportCrash(name: string, message: string, stacktrace: string): void {
-        if (typeof name !== 'string') {
-            this.logger.warn('reportCrash', 'name is not a string', name);
+        if (this.isShutdown() || this.config.crashReportingLevel !== CrashReportingLevel.OptInCrashes) {
 
             return;
         }
 
-        if (!this.mayReportCrash() || name.length === 0) {
+        if (typeof name !== 'string' || name.length === 0) {
+            validationFailed(this.logger, 'reportCrash', 'name must be a non empty string', {name});
 
             return;
         }
 
-        this.logger.debug('reportCrash', {name, reason: message, stacktrace});
+        this.logger.debug('reportCrash', {name, message, stacktrace});
 
         this.payloadData.reportCrash(name, String(message), String(stacktrace));
     }
 
-    public init(): void {
-        this.openKit.waitForInit(() => {
-            if (this.openKit.status === Status.Initialized) {
-                this.initialize();
-            }
-        });
-    }
-
     public traceWebRequest(url: string): WebRequestTracer {
+        if (this.isShutdown() || this.config.dataCollectionLevel === DataCollectionLevel.Off) {
+
+            return defaultNullWebRequestTracer;
+        }
+
         if (typeof url !== 'string' || url.length === 0) {
+            validationFailed(this.logger, 'traceWebRequest', 'url must be a non empty string', {url});
+
             return defaultNullWebRequestTracer;
         }
 
-        if (this.status === Status.Shutdown) {
-            return defaultNullWebRequestTracer;
-        }
+        this.logger.debug('traceWebRequest', {url});
 
-        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
-            return defaultNullWebRequestTracer;
-        }
-
-        const { serverId, config: {deviceId, loggerFactory, applicationId} } = this.state;
+        const { deviceId, applicationId, loggerFactory } = this.config;
 
         return new WebRequestTracerImpl(
-            this.payloadData, 0, url, loggerFactory, serverId, deviceId, applicationId, this.sessionId,
+            this.payloadData, 0, url, loggerFactory, deviceId, applicationId, this.sessionId,
         );
     }
 
-    public flush(): void {
-        this.waitForInit(() => {
-            if (this.status === Status.Initialized) {
-                this.payloadSender.flush();
-            }
-        });
+    public isShutdown(): boolean {
+        return this._isShutdown === true;
     }
 
-    private async initialize(): Promise<void> {
-        if (this.openKit.status !== Status.Initialized) {
-            return;
-        }
-
-        // our state may be outdated, update it
-        this.state.updateFromState(this.openKit.state);
-
-        let response: StatusResponse;
-        try {
-            response = await this.communicationChannel.sendNewSessionRequest(
-                this.state.config.beaconURL, StatusRequestImpl.from(this.state));
-        } catch (exception) {
-            this.logger.warn('Initialization failed with exception', exception);
-            response = defaultInvalidStatusResponse;
-        }
-
-        this.finishInitialization(response);
-        this.logger.debug('Successfully initialized Session', this.sessionId);
+    public _getOpenActions(): Action[] {
+        return this.openActions.slice(0);
     }
 
-    private mayReportCrash(): boolean {
-        return this.status !== Status.Shutdown &&
-            !this.state.isCaptureDisabled() &&
-            this.state.config.crashReportingLevel === CrashReportingLevel.OptInCrashes &&
-            this.state.captureCrashes === CaptureMode.On;
-    }
-
-    private mayEnterAction(): boolean {
-        return this.status !== Status.Shutdown &&
-            this.state.isCaptureDisabled() === false &&
-            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off;
-    }
-
-    /**
-     * Ends the session.
-     * If the session is initialized, all data is flushed before shutting the session down.
-     */
-    private endSession(): void {
-        if (this.state.config.dataCollectionLevel === DataCollectionLevel.Off) {
-            // We only send the end-session event if the user enabled monitoring.
-            return;
-        }
-
-        this.logger.debug(`Ending Session (${this.sessionId}`);
-
-        this.openActions.slice().forEach((action) => action.leaveAction());
-
-        if (this.status === Status.Initialized) {
-            this.payloadData.endSession();
-        }
-
-        this.openKit.removeSession(this);
-        this.shutdown();
-    }
-
-    private mayReportError(): boolean {
-        return this.status !== Status.Shutdown &&
-            this.state.config.dataCollectionLevel !== DataCollectionLevel.Off &&
-            !this.state.isCaptureDisabled() &&
-            this.state.captureErrors === CaptureMode.On;
+    public _endAction(action: Action): void {
+        removeElement(this.openActions, action);
     }
 }

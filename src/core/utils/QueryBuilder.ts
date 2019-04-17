@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { PayloadKey } from '../../protocol/PayloadKey';
-import { QueryKey } from '../../protocol/QueryKey';
-import { truncate } from '../../utils/Utils';
+import { PayloadKey } from '../protocol/PayloadKey';
+import { QueryKey } from '../protocol/QueryKey';
+import { truncate } from './Utils';
 
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: Record<string, string> = {};

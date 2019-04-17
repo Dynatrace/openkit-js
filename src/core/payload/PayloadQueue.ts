@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from '../../utils/QueryBuilder';
+import { Payload } from './Payload';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
+export class PayloadQueue {
+    private readonly queue: Payload[] = [];
+
+    public push(payload: Payload): void {
+        this.queue.push(payload);
     }
 
-    public build(): string {
-        const query = super.build();
+    public peek(): Payload | undefined {
+        return this.queue[0];
+    }
 
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
+    public pop(): Payload | undefined {
+        return this.queue.shift();
+    }
+
+    public isEmpty(): boolean {
+        return this.queue.length === 0;
+    }
+
+    public _getCurrentQueue(): Payload[] {
+        return this.queue.slice(0);
     }
 }

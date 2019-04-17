@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from '../../utils/QueryBuilder';
+import { defaultNullLogger } from '../../../src/core/logging/NullLogger';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
-    }
+describe('NullLogger', () => {
+    it('should not crash on debug', () => {
+        defaultNullLogger.debug('something');
+    });
 
-    public build(): string {
-        const query = super.build();
+    it('should not crash on info', () => {
+        defaultNullLogger.info('something');
+    });
 
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
-    }
-}
+    it('should not crash on warn', () => {
+        defaultNullLogger.warn('something');
+    });
+
+    it('should not crash on error', () => {
+        defaultNullLogger.error('something');
+    });
+});

@@ -16,7 +16,6 @@
 
 export const enum ResponseKey {
     Capture = 'cp',
-    MonitorName = 'bn',
     ServerId = 'id',
     MaxBeaconSize = 'bl',
     CaptureErrors = 'er',

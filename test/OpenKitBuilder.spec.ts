@@ -15,7 +15,7 @@
  */
 
 import { mock } from 'ts-mockito';
-import { OpenKitBuilder } from '../src';
+import { LogLevel, OpenKitBuilder } from '../src';
 import {
     CommunicationChannel,
     CrashReportingLevel,
@@ -63,39 +63,39 @@ describe('OpenKitBuilder', () => {
     it('should return equal values in the config as set in the constructor', () => {
         const config = builder.getConfig();
 
-        expect(config.deviceId).toEqual('-42');
-        expect(config.applicationId).toEqual('app-id');
-        expect(config.beaconURL).toEqual('https://example.com');
+        expect(config.openKit.deviceId).toEqual('-42');
+        expect(config.openKit.applicationId).toEqual('app-id');
+        expect(config.openKit.beaconURL).toEqual('https://example.com');
     });
 
     it('should set the application name', () => {
         builder.withApplicationName('app-name');
 
-        expect(builder.getConfig().applicationName).toEqual('app-name');
+        expect(builder.getConfig().meta.applicationName).toEqual('app-name');
     });
 
     it('should set the application version', () => {
         builder.withApplicationVersion('1.3.2');
 
-        expect(builder.getConfig().applicationVersion).toEqual('1.3.2');
+        expect(builder.getConfig().meta.applicationVersion).toEqual('1.3.2');
     });
 
     it('should set the crash reporting level', () => {
         builder.withCrashReportingLevel(CrashReportingLevel.OptInCrashes);
 
-        expect(builder.getConfig().crashReportingLevel).toEqual(CrashReportingLevel.OptInCrashes);
+        expect(builder.getConfig().privacy.crashReportingLevel).toEqual(CrashReportingLevel.OptInCrashes);
     });
 
     it('should set the data collection level', () => {
         builder.withDataCollectionLevel(DataCollectionLevel.Performance);
 
-        expect(builder.getConfig().dataCollectionLevel).toEqual(DataCollectionLevel.Performance);
+        expect(builder.getConfig().privacy.dataCollectionLevel).toEqual(DataCollectionLevel.Performance);
     });
 
     it('should set the operating system', () => {
         builder.withOperatingSystem('Arch');
 
-        expect(builder.getConfig().operatingSystem).toEqual('Arch');
+        expect(builder.getConfig().meta.operatingSystem).toEqual('Arch');
     });
 
     it('should set the communication channel', () => {
@@ -103,7 +103,7 @@ describe('OpenKitBuilder', () => {
 
         builder.withCommunicationChannel(channel);
 
-        expect(builder.getConfig().communicationChannel).toBe(channel);
+        expect(builder.getConfig().openKit.communicationChannel).toBe(channel);
     });
 
     it('should set the random provider', () => {
@@ -111,20 +111,23 @@ describe('OpenKitBuilder', () => {
 
         builder.withRandomNumberProvider(random);
 
-        expect(builder.getConfig().random).toBe(random);
+        expect(builder.getConfig().openKit.random).toBe(random);
     });
 
-    it('should set the logging factory', () => {
-        const loggerFactory = new StubLoggerFactory();
+    describe('loggerFactory', () => {
+        it('should set the logging factory', () => {
+            const loggerFactory = new StubLoggerFactory();
 
-        builder.withLoggerFactory(loggerFactory);
+            builder.withLoggerFactory(loggerFactory);
 
-        expect(builder.getConfig().loggerFactory).toBe(loggerFactory);
+            expect(builder.getConfig().openKit.loggerFactory).toBe(loggerFactory);
+        });
+
+        it('should set a default logging factory if none is configured', () => {
+            expect(builder.getConfig().openKit.loggerFactory).toBeInstanceOf(ConsoleLoggerFactory);
+        });
     });
 
-    it('should set a default logging factory if none is configured', () => {
-        expect(builder.getConfig().loggerFactory).toBeInstanceOf(ConsoleLoggerFactory);
-    });
 
     it('should set multiple values at once', () => {
         const config = builder
@@ -135,12 +138,12 @@ describe('OpenKitBuilder', () => {
             .withApplicationVersion('5.6.7')
             .getConfig();
 
-        expect(config.deviceId).toEqual('-42');
-        expect(config.operatingSystem).toEqual('Arch');
-        expect(config.dataCollectionLevel).toEqual(DataCollectionLevel.UserBehavior);
-        expect(config.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
-        expect(config.applicationName).toEqual('App Name');
-        expect(config.applicationVersion).toEqual('5.6.7');
+        expect(config.openKit.deviceId).toEqual('-42');
+        expect(config.meta.operatingSystem).toEqual('Arch');
+        expect(config.privacy.dataCollectionLevel).toEqual(DataCollectionLevel.UserBehavior);
+        expect(config.privacy.crashReportingLevel).toEqual(CrashReportingLevel.OptOutCrashes);
+        expect(config.meta.applicationName).toEqual('App Name');
+        expect(config.meta.applicationVersion).toEqual('5.6.7');
     });
 
     it('should return an openkit instance', () => {
@@ -152,6 +155,26 @@ describe('OpenKitBuilder', () => {
 
        expect(ok).toBeInstanceOf(OpenKitImpl);
     });
+
+    describe('logLevel', () => {
+        it('should set the log level', () => {
+            builder.withLogLevel(LogLevel.Warn);
+
+            const config = builder.getConfig();
+            const factory = config.openKit.loggerFactory as ConsoleLoggerFactory;
+
+            expect(factory._logLevel).toBe(LogLevel.Warn);
+        });
+    });
+
+    describe('sendingStrategies', () => {
+        it('should set strategies if the browser is used', () => {
+            const strategies = builder.getConfig().openKit.sendingStrategies;
+
+            expect(strategies.length).toBeGreaterThan(0);
+        });
+    });
+
 
     describe('deviceId', () => {
         const randomNumberProvider: RandomNumberProvider = { nextPositiveInteger: () => 1337 };
@@ -165,7 +188,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-            expect(config.deviceId).toBe('1337');
+            expect(config.openKit.deviceId).toBe('1337');
        });
 
        it('should generate a random device id, if the dcl = Off', () => {
@@ -178,7 +201,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('1337');
+           expect(config.openKit.deviceId).toBe('1337');
        });
 
        it('should generate a random device id, if the dcl = Performance', () => {
@@ -191,7 +214,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('1337');
+           expect(config.openKit.deviceId).toBe('1337');
        });
 
        it('should remove a "+" from the start of a device id', () => {
@@ -202,7 +225,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('12345');
+           expect(config.openKit.deviceId).toBe('12345');
        });
 
        it('should generate a random device id, if there is a "+" in the device id, which is not at the start', () => {
@@ -214,7 +237,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('1337');
+           expect(config.openKit.deviceId).toBe('1337');
        });
 
        it('should generate a random device id, if there is a "+" at the start, but no number', () => {
@@ -226,7 +249,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('1337');
+           expect(config.openKit.deviceId).toBe('1337');
        });
 
        it('should use the device id if it is negative', () => {
@@ -238,7 +261,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('-54321');
+           expect(config.openKit.deviceId).toBe('-54321');
        });
 
        it('should generate a random device id, if the number is longer than 19 characters', () => {
@@ -250,7 +273,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('1337');
+           expect(config.openKit.deviceId).toBe('1337');
        });
 
        it('should use the device id, if it is 19 characters and negative', () => {
@@ -262,7 +285,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('-1111122222333334444');
+           expect(config.openKit.deviceId).toBe('-1111122222333334444');
        });
 
        it('should use the device id, if it is 19 characters and positive', () => {
@@ -274,7 +297,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('1111122222333334444');
+           expect(config.openKit.deviceId).toBe('1111122222333334444');
        });
 
        it('should use the device id, if it is 1 character', () => {
@@ -286,7 +309,7 @@ describe('OpenKitBuilder', () => {
            const config = builder.getConfig();
 
            // then
-           expect(config.deviceId).toBe('5');
+           expect(config.openKit.deviceId).toBe('5');
        });
     });
 
@@ -297,7 +320,7 @@ describe('OpenKitBuilder', () => {
                 builder.withManufacturer('Dynatrace');
 
                 // then
-                expect(builder.getConfig().manufacturer).toEqual('Dynatrace');
+                expect(builder.getConfig().device.manufacturer).toEqual('Dynatrace');
             });
 
             it('should not update the manufacturer if it is not a valid string', () => {
@@ -309,12 +332,12 @@ describe('OpenKitBuilder', () => {
                     builder.withManufacturer(value as string);
 
                     // then
-                    expect(builder.getConfig().manufacturer).not.toEqual(String(value));
-                    expect(builder.getConfig().manufacturer).not.toEqual(value);
+                    expect(builder.getConfig().device.manufacturer).not.toEqual(String(value));
+                    expect(builder.getConfig().device.manufacturer).not.toEqual(value);
                 });
 
                 // then
-                expect(builder.getConfig().manufacturer).toBeUndefined();
+                expect(builder.getConfig().device.manufacturer).toBeUndefined();
             });
 
             it('should not update the manufacturer if it is an empty string', () => {
@@ -322,8 +345,8 @@ describe('OpenKitBuilder', () => {
                 builder.withManufacturer('');
 
                 // then
-                expect(builder.getConfig().manufacturer).not.toEqual('');
-                expect(builder.getConfig().manufacturer).toBeUndefined();
+                expect(builder.getConfig().device.manufacturer).not.toEqual('');
+                expect(builder.getConfig().device.manufacturer).toBeUndefined();
             });
 
             it('should truncate a manufacturer over 250 characters', () => {
@@ -335,7 +358,7 @@ describe('OpenKitBuilder', () => {
                 builder.withManufacturer(tooLongName);
 
                 // then
-                expect(builder.getConfig().manufacturer).toEqual(validName);
+                expect(builder.getConfig().device.manufacturer).toEqual(validName);
             });
 
             it('should return the same instance', () => {
@@ -350,7 +373,7 @@ describe('OpenKitBuilder', () => {
                 builder.withModelId('Dynatrace');
 
                 // then
-                expect(builder.getConfig().modelId).toEqual('Dynatrace');
+                expect(builder.getConfig().device.modelId).toEqual('Dynatrace');
             });
 
             it('should not update the modelId if it is not a valid string', () => {
@@ -362,12 +385,12 @@ describe('OpenKitBuilder', () => {
                     builder.withModelId(value as string);
 
                     // then
-                    expect(builder.getConfig().modelId).not.toEqual(String(value));
-                    expect(builder.getConfig().modelId).not.toEqual(value);
+                    expect(builder.getConfig().device.modelId).not.toEqual(String(value));
+                    expect(builder.getConfig().device.modelId).not.toEqual(value);
                 });
 
                 // then
-                expect(builder.getConfig().modelId).toBeUndefined();
+                expect(builder.getConfig().device.modelId).toBeUndefined();
             });
 
             it('should not update the modelId if it is an empty string', () => {
@@ -375,8 +398,8 @@ describe('OpenKitBuilder', () => {
                 builder.withModelId('');
 
                 // then
-                expect(builder.getConfig().modelId).not.toEqual('');
-                expect(builder.getConfig().modelId).toBeUndefined();
+                expect(builder.getConfig().device.modelId).not.toEqual('');
+                expect(builder.getConfig().device.modelId).toBeUndefined();
             });
 
             it('should truncate a modelId over 250 characters', () => {
@@ -388,7 +411,7 @@ describe('OpenKitBuilder', () => {
                 builder.withModelId(tooLongName);
 
                 // then
-                expect(builder.getConfig().modelId).toEqual(validName);
+                expect(builder.getConfig().device.modelId).toEqual(validName);
             });
 
             it('should return the same instance', () => {
@@ -403,7 +426,7 @@ describe('OpenKitBuilder', () => {
                 builder.withUserLanguage('Dynatrace');
 
                 // then
-                expect(builder.getConfig().userLanguage).toEqual('Dynatrace');
+                expect(builder.getConfig().device.userLanguage).toEqual('Dynatrace');
             });
 
             it('should not update the userLanguage if it is not a valid string', () => {
@@ -415,12 +438,12 @@ describe('OpenKitBuilder', () => {
                     builder.withUserLanguage(value as string);
 
                     // then
-                    expect(builder.getConfig().userLanguage).not.toEqual(String(value));
-                    expect(builder.getConfig().userLanguage).not.toEqual(value);
+                    expect(builder.getConfig().device.userLanguage).not.toEqual(String(value));
+                    expect(builder.getConfig().device.userLanguage).not.toEqual(value);
                 });
 
                 // then
-                expect(builder.getConfig().userLanguage).toBeUndefined();
+                expect(builder.getConfig().device.userLanguage).toBeUndefined();
             });
 
             it('should not update the userLanguage if it is an empty string', () => {
@@ -428,8 +451,8 @@ describe('OpenKitBuilder', () => {
                 builder.withUserLanguage('');
 
                 // then
-                expect(builder.getConfig().userLanguage).not.toEqual('');
-                expect(builder.getConfig().userLanguage).toBeUndefined();
+                expect(builder.getConfig().device.userLanguage).not.toEqual('');
+                expect(builder.getConfig().device.userLanguage).toBeUndefined();
             });
         });
 
@@ -439,8 +462,8 @@ describe('OpenKitBuilder', () => {
                 builder.withScreenResolution(1200, 900);
 
                 // then
-                expect(builder.getConfig().screenWidth).toBe(1200);
-                expect(builder.getConfig().screenHeight).toBe(900);
+                expect(builder.getConfig().device.screenWidth).toBe(1200);
+                expect(builder.getConfig().device.screenHeight).toBe(900);
             });
 
             it('should update the screen resolution properties with valid numbers as string', () => {
@@ -449,8 +472,8 @@ describe('OpenKitBuilder', () => {
                 builder.withScreenResolution('1200', '900');
 
                 // then
-                expect(builder.getConfig().screenWidth).toBe(1200);
-                expect(builder.getConfig().screenHeight).toBe(900);
+                expect(builder.getConfig().device.screenWidth).toBe(1200);
+                expect(builder.getConfig().device.screenHeight).toBe(900);
             });
 
             it('should not update if width or height is not a finite number or positive', () => {
@@ -462,8 +485,8 @@ describe('OpenKitBuilder', () => {
                     builder.withScreenResolution(width as number, 900).getConfig();
 
                     // then
-                    expect(builder.getConfig().screenWidth).toBeUndefined();
-                    expect(builder.getConfig().screenHeight).toBeUndefined();
+                    expect(builder.getConfig().device.screenWidth).toBeUndefined();
+                    expect(builder.getConfig().device.screenHeight).toBeUndefined();
                 });
 
                 invalidInputs.forEach(height => {
@@ -471,8 +494,8 @@ describe('OpenKitBuilder', () => {
                     builder.withScreenResolution(1200, height as number).getConfig();
 
                     // then
-                    expect(builder.getConfig().screenWidth).toBeUndefined();
-                    expect(builder.getConfig().screenHeight).toBeUndefined();
+                    expect(builder.getConfig().device.screenWidth).toBeUndefined();
+                    expect(builder.getConfig().device.screenHeight).toBeUndefined();
                 });
             });
         });
@@ -487,7 +510,7 @@ describe('OpenKitBuilder', () => {
                     builder.withScreenOrientation(orientation);
 
                     // then
-                    expect(builder.getConfig().orientation).toBe(orientation);
+                    expect(builder.getConfig().device.orientation).toBe(orientation);
                 });
             });
 
@@ -500,7 +523,7 @@ describe('OpenKitBuilder', () => {
                     builder.withScreenOrientation(invalidInput as Orientation);
 
                     // then
-                    expect(builder.getConfig().orientation).toBeUndefined();
+                    expect(builder.getConfig().device.orientation).toBeUndefined();
                 });
             });
         });

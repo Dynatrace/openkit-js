@@ -25,6 +25,9 @@ import {
     Orientation,
     RandomNumberProvider,
 } from './api';
+import { ImmediateSendingStrategy } from './core/beacon/strategies/ImmediateSendingStrategy';
+import { IntervalSendingStrategy } from './core/beacon/strategies/IntervalSendingStrategy';
+import { SendingStrategy } from './core/beacon/strategies/SendingStrategy';
 import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
 import { Configuration } from './core/config/Configuration';
@@ -66,7 +69,6 @@ export class OpenKitBuilder {
     private userLanguage?: string;
     private screenWidth?: number;
     private screenHeight?: number;
-    private screenDensity?: number;
     private orientation?: Orientation;
 
     /**
@@ -319,28 +321,38 @@ export class OpenKitBuilder {
 
         // user does not allow data tracking
         const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random);
+        const sendingStrategies = getContextBasedSendingStrategies();
+
         return {
-            beaconURL: this.beaconUrl,
-            deviceId,
-            applicationId: this.applicationId,
+            openKit: {
+                beaconURL: this.beaconUrl,
+                deviceId,
+                applicationId: this.applicationId,
+                communicationChannel,
+                random,
+                loggerFactory,
+                sendingStrategies,
+            },
 
-            applicationName: this.applicationName,
-            applicationVersion: this.applicationVersion,
-            operatingSystem: this.operatingSystem,
+            privacy: {
+                dataCollectionLevel: this.dataCollectionLevel,
+                crashReportingLevel: this.crashReportingLevel,
+            },
 
-            dataCollectionLevel: this.dataCollectionLevel,
-            crashReportingLevel: this.crashReportingLevel,
+            meta: {
+                applicationName: this.applicationName,
+                applicationVersion: this.applicationVersion,
+                operatingSystem: this.operatingSystem,
+            },
 
-            communicationChannel,
-            random,
-            loggerFactory,
-
-            manufacturer: this.manufacturer,
-            modelId: this.modelId,
-            userLanguage: this.userLanguage,
-            screenWidth: this.screenWidth,
-            screenHeight: this.screenHeight,
-            orientation: this.orientation,
+            device: {
+                manufacturer: this.manufacturer,
+                modelId: this.modelId,
+                userLanguage: this.userLanguage,
+                screenWidth: this.screenWidth,
+                screenHeight: this.screenHeight,
+                orientation: this.orientation,
+            },
         };
     }
 }
@@ -359,4 +371,14 @@ const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: R
     }
 
     return id;
+};
+
+const isNodeJs = (): boolean => typeof process !== 'undefined' && process.release && process.release.name === 'node';
+
+const getContextBasedSendingStrategies = (): SendingStrategy[] => {
+    if (isNodeJs()) {
+        return [new IntervalSendingStrategy()];
+    } else {
+        return [new ImmediateSendingStrategy()];
+    }
 };

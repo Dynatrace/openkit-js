@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Action, WebRequestTracer } from '../../api';
+import { Action, WebRequestTracer } from '../../../api';
 import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 
 export class NullAction implements Action {

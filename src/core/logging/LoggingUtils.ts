@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
-import { QueryKey } from '../../protocol/QueryKey';
-import { QueryBuilder } from '../../utils/QueryBuilder';
+import { Logger } from '../../api';
 
-export class UrlBuilder extends QueryBuilder<QueryKey> {
-    constructor(private readonly url: string) {
-        super();
-    }
-
-    public build(): string {
-        const query = super.build();
-
-        return query.length === 0 ? this.url : `${this.url}?${query}`;
-    }
-}
+export const validationFailed = (log: Logger, component: string, reason: string, elements: object = {}) =>
+    log.warn(component, 'Validation failed', reason, elements);

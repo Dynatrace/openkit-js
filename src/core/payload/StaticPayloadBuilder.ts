@@ -15,26 +15,26 @@
  */
 
 import { Configuration } from '../config/Configuration';
-import { ActionImpl } from '../impl/ActionImpl';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
-import { PayloadQueryBuilder } from './builder/PayloadQueryBuilder';
+import { combinePayloads, Payload } from './Payload';
+import { PayloadQueryBuilder } from './PayloadQueryBuilder';
 
-export class PayloadBuilder {
+export class StaticPayloadBuilder {
     public static reportCrash(errorName: string, reason: string, stacktrace: string,
-                              sequenceNumber: number, sessionStartTime: number, currentTime: number): string {
-        return PayloadBuilder
+                              sequenceNumber: number, timeSinceSessionStart: number): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.Crash, errorName)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.Time0, currentTime - sessionStartTime)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
             .add(PayloadKey.Reason, reason)
             .add(PayloadKey.Stacktrace, stacktrace)
             .build();
     }
-    public static startSession(sequenceNumber: number): string {
-        return PayloadBuilder
+    public static startSession(sequenceNumber: number): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.SessionStart)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
@@ -42,8 +42,8 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static endSession(sequenceNumber: number, duration: number): string {
-        return PayloadBuilder
+    public static endSession(sequenceNumber: number, duration: number): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.SessionEnd)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
@@ -51,15 +51,22 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static action(action: ActionImpl, sessionStartTime: number): string {
-        return PayloadBuilder
-            .basicEventData(EventType.ManualAction, action.name)
-            .add(PayloadKey.ActionId, action.actionId)
+    public static action(
+        name: string,
+        actionId: number,
+        startSequenceNumber: number,
+        endSequenceNumber: number,
+        timeSinceSessionStart: number,
+        duration: number,
+    ): Payload {
+        return StaticPayloadBuilder
+            .basicEventData(EventType.ManualAction, name)
+            .add(PayloadKey.ActionId, actionId)
             .add(PayloadKey.ParentActionId, 0)
-            .add(PayloadKey.StartSequenceNumber, action.startSequenceNumber)
-            .add(PayloadKey.EndSequenceNumber, action.endSequenceNumber!)
-            .add(PayloadKey.Time0, action.startTime - sessionStartTime)
-            .add(PayloadKey.Time1, action.endTime - action.startTime)
+            .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
+            .add(PayloadKey.EndSequenceNumber, endSequenceNumber!)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
+            .add(PayloadKey.Time1, duration)
             .build();
     }
 
@@ -68,8 +75,8 @@ export class PayloadBuilder {
         parentActionId: number,
         startSequenceNumber: number,
         timeSinceSessionStart: number,
-    ): string {
-        return PayloadBuilder
+    ): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.NamedEvent, name)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
@@ -77,56 +84,64 @@ export class PayloadBuilder {
             .build();
     }
 
-    public static prefix(config: Configuration, sessionId: number, clientIpAddress: string): string {
+    public static applicationWidePrefix(config: Configuration): Payload {
+        const {openKit, device, privacy, meta} = config;
+
         return new PayloadQueryBuilder()
             .add(PayloadKey.ProtocolVersion, protocolVersion)
             .add(PayloadKey.OpenKitVersion, openKitVersion)
-            .add(PayloadKey.ApplicationId, config.applicationId)
-            .add(PayloadKey.ApplicationName, config.applicationName)
-            .addIfDefined(PayloadKey.ApplicationVersion, config.applicationVersion)
-            .addIfDefined(PayloadKey.DeviceOs, config.operatingSystem)
+            .add(PayloadKey.ApplicationId, openKit.applicationId)
+            .add(PayloadKey.ApplicationName, meta.applicationName === undefined ? '' : meta.applicationName)
+            .addIfDefined(PayloadKey.ApplicationVersion, meta.applicationVersion)
+            .addIfDefined(PayloadKey.DeviceOs, meta.operatingSystem)
             .add(PayloadKey.PlatformType, platformTypeOpenKit)
             .add(PayloadKey.AgentTechnologyType, agentTechnologyType)
 
-            .add(PayloadKey.VisitorId, config.deviceId)
-            .add(PayloadKey.SessionNumber, sessionId)
-            .add(PayloadKey.ClientIpAddress, clientIpAddress)
+            .add(PayloadKey.VisitorId, openKit.deviceId)
 
-            .add(PayloadKey.DataCollectionLevel, config.dataCollectionLevel)
-            .add(PayloadKey.CrashReportingLevel, config.crashReportingLevel)
+            .add(PayloadKey.DataCollectionLevel, privacy.dataCollectionLevel)
+            .add(PayloadKey.CrashReportingLevel, privacy.crashReportingLevel)
 
-            .addIfDefined(PayloadKey.DeviceManufacturer, config.manufacturer)
-            .addIfDefined(PayloadKey.DeviceModel, config.modelId)
-            .addIfDefined(PayloadKey.ScreenWidth, config.screenWidth)
-            .addIfDefined(PayloadKey.ScreenHeight, config.screenHeight)
-            .addIfDefined(PayloadKey.UserLanguage, config.userLanguage)
-            .addIfDefined(PayloadKey.Orientation, config.orientation)
+            .addIfDefined(PayloadKey.DeviceManufacturer, device.manufacturer)
+            .addIfDefined(PayloadKey.DeviceModel, device.modelId)
+            .addIfDefined(PayloadKey.ScreenWidth, device.screenWidth)
+            .addIfDefined(PayloadKey.ScreenHeight, device.screenHeight)
+            .addIfDefined(PayloadKey.UserLanguage, device.userLanguage)
+            .addIfDefined(PayloadKey.Orientation, device.orientation)
             .build();
     }
 
-    public static mutable(sessionStartTime: number, multiplicity: number, transmissionTime: number): string {
-        return new PayloadQueryBuilder()
+    public static sessionPrefix(prefix: Payload, sessionId: number, clientIpAddress: string, sessionStartTime: number): Payload {
+        const sessionPrefix = new PayloadQueryBuilder()
+            .add(PayloadKey.SessionNumber, sessionId)
+            .add(PayloadKey.ClientIpAddress, clientIpAddress)
             .add(PayloadKey.SessionStartTime, sessionStartTime)
+            .build();
+
+        return combinePayloads(prefix, sessionPrefix);
+    }
+
+    public static mutable(multiplicity: number, transmissionTime: number): Payload {
+        return new PayloadQueryBuilder()
             .add(PayloadKey.Multiplicity, multiplicity)
             .add(PayloadKey.TransmissionTime, transmissionTime)
             .build();
     }
 
     public static reportValue(
-        action: ActionImpl,
+        actionId: number,
         name: string,
         value: number | string | null | undefined,
         sequenceNumber: number,
-        timestamp: number,
-        sessionStartTime: number,
-    ): string {
+        timeSinceSessionStart: number,
+    ): Payload {
         const eventType = typeof value === 'number' ? EventType.ValueDouble : EventType.ValueString;
 
-        return PayloadBuilder
+        return StaticPayloadBuilder
             .basicEventData(eventType, name)
-            .add(PayloadKey.ParentActionId, action.actionId)
+            .add(PayloadKey.ParentActionId, actionId)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
             .addIfDefinedAndNotNull(PayloadKey.Value, value)
             .build();
     }
@@ -138,8 +153,8 @@ export class PayloadBuilder {
         timeSinceSessionStart: number,
         reason: string,
         errorValue: number,
-    ): string {
-        return PayloadBuilder
+    ): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.Error, name)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
@@ -152,13 +167,13 @@ export class PayloadBuilder {
     public static identifyUser(
         userTag: string,
         sequenceNumber: number,
-        timestamp: number,
-        sessionStartTime: number): string {
-        return PayloadBuilder
+        timeSinceSessionStart: number,
+    ): Payload {
+        return StaticPayloadBuilder
             .basicEventData(EventType.IdentifyUser, userTag)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
-            .add(PayloadKey.Time0, timestamp - sessionStartTime)
+            .add(PayloadKey.Time0, timeSinceSessionStart)
             .build();
     }
 
@@ -172,8 +187,8 @@ export class PayloadBuilder {
         bytesSent: number,
         bytesReceived: number,
         responseCode: number,
-    ): string {
-        return PayloadBuilder.basicEventData(EventType.WebRequest, url)
+    ): Payload {
+        return StaticPayloadBuilder.basicEventData(EventType.WebRequest, url)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)

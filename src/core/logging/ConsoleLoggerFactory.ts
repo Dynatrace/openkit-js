@@ -23,16 +23,16 @@ import { ConsoleLogger } from './ConsoleLogger';
  * @see {@link ConsoleLogger}
  */
 export class ConsoleLoggerFactory implements LoggerFactory {
-    private readonly logLevel: LogLevel;
+    public readonly _logLevel: LogLevel;
 
     constructor(logLevel: LogLevel) {
-        this.logLevel = logLevel;
+        this._logLevel = logLevel;
     }
 
     /**
      * @inheritDoc
      */
     public createLogger(name: string): Logger {
-        return new ConsoleLogger(name, this.logLevel);
+        return new ConsoleLogger(name, this._logLevel);
     }
 }

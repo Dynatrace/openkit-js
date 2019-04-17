@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { PayloadQueryBuilder } from '../../../../src/core/beacon/builder/PayloadQueryBuilder';
-import { PayloadKey } from '../../../../src/core/protocol/PayloadKey';
+import { PayloadQueryBuilder } from '../../../src/core/payload/PayloadQueryBuilder';
+import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
 
 describe('PayloadQueryBuilder', () => {
     let builder: PayloadQueryBuilder;
@@ -61,6 +61,40 @@ describe('PayloadQueryBuilder', () => {
             builder.add(PayloadKey.DeviceOs, 2);
 
             expect(builder.build()).toEqual('os=2')
+        });
+    });
+
+    describe('addIfDefinedAndNotNull', () => {
+        it('should not add if the value is undefined', () => {
+            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationName, undefined);
+
+            expect(builder.build()).toEqual('');
+        });
+
+        it('should not add if the value is null', () => {
+            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationName, null);
+
+            expect(builder.build()).toEqual('');
+        });
+
+        it('should add if the value is valid', () => {
+            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationName, 'name');
+
+            expect(builder.build()).toEqual('an=name');
+        });
+    });
+
+    describe('addIfNotNegative', () => {
+        it('should not add if the value is negative', () => {
+            builder.addIfNotNegative(PayloadKey.ApplicationName, -1);
+
+            expect(builder.build()).toEqual('');
+        });
+
+        it('should add if the value is positive', () => {
+            builder.addIfNotNegative(PayloadKey.ApplicationName, 1);
+
+            expect(builder.build()).toEqual('an=1');
         });
     });
 

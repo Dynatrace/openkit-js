@@ -75,4 +75,25 @@ describe('CallbackHolder', () => {
 
        expect(value).toBe(true);
     });
+
+    describe('contains', () => {
+        it('should return true if the callback is registered', () => {
+            // given
+            const cb = () => null;
+
+            // when
+            holder.add(cb);
+
+            // then
+            expect(holder.contains(cb)).toBeTruthy();
+        });
+
+        it('should return false if the callback is not registered', () => {
+            // given
+            const cb = () => null;
+
+            // when, then
+            expect(holder.contains(cb)).toBeFalsy();
+        });
+    });
 });

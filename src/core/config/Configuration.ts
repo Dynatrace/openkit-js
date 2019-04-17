@@ -22,28 +22,42 @@ import {
     Orientation,
     RandomNumberProvider,
 } from '../../api';
+import { SendingStrategy } from '../beacon/strategies/SendingStrategy';
+
+export interface PrivacyConfiguration {
+    readonly dataCollectionLevel: DataCollectionLevel;
+    readonly crashReportingLevel: CrashReportingLevel;
+}
+
+export interface DeviceMetadata {
+    readonly manufacturer: string;
+    readonly modelId: string;
+    readonly userLanguage: string;
+    readonly screenWidth: number;
+    readonly screenHeight: number;
+    readonly orientation: Orientation;
+}
+
+export interface ApplicationMetadata {
+    readonly applicationName: string;
+    readonly applicationVersion: string;
+    readonly operatingSystem: string;
+}
+
+export interface OpenKitConfiguration {
+    readonly beaconURL: string;
+    readonly applicationId: string;
+    readonly deviceId: string;
+
+    readonly sendingStrategies: SendingStrategy[];
+    readonly communicationChannel: CommunicationChannel;
+    readonly loggerFactory: LoggerFactory;
+    readonly random: RandomNumberProvider;
+}
 
 export interface Configuration {
-    beaconURL: string;
-    applicationId: string;
-    deviceId: string;
-
-    applicationName: string;
-    applicationVersion?: string;
-    operatingSystem?: string;
-
-    dataCollectionLevel: DataCollectionLevel;
-    crashReportingLevel: CrashReportingLevel;
-
-    communicationChannel: CommunicationChannel;
-    loggerFactory: LoggerFactory;
-    random: RandomNumberProvider;
-
-    // Additional metadata
-    manufacturer?: string;
-    modelId?: string;
-    userLanguage?: string;
-    screenWidth?: number;
-    screenHeight?: number;
-    orientation?: Orientation;
+    readonly openKit: OpenKitConfiguration;
+    readonly privacy: PrivacyConfiguration;
+    readonly device: Partial<DeviceMetadata>;
+    readonly meta: Partial<ApplicationMetadata>;
 }

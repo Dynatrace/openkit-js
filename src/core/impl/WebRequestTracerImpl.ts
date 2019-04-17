@@ -15,13 +15,14 @@
  */
 
 import { Logger, LoggerFactory, WebRequestTracer } from '../../api';
-import { PayloadData } from '../beacon/PayloadData';
+import { validationFailed } from '../logging/LoggingUtils';
 import { protocolVersion } from '../PlatformConstants';
+import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 
 const tagPrefix = 'MT';
 
 // We do not need to percent encode, because the device id and application id are only [0-9a-fA-F-]
-const createTag =
+export const createTag =
     (actionId: number, sessionNumber: number, sequenceNumber: number, serverId: number, deviceId: string, appId: string): string =>
         [
             tagPrefix,
@@ -36,7 +37,7 @@ const createTag =
         ].join('_');
 
 export class WebRequestTracerImpl implements WebRequestTracer {
-    private readonly payload: PayloadData;
+    private readonly payload: PayloadBuilderHelper;
     private readonly parentActionId: number;
     private readonly url: string;
     private readonly startSequenceNumber: number;
@@ -51,11 +52,10 @@ export class WebRequestTracerImpl implements WebRequestTracer {
     private bytesReceived: number = -1;
 
     constructor(
-        payload: PayloadData,
+        payload: PayloadBuilderHelper,
         actionId: number,
         url: string,
         logFactory: LoggerFactory,
-        serverId: number,
         deviceId: string,
         appId: string,
         sessionNumber: number,
@@ -67,25 +67,31 @@ export class WebRequestTracerImpl implements WebRequestTracer {
         // creating start sequence number has to be done here, because it's needed for the creation of the tag
         this.startSequenceNumber = payload.createSequenceNumber();
 
-        this.logger = logFactory.createLogger(`WebRequestTracerImpl] [${sessionNumber}] [${this.startSequenceNumber}`);
+        this.logger = logFactory.createLogger(
+            `WebRequestTracerImpl (sessionId=${sessionNumber}, startSequence=${this.startSequenceNumber})`);
 
         // if start is not called before using the setters the start time (e.g. load time) is not in 1970
         this.startTime = payload.currentTimestamp();
 
-        this.tag = createTag(this.parentActionId, sessionNumber, this.startSequenceNumber, serverId, deviceId, appId);
+        this.tag =
+            payload.getWebRequestTracerTag(actionId, sessionNumber, this.startSequenceNumber, deviceId, appId);
 
         this.logger.debug('create');
     }
 
     public getTag(): string {
-        this.logger.debug('getTag', `tag=${this.tag}`);
+        this.logger.debug('getTag', {tag: this.tag});
 
         return this.tag;
     }
 
     public setBytesReceived(bytesReceived: number): this {
-        if (!this.isStopped()) {
-            this.logger.debug('setBytesReceived', `bytesReceived=${bytesReceived}`);
+        if (!isFinite(bytesReceived) || bytesReceived < 0) {
+            validationFailed(this.logger, 'setBytesReceived', 'bytes must be a positive finite number', {bytesReceived});
+        } else if (this.isStopped()) {
+            validationFailed(this.logger, 'setBytesReceived', 'webrequest is already stopped');
+        } else {
+            this.logger.debug('setBytesReceived', {bytesReceived});
 
             this.bytesReceived = bytesReceived;
         }
@@ -94,8 +100,12 @@ export class WebRequestTracerImpl implements WebRequestTracer {
     }
 
     public setBytesSent(bytesSent: number): this {
-        if (!this.isStopped()) {
-            this.logger.debug('setBytesReceived', `bytesSent=${bytesSent}`);
+        if (!isFinite(bytesSent) || bytesSent < 0) {
+            validationFailed(this.logger, 'setBytesSent', 'bytes must be a positive finite number', {bytesSent});
+        } else if (this.isStopped()) {
+            validationFailed(this.logger, 'setBytesSent', 'webrequest is already stopped');
+        } else {
+            this.logger.debug('setBytesSent', {bytesSent});
 
             this.bytesSent = bytesSent;
         }
@@ -104,7 +114,9 @@ export class WebRequestTracerImpl implements WebRequestTracer {
     }
 
     public start(): this {
-        if (!this.isStopped()) {
+        if (this.isStopped()) {
+            validationFailed(this.logger, 'setBytesSent', 'webrequest is already stopped');
+        } else {
             this.logger.debug('start');
 
             this.startTime = this.payload.currentTimestamp();
@@ -115,6 +127,8 @@ export class WebRequestTracerImpl implements WebRequestTracer {
 
     public stop(responseCode?: number): void {
         if (this.isStopped()) {
+            validationFailed(this.logger, 'setBytesSent', 'webrequest is already stopped');
+
             return;
         }
 
@@ -126,7 +140,7 @@ export class WebRequestTracerImpl implements WebRequestTracer {
 
         this.endSequenceNumber = this.payload.createSequenceNumber();
 
-        this.logger.debug('stop()', 'duration=' + (this.endTime - this.startTime));
+        this.logger.debug('stop', { duration: this.endTime - this.startTime});
         this.payload.addWebRequest(this, this.parentActionId);
     }
 
