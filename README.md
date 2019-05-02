@@ -108,3 +108,4 @@ Crashes are used to report (unhandled) exceptions on a `Session`.
 
 OpenKit enables you to tag sessions with unique user tags. The user tag is a String 
 that allows to uniquely identify a single user.
+ 
