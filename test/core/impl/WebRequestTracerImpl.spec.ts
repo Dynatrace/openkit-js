@@ -17,7 +17,6 @@
 import { anything, instance, mock, reset, when } from 'ts-mockito';
 import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
 import { createTag, WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
-import { defaultNullLogger } from '../../../src/core/logging/NullLogger';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
 describe('WebRequestTracerImpl', () => {
@@ -49,7 +48,7 @@ describe('WebRequestTracerImpl', () => {
         it('should not update bytesReceived if the request is stopped', () => {
             // given
             webRequest.setBytesReceived(1000);
-            webRequest.stop();
+            webRequest.stop(200);
 
             // when
             webRequest.setBytesReceived(2000);
@@ -76,7 +75,7 @@ describe('WebRequestTracerImpl', () => {
         it('should not update bytesSent if the request is stopped', () => {
             // given
             webRequest.setBytesSent(1000);
-            webRequest.stop();
+            webRequest.stop(200);
 
             // when
             webRequest.setBytesSent(2000);
@@ -117,7 +116,7 @@ describe('WebRequestTracerImpl', () => {
 
        it('should not update startTime if the webRequest is stopped', () => {
            // when
-           webRequest.stop();
+           webRequest.stop(200);
            webRequest.start();
 
            // then
@@ -134,7 +133,7 @@ describe('WebRequestTracerImpl', () => {
     describe('stop', () => {
         it('should set the duration after stop has been called', () => {
             // when
-            webRequest.stop();
+            webRequest.stop(200);
 
             // then
             expect(webRequest.getDuration()).toBe(300);
@@ -142,7 +141,7 @@ describe('WebRequestTracerImpl', () => {
 
         it('should set the end sequence number after stop has been called', () => {
             // when
-            webRequest.stop();
+            webRequest.stop(200);
 
             // then
             expect(webRequest.getEndSequenceNumber()).toBe(9);
@@ -156,17 +155,9 @@ describe('WebRequestTracerImpl', () => {
             expect(webRequest.getResponseCode()).toBe(404);
         });
 
-        it('should have a default response code of -1', () => {
-            // when
-            webRequest.stop();
-
-            // then
-            expect(webRequest.getResponseCode()).toBe(-1);
-        });
-
         it('should not update the response code if it is already stopped', () => {
             // given
-            webRequest.stop();
+            webRequest.stop(-1);
 
             // when
             webRequest.stop(300);
@@ -184,7 +175,7 @@ describe('WebRequestTracerImpl', () => {
 
         it('should return the duration if the webRequest is stopped', () =>{
             // when
-            webRequest.stop();
+            webRequest.stop(200);
 
             // then
             expect(webRequest.getDuration()).toBe(300);

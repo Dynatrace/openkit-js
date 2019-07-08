@@ -125,7 +125,7 @@ export class WebRequestTracerImpl implements WebRequestTracer {
         return this;
     }
 
-    public stop(responseCode?: number): void {
+    public stop(responseCode: number): void {
         if (this.isStopped()) {
             validationFailed(this.logger, 'setBytesSent', 'webrequest is already stopped');
 

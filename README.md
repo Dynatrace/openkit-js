@@ -47,6 +47,10 @@ If you use a platform without XMLHttpRequests and not node.js (http-module), you
 the XMLHttpRequest, or provide your own CommunicationChannel implementation, which can use the protocol
 you want (e.g. MQTT).
 
+## Obtaining OpenKit from npm
+
+OpenKit is available on [npm](https://www.npmjs.com/package/@dynatrace/openkit-js) and should be used via npm or yarn.
+
 ## Development
 
 See [development.md](development.md).
@@ -108,4 +112,3 @@ Crashes are used to report (unhandled) exceptions on a `Session`.
 
 OpenKit enables you to tag sessions with unique user tags. The user tag is a String 
 that allows to uniquely identify a single user.
- 

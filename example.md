@@ -225,9 +225,9 @@ webRequestTracer.start();
 // perform the request here & do not forget to add the HTTP header
 
 // the following code has to be executed after the request finished
-webRequestTracer.setBytesSent(12345);       // optional, 12345 bytes sent
-webRequestTracer.setBytesReceived(67890);   // optional, 67890 received
-webRequestTracer.stop(200);                 // stop the web request tracer, with the optional response code
+webRequestTracer.setBytesSent(12345);
+webRequestTracer.setBytesReceived(67890);
+webRequestTracer.stop(200);                 // stop the web request tracer, with the response code
 ```
 
 ## Terminating the OpenKit Instance

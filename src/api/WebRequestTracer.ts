@@ -53,5 +53,5 @@ export interface WebRequestTracer {
     /**
      * Stops the web request timing. Should be called when the web request is finished.
      */
-    stop(responseCode?: number): void;
+    stop(responseCode: number): void;
 }

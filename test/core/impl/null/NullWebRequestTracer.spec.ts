@@ -34,7 +34,6 @@ describe('NullWebRequestTracer', () => {
     });
 
     it('should not crash on stop', () => {
-        defaultNullWebRequestTracer.stop();
         defaultNullWebRequestTracer.stop(42);
     });
 });

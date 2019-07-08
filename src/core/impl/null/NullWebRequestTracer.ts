@@ -33,7 +33,7 @@ class NullWebRequestTracer implements  WebRequestTracer {
         return this;
     }
 
-    public stop(responseCode?: number): void {
+    public stop(responseCode: number): void {
         // stub
     }
 }
