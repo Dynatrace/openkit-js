@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.0.0...release/1.0)
 
+### Security
+- Update vulnerable packages
+
 ### Changed
 - Fixed build paths
 - Removed unused dev dependency
