@@ -12,11 +12,7 @@
       "es2015.promise"
     ]
   },
-  "exclude": [
-    "node_modules",
-    "example",
-    "build",
-    "dist",
-    "test"
+  "include": [
+    "src/**/*"
   ]
 }

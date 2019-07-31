@@ -5,6 +5,7 @@
   "author": "Dynatrace",
   "types": "dist/types/index.d.ts",
   "main": "dist/node/index.js",
+  "browser": "dist/browser/openkit.js",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -14,7 +15,7 @@
     "test": "jest",
     "lint": "tslint --project ./tsconfig.base.json -c tslint.json",
     "lint:spec": "tslint --project ./tsconfig.base.json -c tslint.spec.json",
-    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/index.ts src/api --tsconfig tsconfig.base.json --exclude src/core/**/* --excludePrivate --excludeNotExported",
+    "docs": "typedoc --out docs src/OpenKitBuilder.ts src/index.ts src/api --tsconfig tsconfig.base.json --exclude src/core --excludePrivate --excludeNotExported --excludeExternals",
     "docs:markdown": "yarn docs --theme markdown",
     "build": "yarn build:browser && yarn build:node",
     "build:node": "tsc -p tsconfig.node.json",
@@ -23,7 +24,6 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
-    "@types/promise-polyfill": "^6.0.3",
     "codelyzer": "^5.0.0-beta.1",
     "jest": "^24.5.0",
     "ts-jest": "^24.0.0",
@@ -45,4 +45,3 @@
     "docs"
   ]
 }
-
