@@ -51,6 +51,11 @@ you want (e.g. MQTT).
 
 OpenKit is available on [npm](https://www.npmjs.com/package/@dynatrace/openkit-js) and should be used via npm or yarn.
 
+For browsers a mirroring service like [jsDelivr](https://www.jsdelivr.com/package/npm/@dynatrace/openkit-js) can be used.
+```html
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@dynatrace/openkit-js@1.0.0/dist/browser/openkit.js"></script>
+```
+
 ## Development
 
 See [development.md](development.md).
@@ -112,3 +117,35 @@ Crashes are used to report (unhandled) exceptions on a `Session`.
 
 OpenKit enables you to tag sessions with unique user tags. The user tag is a String 
 that allows to uniquely identify a single user.
+
+## Example
+
+This small example provides a rough overview how OpenKit can be used.
+Detailed explanation is available in [example.md](example.md).
+
+```javascript
+const applicationName = "My OpenKit application";
+const applicationID = "application-id";
+const deviceID = 42;
+const endpointURL = "https://tenantid.beaconurl.com/mbeacon";
+
+const openKit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
+    .withApplicationName(applicationName)
+    .withApplicationVersion("1.0.0.0")
+    .withOperatingSystem("Windows 10")
+    .withManufacturer("MyCompany")
+    .withModelId("MyModelId")
+    .build();
+
+const clientIP = "8.8.8.8";
+const session = openKit.createSession(clientIP);
+
+session.identifyUser("jane.doe@example.com");
+
+const actionName = "rootActionName";
+const action = session.enterAction(actionName);
+
+action.leaveAction();
+session.end();
+openKit.shutdown();
+```

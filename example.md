@@ -5,7 +5,7 @@ developer's point of view. It explains the usage of all the API methods.
 
 ## Obtaining an OpenKit Instance
 
-For Dynatrace SaaS and Dynatrace Managed the `DynatraceOpenKitBuilder` is used to build new OpenKit instances. 
+For Dynatrace SaaS and Dynatrace Managed the `OpenKitBuilder` is used to build new OpenKit instances. 
 
 ```javascript
 const applicationId = 'application-id';
