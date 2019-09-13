@@ -1,6 +1,9 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.0.0...release/1.0)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.0.1...release/1.0)
+
+## 1.0.1 [Release date: 2019-09-13]
+[GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.0.1)
 
 ### Security
 - Update vulnerable packages
