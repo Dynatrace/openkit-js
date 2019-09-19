@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
-import { Configuration, OpenKitConfiguration } from '../../../src/core/config/Configuration';
-import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
+import {CrashReportingLevel, DataCollectionLevel} from '../../../src/api';
+import {Configuration, OpenKitConfiguration} from '../../../src/core/config/Configuration';
+import {StaticPayloadBuilder} from '../../../src/core/payload/StaticPayloadBuilder';
 import {
     agentTechnologyType,
     openKitVersion,
     platformTypeOpenKit,
     protocolVersion,
 } from '../../../src/core/PlatformConstants';
-import { EventType } from '../../../src/core/protocol/EventType';
-import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
-import { PayloadDecoder } from '../../../src/core/utils/PayloadDecoder';
-import { Mutable } from '../../Helpers';
+import {EventType} from '../../../src/core/protocol/EventType';
+import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
+import {PayloadDecoder} from '../../../src/core/utils/PayloadDecoder';
+import {Mutable} from '../../Helpers';
 
 const parse = (payload: string) => {
     const pairs = new PayloadDecoder(payload).getEntries();
@@ -37,8 +37,8 @@ const parse = (payload: string) => {
     }
 };
 
-const payloadExpect = (pairs: {[key: string]: string}, key: string, expected: string | undefined) => {
-  expect(pairs[key]).toEqual(expected);
+const payloadExpect = (pairs: { [key: string]: string }, key: string, expected: string | undefined) => {
+    expect(pairs[key]).toEqual(expected);
 };
 
 const payloadKeysExpect = (keys: string[], expected: PayloadKey[]) => {
@@ -461,101 +461,122 @@ describe('PayloadBuilder', () => {
     });
 
     describe('reportCrash', () => {
-       it('should build the correct payload', () => {
-           // given
-          const payload = StaticPayloadBuilder.reportCrash('errorName', 'reason', 'stacktrace', 6, 4000);
+        it('should build the correct payload', () => {
+            // given
+            const stacktrace = "javax.servlet.ServletException: Something bad happened\n" +
+                "    at com.example.myproject.OpenSessionInViewFilter.doFilter(OpenSessionInViewFilter.java:60)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
+                "    at com.example.myproject.ExceptionHandlerFilter.doFilter(ExceptionHandlerFilter.java:28)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
+                "    at com.example.myproject.OutputBufferFilter.doFilter(OutputBufferFilter.java:33)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:388)\n" +
+                "    at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)\n" +
+                "    at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:182)\n" +
+                "    at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)\n" +
+                "    at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:418)\n" +
+                "    at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)\n" +
+                "    at org.mortbay.jetty.Server.handle(Server.java:326)\n" +
+                "    at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:542)\n" +
+                "    at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:943)\n" +
+                "    at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:756)\n" +
+                "    at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:218)\n" +
+                "    at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)\n" +
+                "    at org.mortbay.jetty.bio.SocketConnector$Connection.run(SocketConnector.java:228)\n" +
+                "    at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:582)\n";
+            const payload = StaticPayloadBuilder.reportCrash('errorName', 'reason', stacktrace, 6, 4000);
 
-           // when
-           const {keys, pairs} = parse(payload);
+            // when
+            const {keys, pairs} = parse(payload);
 
-           // then
-           payloadKeysExpect(keys, [
-               PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId,
-               PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.Stacktrace]);
+            // then
+            payloadKeysExpect(keys, [
+                PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId,
+                PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.Stacktrace]);
 
-          payloadExpect(pairs, PayloadKey.EventType, EventType.Crash.toString());
-          payloadExpect(pairs, PayloadKey.ThreadId, '1');
-          payloadExpect(pairs, PayloadKey.KeyName, 'errorName');
-          payloadExpect(pairs, PayloadKey.ParentActionId, '0');
-          payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
-          payloadExpect(pairs, PayloadKey.Time0, '4000');
-          payloadExpect(pairs, PayloadKey.Reason, 'reason');
-          payloadExpect(pairs, PayloadKey.Stacktrace, 'stacktrace');
-       });
+            payloadExpect(pairs, PayloadKey.EventType, EventType.Crash.toString());
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.KeyName, 'errorName');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '0');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '6');
+            payloadExpect(pairs, PayloadKey.Time0, '4000');
+            payloadExpect(pairs, PayloadKey.Reason, 'reason');
+            payloadExpect(pairs, PayloadKey.Stacktrace, stacktrace);
+        });
     });
 
     describe('reportEvent', () => {
-       it('should build the payload', () => {
-           // given
-           const payload = StaticPayloadBuilder.reportNamedEvent('Name', 5, 8, 5431);
+        it('should build the payload', () => {
+            // given
+            const payload = StaticPayloadBuilder.reportNamedEvent('Name', 5, 8, 5431);
 
-           // when
-           const {keys, pairs} = parse(payload);
+            // when
+            const {keys, pairs} = parse(payload);
 
-           // then
-           payloadKeysExpect(keys, [
-               PayloadKey.EventType, PayloadKey.KeyName, PayloadKey.ThreadId, PayloadKey.ParentActionId,
-               PayloadKey.StartSequenceNumber, PayloadKey.Time0]);
+            // then
+            payloadKeysExpect(keys, [
+                PayloadKey.EventType, PayloadKey.KeyName, PayloadKey.ThreadId, PayloadKey.ParentActionId,
+                PayloadKey.StartSequenceNumber, PayloadKey.Time0]);
 
-           payloadExpect(pairs, PayloadKey.EventType, EventType.NamedEvent.toString());
-           payloadExpect(pairs, PayloadKey.KeyName, 'Name');
-           payloadExpect(pairs, PayloadKey.ThreadId, '1');
-           payloadExpect(pairs, PayloadKey.ParentActionId, '5');
-           payloadExpect(pairs, PayloadKey.StartSequenceNumber, '8');
-           payloadExpect(pairs, PayloadKey.Time0, '5431');
-       });
+            payloadExpect(pairs, PayloadKey.EventType, EventType.NamedEvent.toString());
+            payloadExpect(pairs, PayloadKey.KeyName, 'Name');
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '5');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '8');
+            payloadExpect(pairs, PayloadKey.Time0, '5431');
+        });
     });
 
     describe('webRequest', () => {
-       it('should build the payload with all optional values', () => {
-           // given
-           const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, 1400, 5430, 200);
+        it('should build the payload with all optional values', () => {
+            // given
+            const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, 1400, 5430, 200);
 
-           // when
-           const {keys, pairs} = parse(payload);
+            // when
+            const {keys, pairs} = parse(payload);
 
-           // then
-           payloadKeysExpect(keys, [
-               PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
-               PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
-               PayloadKey.Time1, PayloadKey.BytesSent, PayloadKey.BytesReceived, PayloadKey.ResponseCode]);
+            // then
+            payloadKeysExpect(keys, [
+                PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
+                PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
+                PayloadKey.Time1, PayloadKey.BytesSent, PayloadKey.BytesReceived, PayloadKey.ResponseCode]);
 
-           payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
-           payloadExpect(pairs, PayloadKey.ThreadId, '1');
-           payloadExpect(pairs, PayloadKey.KeyName, 'https://example.com');
-           payloadExpect(pairs, PayloadKey.ParentActionId, '70');
-           payloadExpect(pairs, PayloadKey.StartSequenceNumber, '196');
-           payloadExpect(pairs, PayloadKey.Time0, '500');
-           payloadExpect(pairs, PayloadKey.EndSequenceNumber, '207');
-           payloadExpect(pairs, PayloadKey.Time1, '5000');
-           payloadExpect(pairs, PayloadKey.BytesSent, '1400');
-           payloadExpect(pairs, PayloadKey.BytesReceived, '5430');
-           payloadExpect(pairs, PayloadKey.ResponseCode, '200');
-       });
+            payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.KeyName, 'https://example.com');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '70');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '196');
+            payloadExpect(pairs, PayloadKey.Time0, '500');
+            payloadExpect(pairs, PayloadKey.EndSequenceNumber, '207');
+            payloadExpect(pairs, PayloadKey.Time1, '5000');
+            payloadExpect(pairs, PayloadKey.BytesSent, '1400');
+            payloadExpect(pairs, PayloadKey.BytesReceived, '5430');
+            payloadExpect(pairs, PayloadKey.ResponseCode, '200');
+        });
 
-       it('should build the payload without optional values', () => {
-           // given
-           const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, -1, -1, -1);
+        it('should build the payload without optional values', () => {
+            // given
+            const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, -1, -1, -1);
 
-           // when
-           const {keys, pairs} = parse(payload);
+            // when
+            const {keys, pairs} = parse(payload);
 
-           // then
-           payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
-               PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
-               PayloadKey.Time1]);
+            // then
+            payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
+                PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
+                PayloadKey.Time1]);
 
-           payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
-           payloadExpect(pairs, PayloadKey.ThreadId, '1');
-           payloadExpect(pairs, PayloadKey.KeyName, 'https://example.com');
-           payloadExpect(pairs, PayloadKey.ParentActionId, '70');
-           payloadExpect(pairs, PayloadKey.StartSequenceNumber, '196');
-           payloadExpect(pairs, PayloadKey.Time0, '500');
-           payloadExpect(pairs, PayloadKey.EndSequenceNumber, '207');
-           payloadExpect(pairs, PayloadKey.Time1, '5000');
-           payloadExpect(pairs, PayloadKey.BytesSent, undefined);
-           payloadExpect(pairs, PayloadKey.BytesReceived, undefined);
-           payloadExpect(pairs, PayloadKey.ResponseCode, undefined);
-       });
+            payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
+            payloadExpect(pairs, PayloadKey.ThreadId, '1');
+            payloadExpect(pairs, PayloadKey.KeyName, 'https://example.com');
+            payloadExpect(pairs, PayloadKey.ParentActionId, '70');
+            payloadExpect(pairs, PayloadKey.StartSequenceNumber, '196');
+            payloadExpect(pairs, PayloadKey.Time0, '500');
+            payloadExpect(pairs, PayloadKey.EndSequenceNumber, '207');
+            payloadExpect(pairs, PayloadKey.Time1, '5000');
+            payloadExpect(pairs, PayloadKey.BytesSent, undefined);
+            payloadExpect(pairs, PayloadKey.BytesReceived, undefined);
+            payloadExpect(pairs, PayloadKey.ResponseCode, undefined);
+        });
     });
 });

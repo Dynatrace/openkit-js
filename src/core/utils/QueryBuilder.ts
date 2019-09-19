@@ -21,8 +21,8 @@ import { truncate } from './Utils';
 export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     private readonly options: Record<string, string> = {};
 
-    public add(key: T, value: string | number): this {
-        this.options[key] = truncate(value.toString());
+    public add(key: T, value: string | number, maxLength?: number): this {
+        this.options[key] = truncate(value.toString(), maxLength);
 
         return this;
     }

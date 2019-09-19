@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@dynatrace/openkit-js@latest":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@dynatrace/openkit-js/-/openkit-js-1.0.0.tgz#09b00d79eb90e76b25a68768bafabb337914cf18"
-  integrity sha512-yewjSrzxCoXQgwor4oztI8RyasuZrZTDkhXQZaIfrTPWv4CqgHKxrjQ6HQi2aX2pgA7wlgj/2KdT3n04gHRVjA==
+"@dynatrace/openkit-js@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@dynatrace/openkit-js/-/openkit-js-1.0.1.tgz#58a2b09aff3fbb7ff57ce48b98bbf88d870bd16e"
+  integrity sha512-c+0aepo6Spbc+TPUNnYzrEQMUfZUbu0WPp2eEq4F0AlHywqAazs00s9s795Cf0aGcNasjEjXbGRmzv2C3jcGSw==
   dependencies:
     axios "^0.18.0"
 

@@ -77,6 +77,41 @@ describe('PayloadBuilder', () => {
             verify(staticBuilderSpy.reportCrash('name', 'reason', 'stack', 6, 100)).once();
             verify(builderSpy._push(anything())).once();
         });
+
+        it('should not truncate the payload if longer than 250 chars', () => {
+            // given
+            const stacktrace = "javax.servlet.ServletException: Something bad happened\n" +
+                "    at com.example.myproject.OpenSessionInViewFilter.doFilter(OpenSessionInViewFilter.java:60)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
+                "    at com.example.myproject.ExceptionHandlerFilter.doFilter(ExceptionHandlerFilter.java:28)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
+                "    at com.example.myproject.OutputBufferFilter.doFilter(OutputBufferFilter.java:33)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
+                "    at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:388)\n" +
+                "    at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)\n" +
+                "    at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:182)\n" +
+                "    at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)\n" +
+                "    at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:418)\n" +
+                "    at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)\n" +
+                "    at org.mortbay.jetty.Server.handle(Server.java:326)\n" +
+                "    at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:542)\n" +
+                "    at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:943)\n" +
+                "    at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:756)\n" +
+                "    at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:218)\n" +
+                "    at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)\n" +
+                "    at org.mortbay.jetty.bio.SocketConnector$Connection.run(SocketConnector.java:228)\n" +
+                "    at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:582)\n";
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.captureCrashes).thenReturn(CaptureMode.On);
+
+            // when
+            builder.reportCrash('name', 'reason', stacktrace, 6, 100);
+
+            // then
+            verify(staticBuilderSpy.reportCrash(anything(), anything(), anything(), anything(), anything())).once();
+            verify(staticBuilderSpy.reportCrash('name', 'reason', stacktrace, 6, 100)).once();
+            verify(builderSpy._push(anything())).once();
+        })
     });
 
     describe('reportNamedEvent', () => {
