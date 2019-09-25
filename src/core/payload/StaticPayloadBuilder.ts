@@ -21,6 +21,11 @@ import { PayloadKey } from '../protocol/PayloadKey';
 import { combinePayloads, Payload } from './Payload';
 import { PayloadQueryBuilder } from './PayloadQueryBuilder';
 
+/**
+ * Maximum size of a stacktrace passed to Dynatrace.
+ */
+const MAX_STACKTRACE_LENGTH = 128_000;
+
 export class StaticPayloadBuilder {
     public static reportCrash(errorName: string, reason: string, stacktrace: string,
                               sequenceNumber: number, timeSinceSessionStart: number): Payload {
@@ -30,7 +35,7 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)
             .add(PayloadKey.Reason, reason)
-            .add(PayloadKey.Stacktrace, stacktrace)
+            .add(PayloadKey.Stacktrace, stacktrace, MAX_STACKTRACE_LENGTH)
             .build();
     }
     public static startSession(sequenceNumber: number): Payload {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { PayloadQueryBuilder } from '../../../src/core/payload/PayloadQueryBuilder';
-import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
+import {PayloadQueryBuilder} from '../../../src/core/payload/PayloadQueryBuilder';
+import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
 
 describe('PayloadQueryBuilder', () => {
     let builder: PayloadQueryBuilder;
@@ -61,6 +61,12 @@ describe('PayloadQueryBuilder', () => {
             builder.add(PayloadKey.DeviceOs, 2);
 
             expect(builder.build()).toEqual('os=2')
+        });
+
+        it('should use the supplied max length if set', () => {
+            builder.add(PayloadKey.Stacktrace, '123456789', 5);
+
+            expect(builder.build()).toEqual('st=12345')
         });
     });
 
