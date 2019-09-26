@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.0.0...HEAD)
 
+### Improved
+- Changed maximum length of stacktrace to 128kb
+
 ### Security
 - Update vulnerable packages
 

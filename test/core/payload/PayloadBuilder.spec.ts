@@ -78,7 +78,7 @@ describe('PayloadBuilder', () => {
             verify(builderSpy._push(anything())).once();
         });
 
-        it('should not truncate the payload if longer than 250 chars', () => {
+        it('should not truncate the stacktrace payload if longer than 250 chars', () => {
             // given
             const stacktrace = "javax.servlet.ServletException: Something bad happened\n" +
                 "    at com.example.myproject.OpenSessionInViewFilter.doFilter(OpenSessionInViewFilter.java:60)\n" +
@@ -336,7 +336,7 @@ describe('PayloadBuilder', () => {
             when(state.capture).thenReturn(CaptureMode.On);
 
             // when
-            builder.webRequest('https://example.com', 6, 4, 100, 5, 6000, 100, 200, 300)
+            builder.webRequest('https://example.com', 6, 4, 100, 5, 6000, 100, 200, 300);
 
             // then
             verify(staticBuilderSpy.webRequest(anything(), anything(), anything(), anything(), anything(), anything(), anything(), anything(), anything())).once();
