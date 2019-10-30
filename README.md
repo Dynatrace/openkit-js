@@ -53,7 +53,7 @@ OpenKit is available on [npm](https://www.npmjs.com/package/@dynatrace/openkit-j
 
 For browsers a mirroring service like [jsDelivr](https://www.jsdelivr.com/package/npm/@dynatrace/openkit-js) can be used.
 ```html
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@dynatrace/openkit-js@1.0.0/dist/browser/openkit.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@dynatrace/openkit-js@1.0.2/dist/browser/openkit.js"></script>
 ```
 
 ## Development
