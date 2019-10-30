@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.0.2...release/1.0)
 
+### Added
+- Technology type support for errors and crashes
+
 ## 1.0.2 [Release date: 2019-09-23]
 [GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.0.2)
 

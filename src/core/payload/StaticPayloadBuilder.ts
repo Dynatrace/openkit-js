@@ -15,7 +15,7 @@
  */
 
 import { Configuration } from '../config/Configuration';
-import { agentTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
+import { agentTechnologyType, errorTechnologyType, openKitVersion, platformTypeOpenKit, protocolVersion } from '../PlatformConstants';
 import { EventType } from '../protocol/EventType';
 import { PayloadKey } from '../protocol/PayloadKey';
 import { combinePayloads, Payload } from './Payload';
@@ -36,6 +36,7 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.Time0, timeSinceSessionStart)
             .add(PayloadKey.Reason, reason)
             .add(PayloadKey.Stacktrace, stacktrace, MAX_STACKTRACE_LENGTH)
+            .add(PayloadKey.ErrorTechnologyType, errorTechnologyType)
             .build();
     }
     public static startSession(sequenceNumber: number): Payload {
@@ -90,7 +91,7 @@ export class StaticPayloadBuilder {
     }
 
     public static applicationWidePrefix(config: Configuration): Payload {
-        const {openKit, device, privacy, meta} = config;
+        const { openKit, device, privacy, meta } = config;
 
         return new PayloadQueryBuilder()
             .add(PayloadKey.ProtocolVersion, protocolVersion)
@@ -166,6 +167,7 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.Time0, timeSinceSessionStart)
             .add(PayloadKey.Reason, reason)
             .add(PayloadKey.ErrorValue, errorValue)
+            .add(PayloadKey.ErrorTechnologyType, errorTechnologyType)
             .build();
     }
 
