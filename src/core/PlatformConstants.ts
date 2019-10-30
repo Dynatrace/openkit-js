@@ -35,4 +35,12 @@ export const platformTypeOpenKit = 1;
  */
 export const agentTechnologyType = 'okjs';
 
+/**
+ * The default server id, if no other has been chosen by the backend.
+ */
 export const defaultServerId = 1;
+
+/**
+ * Error technology type "custom".
+ */
+export const errorTechnologyType = 'c';

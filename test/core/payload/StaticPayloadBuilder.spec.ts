@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-import {CrashReportingLevel, DataCollectionLevel} from '../../../src/api';
-import {Configuration, OpenKitConfiguration} from '../../../src/core/config/Configuration';
-import {StaticPayloadBuilder} from '../../../src/core/payload/StaticPayloadBuilder';
+import { CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
+import { Configuration, OpenKitConfiguration } from '../../../src/core/config/Configuration';
+import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
 import {
     agentTechnologyType,
     openKitVersion,
     platformTypeOpenKit,
     protocolVersion,
+    errorTechnologyType,
 } from '../../../src/core/PlatformConstants';
-import {EventType} from '../../../src/core/protocol/EventType';
-import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
-import {PayloadDecoder} from '../../../src/core/utils/PayloadDecoder';
-import {Mutable} from '../../Helpers';
+import { EventType } from '../../../src/core/protocol/EventType';
+import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
+import { PayloadDecoder } from '../../../src/core/utils/PayloadDecoder';
+import { Mutable } from '../../Helpers';
 
 const parse = (payload: string) => {
     const pairs = new PayloadDecoder(payload).getEntries();
@@ -52,7 +53,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.startSession(5);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.ThreadId]);
@@ -70,7 +71,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.endSession(6000, 50000000);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.ThreadId, PayloadKey.Time0]);
@@ -93,7 +94,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.action(name, id, sSN, eSN, 420, 6000);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
@@ -155,7 +156,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.applicationWidePrefix(config as Configuration);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
@@ -203,7 +204,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.applicationWidePrefix(config as Configuration);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
@@ -244,7 +245,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.sessionPrefix(prefix, sessionId, clientIp, sST);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [PayloadKey.SessionNumber, PayloadKey.ClientIpAddress, PayloadKey.SessionStartTime, 'mock' as PayloadKey]);
@@ -261,7 +262,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.mutable(765, 98765);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
             expect(keys.sort()).toEqual([PayloadKey.Multiplicity, PayloadKey.TransmissionTime].sort());
             payloadExpect(pairs, PayloadKey.Multiplicity, '765');
             payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
@@ -274,7 +275,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.identifyUser('Dynatrace Power User', 6, 60);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0]);
@@ -301,12 +302,13 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportError(name, pAId, sSN, tSSS, reason, ev);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
                 PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId,
-                PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.ErrorValue]);
+                PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.ErrorValue,
+                PayloadKey.ErrorTechnologyType]);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.Error.toString());
             payloadExpect(pairs, PayloadKey.ThreadId, '1');
@@ -316,6 +318,7 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.Time0, tSSS.toString());
             payloadExpect(pairs, PayloadKey.Reason, reason);
             payloadExpect(pairs, PayloadKey.ErrorValue, ev.toString());
+            payloadExpect(pairs, PayloadKey.ErrorTechnologyType, errorTechnologyType);
         });
     });
 
@@ -328,7 +331,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My String Value', 'Some String value', 6, 500);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
@@ -350,7 +353,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', 456.321, 6, 500);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Value]);
@@ -369,7 +372,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', +Infinity, 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.Value, 'Infinity');
@@ -380,7 +383,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', -Infinity, 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.Value, '-Infinity');
@@ -391,7 +394,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', NaN, 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.Value, 'NaN');
@@ -402,7 +405,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', '', 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -414,7 +417,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', null, 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -426,7 +429,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'My int value', undefined, 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -439,7 +442,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, str, '', 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -452,7 +455,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportValue(actionId, 'Key', str, 6, 600);
 
             // when
-            const {pairs} = parse(payload);
+            const { pairs } = parse(payload);
 
             // then
             payloadExpect(pairs, PayloadKey.EventType, EventType.ValueString.toString());
@@ -487,12 +490,13 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportCrash('errorName', 'reason', stacktrace, 6, 4000);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
                 PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName, PayloadKey.ParentActionId,
-                PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.Stacktrace]);
+                PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.Reason, PayloadKey.Stacktrace,
+                PayloadKey.ErrorTechnologyType]);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.Crash.toString());
             payloadExpect(pairs, PayloadKey.ThreadId, '1');
@@ -502,6 +506,7 @@ describe('PayloadBuilder', () => {
             payloadExpect(pairs, PayloadKey.Time0, '4000');
             payloadExpect(pairs, PayloadKey.Reason, 'reason');
             payloadExpect(pairs, PayloadKey.Stacktrace, stacktrace);
+            payloadExpect(pairs, PayloadKey.ErrorTechnologyType, errorTechnologyType);
         });
     });
 
@@ -511,7 +516,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.reportNamedEvent('Name', 5, 8, 5431);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
@@ -533,7 +538,7 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, 1400, 5430, 200);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [
@@ -559,12 +564,12 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.webRequest('https://example.com', 70, 196, 500, 207, 5000, -1, -1, -1);
 
             // when
-            const {keys, pairs} = parse(payload);
+            const { keys, pairs } = parse(payload);
 
             // then
             payloadKeysExpect(keys, [PayloadKey.EventType, PayloadKey.ThreadId, PayloadKey.KeyName,
-                PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
-                PayloadKey.Time1]);
+            PayloadKey.ParentActionId, PayloadKey.StartSequenceNumber, PayloadKey.Time0, PayloadKey.EndSequenceNumber,
+            PayloadKey.Time1]);
 
             payloadExpect(pairs, PayloadKey.EventType, EventType.WebRequest.toString());
             payloadExpect(pairs, PayloadKey.ThreadId, '1');

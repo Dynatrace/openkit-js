@@ -57,6 +57,7 @@ export const enum PayloadKey {
     Reason = 'rs',
     ErrorValue = 'ev',
     Stacktrace = 'st',
+    ErrorTechnologyType = 'tt',
 
     // Report Values
     Value = 'vl',
