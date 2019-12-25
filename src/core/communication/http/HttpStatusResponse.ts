@@ -16,7 +16,7 @@
 
 import { CaptureMode, Logger, LoggerFactory, StatusResponse } from '../../../api';
 import { ResponseKey } from '../../protocol/ResponseKey';
-import { PayloadDecoder } from '../../utils/PayloadDecoder';
+import { decodePayload } from '../../utils/PayloadDecoder';
 import { HttpResponse } from './HttpClient';
 
 const parsePositiveInt = (str: string, defaultValue: number): number => {
@@ -47,7 +47,7 @@ export class HttpStatusResponse implements StatusResponse {
             return;
         }
 
-        const entries = new PayloadDecoder(response.payload).getEntries();
+        const entries = decodePayload(response.payload);
         if (entries.type !== 'm') {
             this.valid = false;
             this.logger.debug('Invalid response type:', entries.type);

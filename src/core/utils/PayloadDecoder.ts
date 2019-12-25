@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-export class PayloadDecoder {
-    private entries: Record<string, string> = {};
+const splitEntry = (entry: string): [string, string] => {
+    return entry.split('=') as [string, string];
+};
 
-    constructor(query: string) {
-        this.decode(query);
-    }
+export const decodePayload = (
+    queryString: string,
+): Record<string, string> => {
+    const entries: Record<string, string> = {};
 
-    public getEntries(): Readonly<Record<string, string>> {
-        return this.entries;
-    }
+    queryString
+        .split('&')
+        .map(splitEntry)
+        .forEach(([key, value]) => entries[key] = decodeURIComponent(value));
 
-    private decode(query: string): void {
-        query
-            .split('&')
-            .forEach((entry) => this.decodeEntry(entry));
-    }
-
-    private decodeEntry(entry: string): void {
-        const [key, value] = entry.split('=');
-
-        this.entries[key] = decodeURIComponent(value);
-    }
-}
+    return entries;
+};
