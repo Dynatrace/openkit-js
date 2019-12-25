@@ -20,7 +20,7 @@ import { OpenKitImpl } from '../impl/OpenKitImpl';
 import { Payload } from '../payload/Payload';
 import { defaultServerId } from '../PlatformConstants';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
-import { StatusRequestImpl } from './StatusRequestImpl';
+import { createStatusRequest } from './StatusRequestImpl';
 import { BeaconCacheImpl, CacheEntry } from './strategies/BeaconCache';
 import { SendingStrategy } from './strategies/SendingStrategy';
 
@@ -62,7 +62,7 @@ export class BeaconSenderImpl implements BeaconSender {
         this.logger.debug('init');
 
         const response =
-            await this.channel.sendStatusRequest(this.beaconUrl, StatusRequestImpl.create(this.appId, this.okServerId));
+            await this.channel.sendStatusRequest(this.beaconUrl, createStatusRequest(this.appId, this.okServerId));
 
         if (response.valid) {
             this.initialized = true;
@@ -144,7 +144,7 @@ export class BeaconSenderImpl implements BeaconSender {
 
     private async sendNewSessionRequest(entry: CacheEntry): Promise<void> {
         const response = await this.channel.sendNewSessionRequest(
-            this.beaconUrl, StatusRequestImpl.create(this.appId, entry.communicationState.serverId),
+            this.beaconUrl, createStatusRequest(this.appId, entry.communicationState.serverId),
         );
 
         if (response.valid) {
@@ -176,7 +176,7 @@ export class BeaconSenderImpl implements BeaconSender {
         let payload: Payload | undefined;
         // tslint:disable-next-line
         while (payload = entry.builder.getNextPayload(entry.prefix, this.timestampProvider.getCurrentTimestamp())) {
-            const request = StatusRequestImpl.create(this.appId, entry.communicationState.serverId);
+            const request = createStatusRequest(this.appId, entry.communicationState.serverId);
 
             const response = await this.channel.sendPayloadData(this.beaconUrl, request, payload);
 
