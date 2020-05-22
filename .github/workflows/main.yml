@@ -27,3 +27,5 @@ jobs:
       with:
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: .
+      env: 
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
