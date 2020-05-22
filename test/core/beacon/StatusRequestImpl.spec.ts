@@ -14,44 +14,23 @@
  * limitations under the License.
  */
 
-import { StatusRequest } from '../../../src/api';
-import { StatusRequestImpl } from '../../../src/core/beacon/StatusRequestImpl';
+import { createStatusRequest } from '../../../src/core/beacon/StatusRequestImpl';
 import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src/core/PlatformConstants';
 
-describe('StatusRequestImpl', () => {
-    let request: StatusRequest;
+const APP_ID = 'app-id';
+const SERVER_ID = 8;
 
-    beforeEach(() => {
-        request = new StatusRequestImpl('agentTechnology', 'app-id', 'version', 7, 42);
-    });
+describe('createStatusRequest', () => {
+    it('should contain the correct base information, with the additional information passed into', () => {
+        const request = createStatusRequest(APP_ID, SERVER_ID);
 
-    it('should return the same agentTechnology as passed in the constructor', () => {
-       expect(request.agentTechnologyType).toEqual('agentTechnology');
-    });
+        // Constant values
+        expect(request.agentTechnologyType).toEqual(agentTechnologyType);
+        expect(request.openKitVersion).toEqual(openKitVersion);
+        expect(request.platformType).toEqual(platformTypeOpenKit);
 
-    it('should return the same app-id as passed in the constructor', () => {
-       expect(request.applicationId).toEqual('app-id');
-    });
-
-    it('should return the same openkit-version as passed in the constructor', () => {
-       expect(request.openKitVersion).toEqual('version');
-    });
-
-    it('should return the same platform-type as passed in the constructor', () => {
-       expect(request.platformType).toEqual(7);
-    });
-
-    it('should return the same server-id as passed in the constructor', () => {
-       expect(request.serverId).toEqual(42);
-    });
-
-    it('should create the request from a state', () => {
-       const request = StatusRequestImpl.create('app-id', 8);
-
-       expect(request.agentTechnologyType).toEqual(agentTechnologyType);
-       expect(request.applicationId).toEqual('app-id');
-       expect(request.openKitVersion).toEqual(openKitVersion);
-       expect(request.platformType).toEqual(platformTypeOpenKit);
-       expect(request.serverId).toBe(8);
+        // Variable values
+        expect(request.applicationId).toEqual(APP_ID);
+        expect(request.serverId).toBe(SERVER_ID);
     });
 });

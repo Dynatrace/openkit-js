@@ -19,18 +19,18 @@ import { Configuration, OpenKitConfiguration } from '../../../src/core/config/Co
 import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
 import {
     agentTechnologyType,
+    errorTechnologyType,
     openKitVersion,
     platformTypeOpenKit,
     protocolVersion,
-    errorTechnologyType,
 } from '../../../src/core/PlatformConstants';
 import { EventType } from '../../../src/core/protocol/EventType';
 import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
-import { PayloadDecoder } from '../../../src/core/utils/PayloadDecoder';
+import { decodePayload } from '../../../src/core/utils/PayloadDecoder';
 import { Mutable } from '../../Helpers';
 
 const parse = (payload: string) => {
-    const pairs = new PayloadDecoder(payload).getEntries();
+    const pairs = decodePayload(payload);
 
     return {
         keys: Object.keys(pairs),

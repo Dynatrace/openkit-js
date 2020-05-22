@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-import { PayloadDecoder } from '../../../src/core/utils/PayloadDecoder';
+import { decodePayload } from '../../../src/core/utils/PayloadDecoder';
 
 describe('PayloadDecoder', () => {
     it('should decode a single value', () => {
-        const entities = new PayloadDecoder('a=b').getEntries();
+        const entities = decodePayload('a=b');
 
         expect(entities.a).toEqual('b');
     });
 
     it('should decode multiple values', () => {
-        const entities = new PayloadDecoder('a=b&c=d').getEntries();
+        const entities = decodePayload('a=b&c=d');
 
         expect(entities.a).toEqual('b');
         expect(entities.c).toEqual('d');
     });
 
     it('should decode a single value which is encoded', () => {
-        const entities = new PayloadDecoder('c=d%20e').getEntries();
+        const entities = decodePayload('c=d%20e');
 
         expect(entities.c).toEqual('d e');
     });
 
     it('should decode a multiple values which may be encoded', () => {
-        const entities = new PayloadDecoder('a=b&c=d%20e').getEntries();
+        const entities = decodePayload('a=b&c=d%20e');
 
         expect(entities.a).toEqual('b');
         expect(entities.c).toEqual('d e');
