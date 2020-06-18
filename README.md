@@ -2,6 +2,9 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+:information_source: We changed the default branch name to `main`. You can find the necessary steps to update your local clone on [Scott Hanselman's Blog](https://www.hanselman.com/blog/EasilyRenameYourGitDefaultBranchFromMasterToMain.aspx).  
+We encourage you to rename the default branch in your forks too.
+
 ## What is the OpenKit?
 
 The OpenKit provides an easy and lightweight way to get insights into applications with Dynatrace/AppMon by instrumenting the source code of those applications.
