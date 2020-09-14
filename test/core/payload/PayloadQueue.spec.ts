@@ -94,11 +94,8 @@ describe('PayloadQueue', () => {
         const e2 = queue.pop();
 
         // then
-        expect(queue.isEmpty())
-            .toBeTruthy();
-        expect(e1)
-            .toBeUndefined();
-        expect(e2)
-            .toBeUndefined();
+        expect(queue.isEmpty()).toBeTruthy();
+        expect(e1).toBeUndefined();
+        expect(e2).toBeUndefined();
     });
 });

@@ -18,7 +18,7 @@ import { removeElement } from './Utils';
 
 export type SimpleCallback<T> = (value: T) => void;
 
-export class CallbackHolder <T> {
+export class CallbackHolder<T> {
     private readonly callbacks: Array<SimpleCallback<T>> = [];
 
     public add(cb: SimpleCallback<T>): void {

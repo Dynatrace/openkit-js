@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {PayloadQueryBuilder} from '../../../src/core/payload/PayloadQueryBuilder';
-import {PayloadKey} from '../../../src/core/protocol/PayloadKey';
+import { PayloadQueryBuilder } from '../../../src/core/payload/PayloadQueryBuilder';
+import { PayloadKey } from '../../../src/core/protocol/PayloadKey';
 
 describe('PayloadQueryBuilder', () => {
     let builder: PayloadQueryBuilder;
@@ -33,7 +33,9 @@ describe('PayloadQueryBuilder', () => {
     });
 
     it('should return the same instance after addIfDefined()', () => {
-        expect(builder.addIfDefined(PayloadKey.ActionId, undefined)).toBe(builder);
+        expect(builder.addIfDefined(PayloadKey.ActionId, undefined)).toBe(
+            builder,
+        );
     });
 
     describe('add', () => {
@@ -50,29 +52,32 @@ describe('PayloadQueryBuilder', () => {
         });
 
         it('should concat queries with "&" if multiple values are present', () => {
-           builder.add(PayloadKey.DeviceModel, 'myModel');
-           builder.add(PayloadKey.ApplicationId, '1.0.4');
+            builder.add(PayloadKey.DeviceModel, 'myModel');
+            builder.add(PayloadKey.ApplicationId, '1.0.4');
 
-           expect(builder.build()).toEqual('md=myModel&ap=1.0.4');
+            expect(builder.build()).toEqual('md=myModel&ap=1.0.4');
         });
 
         it('should overwrite already set values', () => {
             builder.add(PayloadKey.DeviceOs, 1);
             builder.add(PayloadKey.DeviceOs, 2);
 
-            expect(builder.build()).toEqual('os=2')
+            expect(builder.build()).toEqual('os=2');
         });
 
         it('should use the supplied max length if set', () => {
             builder.add(PayloadKey.Stacktrace, '123456789', 5);
 
-            expect(builder.build()).toEqual('st=12345')
+            expect(builder.build()).toEqual('st=12345');
         });
     });
 
     describe('addIfDefinedAndNotNull', () => {
         it('should not add if the value is undefined', () => {
-            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationName, undefined);
+            builder.addIfDefinedAndNotNull(
+                PayloadKey.ApplicationName,
+                undefined,
+            );
 
             expect(builder.build()).toEqual('');
         });
@@ -112,16 +117,16 @@ describe('PayloadQueryBuilder', () => {
         });
 
         it('should add the query if the value is defined', () => {
-           builder.addIfDefined(PayloadKey.ApplicationId, '1.2.3');
+            builder.addIfDefined(PayloadKey.ApplicationId, '1.2.3');
 
-           expect(builder.build()).toEqual('ap=1.2.3');
+            expect(builder.build()).toEqual('ap=1.2.3');
         });
 
         it('should add the query with multiple defined values', () => {
             builder.addIfDefined(PayloadKey.ApplicationId, '1.0');
             builder.addIfDefined(PayloadKey.DeviceOs, 'myOs');
 
-            expect(builder.build()).toEqual('ap=1.0&os=myOs')
+            expect(builder.build()).toEqual('ap=1.0&os=myOs');
         });
 
         it('should add the query with multiple defined and undefined values', () => {
@@ -129,21 +134,21 @@ describe('PayloadQueryBuilder', () => {
             builder.addIfDefined(PayloadKey.DeviceOs, 'myOs');
             builder.addIfDefined(PayloadKey.ActionId, undefined);
 
-            expect(builder.build()).toEqual('ap=1.0&os=myOs')
+            expect(builder.build()).toEqual('ap=1.0&os=myOs');
         });
 
         it('should overwrite already set values, if the value is also defined', () => {
-           builder.addIfDefined(PayloadKey.DeviceOs, 1);
-           builder.addIfDefined(PayloadKey.DeviceOs, 0);
+            builder.addIfDefined(PayloadKey.DeviceOs, 1);
+            builder.addIfDefined(PayloadKey.DeviceOs, 0);
 
-            expect(builder.build()).toEqual('os=0')
+            expect(builder.build()).toEqual('os=0');
         });
 
         it('should not overwrite already set values, if the value is not defined', () => {
-           builder.addIfDefined(PayloadKey.DeviceOs, 1);
-           builder.addIfDefined(PayloadKey.DeviceOs, undefined);
+            builder.addIfDefined(PayloadKey.DeviceOs, 1);
+            builder.addIfDefined(PayloadKey.DeviceOs, undefined);
 
-            expect(builder.build()).toEqual('os=1')
+            expect(builder.build()).toEqual('os=1');
         });
     });
 

@@ -5,7 +5,7 @@ developer's point of view. It explains the usage of all the API methods.
 
 ## Obtaining an OpenKit Instance
 
-For Dynatrace SaaS and Dynatrace Managed the `OpenKitBuilder` is used to build new OpenKit instances. 
+For Dynatrace SaaS and Dynatrace Managed the `OpenKitBuilder` is used to build new OpenKit instances.
 
 ```javascript
 const applicationId = 'application-id';
@@ -15,86 +15,83 @@ const beaconUrl = 'https://tenantid.beaconurl.com/mbeacon';
 const openKit = new OpenKitBuilder(beaconUrl, applicationId, deviceId).build();
 ```
 
-* The `beaconUrl` denotes the Dynatrace endpoint OpenKit communicates with and 
-  is shown when creating the application in Dynatrace. The endpoint URL can be found 
-  in the settings page of the custom application in Dynatrace.
-* The `applicationId` parameter is the unique identifier of the application in Dynatrace Saas. The
-  application's id can be found in the settings page of the custom application in Dynatrace.
-* The `deviceId` is a unique identifier, which might be used to uniquely identify a device.
+-   The `beaconUrl` denotes the Dynatrace endpoint OpenKit communicates with and
+    is shown when creating the application in Dynatrace. The endpoint URL can be found
+    in the settings page of the custom application in Dynatrace.
+-   The `applicationId` parameter is the unique identifier of the application in Dynatrace Saas. The
+    application's id can be found in the settings page of the custom application in Dynatrace.
+-   The `deviceId` is a unique identifier, which might be used to uniquely identify a device.
 
 ❕ For Dynatrace Managed the endpoint URL looks a bit different.
 
 ### Optional Configuration
 
-In addition to the mandatory parameters described above, the builder provides additional methods to further 
-customize OpenKit. This includes device specific information like operating system, manufacturer, or model id. 
+In addition to the mandatory parameters described above, the builder provides additional methods to further
+customize OpenKit. This includes device specific information like operating system, manufacturer, or model id.
 
-| Method Name                   | Description                       | Default Value                 |
-| ----------------------------- | --------------------------------- | ----------------------------- |
-| `withApplicationName`         | sets the application name         | ` ` (empty string)            | 
-| `withApplicationVersion`      | sets the application version      |                               |
-| `withOperatingSystem`         | sets the operating system name    |                               |
-| `withManufacturer`            | sets the manufacturer             |                               |
-| `withModelId`                 | sets the model id                 |                               |
-| `withUserLanguage`            | sets the user language            |                               |
-| `withScreenResolution`        | sets the screen resolution        |                               |
-| `withScreenOrientation`       | sets the screen orientation       |                               |
-| `withDataCollectionLevel`     | sets the data collection level    | `2` (User Behavior)           |
-| `withCrashReportingLevel`     | sets the crash reporting level    | `2` (OptIn)                   |
-| `withCommunicationChannel`    | sets the communication channel    | `HttpCommunicationChannel`    |
-| `withRandomNumberProvider`    | sets the random number provider   | `DefaultRandomNumberProvider` |
-| `withLoggerFactory`           | sets the logger factory           | `ConsoleLoggerFactory`        |
-| `withLogLevel`                | sets the log level                | `LogLevel.Info`               |  
-
+| Method Name                | Description                     | Default Value                 |
+| -------------------------- | ------------------------------- | ----------------------------- |
+| `withApplicationName`      | sets the application name       | ` ` (empty string)            |
+| `withApplicationVersion`   | sets the application version    |                               |
+| `withOperatingSystem`      | sets the operating system name  |                               |
+| `withManufacturer`         | sets the manufacturer           |                               |
+| `withModelId`              | sets the model id               |                               |
+| `withUserLanguage`         | sets the user language          |                               |
+| `withScreenResolution`     | sets the screen resolution      |                               |
+| `withScreenOrientation`    | sets the screen orientation     |                               |
+| `withDataCollectionLevel`  | sets the data collection level  | `2` (User Behavior)           |
+| `withCrashReportingLevel`  | sets the crash reporting level  | `2` (OptIn)                   |
+| `withCommunicationChannel` | sets the communication channel  | `HttpCommunicationChannel`    |
+| `withRandomNumberProvider` | sets the random number provider | `DefaultRandomNumberProvider` |
+| `withLoggerFactory`        | sets the logger factory         | `ConsoleLoggerFactory`        |
+| `withLogLevel`             | sets the log level              | `LogLevel.Info`               |
 
 ❕ Please refer to the the TypeDoc for more information regarding possible configuration values.
 
 ## Logging
 
 By default, OpenKit uses a logger implementation that logs to the console. If the default logger is used, the desired
-minimum log level can be set by calling `withLogLevel` in the builder, and only messages with the same or higher 
+minimum log level can be set by calling `withLogLevel` in the builder, and only messages with the same or higher
 priorities are logged.
 
-A custom logger can be set by calling `withLoggerFactory` in the builder. When a custom logger is used, a call to 
+A custom logger can be set by calling `withLoggerFactory` in the builder. When a custom logger is used, a call to
 `withLogLevel` has no effect.
 
 ## Initializing OpenKit
 
-When obtaining an OpenKit instance from the OpenKit builder the instance starts an automatic 
-initialization phase. By default, initialization is performed asynchronously. 
+When obtaining an OpenKit instance from the OpenKit builder the instance starts an automatic
+initialization phase. By default, initialization is performed asynchronously.
 
-There might be situations when a developer wants to ensure that initialization is completed before proceeding with 
+There might be situations when a developer wants to ensure that initialization is completed before proceeding with
 the program logic. For example, short-lived applications where a valid init and shutdown cannot be guaranteed. In
 such a case `waitForInit` can be used.
 
 ```javascript
-openKit.waitForInit((initializedSuccessfully) => {
-    
-});
+openKit.waitForInit((initializedSuccessfully) => {});
 ```
 
 ❕ Please refer to the TypeDoc for additional information.
 
-The callback value indicates whether the OpenKit instance has been initialized successfully or `shutdown` 
+The callback value indicates whether the OpenKit instance has been initialized successfully or `shutdown`
 has been called meanwhile.
 
 An optional parameter exists to wait a given amount of time for OpenKit to initialize as shown in the
 following example.
+
 ```javascript
 // wait 10 seconds for OpenKit to complete initialization
 const timeoutInMilliseconds = 10 * 1000;
-openKit.waitForInit(() => {
-    
-}, timeoutInMilliseconds);
+openKit.waitForInit(() => {}, timeoutInMilliseconds);
 ```
 
 To verify if OpenKit has been initialized, use the `isInitialized` method as shown in the example below.
+
 ```javascript
 const isInitialized = openKit.isInitialized();
 if (isInitialized) {
-    console.log("OpenKit is initialized");
+    console.log('OpenKit is initialized');
 } else {
-    console.log("OpenKit is not yet initialized");
+    console.log('OpenKit is not yet initialized');
 }
 ```
 
@@ -106,6 +103,7 @@ The `createSession` method takes an optional argument, which might be a valid IP
 If no argument is passed, the IP which communicates with the server is assigned.
 
 The example shows how to create sessions.
+
 ```javascript
 const clientIpAddress = '12.34.56.78';
 
@@ -118,7 +116,7 @@ const sessionWithoutArgument = openKit.createSession();
 
 ## Identify User
 
-Users can be identified by calling `identifyUser` on a `Session` instance. This enables you to search and 
+Users can be identified by calling `identifyUser` on a `Session` instance. This enables you to search and
 filter specific user sessions and analyze individual user behavior over time in the backend.
 
 ```javascript
@@ -139,6 +137,7 @@ session.end();
 
 Unexpected application crashes can be reported via a `Session` by invoking the `reportCrash` method.  
 The example below shows how an exception might be reported.
+
 ```javascript
 const error = new Error('Some error');
 
@@ -147,8 +146,9 @@ session.reportCrash(e.name, e.message, e.stack);
 
 ## Starting a Action
 
-As mentioned in the [README](#./README.md) actions are named events, where a `Action` represents the 
+As mentioned in the [README](#./README.md) actions are named events, where a `Action` represents the
 first hierarchy level. An `Action` is created from a `Session` as shown in the example below.
+
 ```javascript
 const rootActionName = 'actionName';
 const action = session.enterAction(rootActionName);
@@ -166,6 +166,7 @@ action.leaveAction();
 ## Report Named Event
 
 To report a named event use the `reportEvent` method on `Action`.
+
 ```javascript
 const eventName = 'eventName';
 action.reportEvent(eventName);
@@ -175,8 +176,10 @@ action.reportEvent(eventName);
 
 Key-value pairs can also be reported via an `Action` as shown in the example below.
 Overloaded methods exist for the following value types:
-* number
-* string
+
+-   number
+-   string
+
 ```javascript
 // first report a numeric value
 const keyNumberName = 'My reported numeric value';
@@ -191,12 +194,13 @@ action.reportValue(keyStringName, stringValue);
 
 ## Report an Error
 
-An `Action` also has the possibility to report an error with a given 
+An `Action` also has the possibility to report an error with a given
 name, code and a reason. The code fragment below shows how.
+
 ```javascript
 const errorName = 'Unknown error';
-const errorCode = 42; 
-const reason = 'Not sure what\'s going on here';
+const errorCode = 42;
+const reason = "Not sure what's going on here";
 
 action.reportError(errorName, errorCode, reason);
 ```
@@ -205,12 +209,13 @@ action.reportError(errorName, errorCode, reason);
 
 One of the most powerful OpenKit features is web request tracing. When the application starts a web
 request (e.g. HTTP GET) a special tag can be attached to the header. This special header allows
-Dynatrace SaaS/Dynatrace Managed to correlate actions with a server side PurePath, however, 
+Dynatrace SaaS/Dynatrace Managed to correlate actions with a server side PurePath, however,
 the developer is responsible for adding the appropriate header field to the request.  
 The field name can be obtained from the exported value `webRequestTagHeader` and the field's value is obtained
 from the `getTag` method (see interface `WebRequestTracer`).
 
 An example is shown below.
+
 ```javascript
 const url = 'http://www.my-backend.com/api/v3/users';
 
@@ -227,7 +232,7 @@ webRequestTracer.start();
 // the following code has to be executed after the request finished
 webRequestTracer.setBytesSent(12345);
 webRequestTracer.setBytesReceived(67890);
-webRequestTracer.stop(200);                 // stop the web request tracer, with the response code
+webRequestTracer.stop(200); // stop the web request tracer, with the response code
 ```
 
 ## Terminating the OpenKit Instance

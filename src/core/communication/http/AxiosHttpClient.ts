@@ -40,7 +40,10 @@ export class AxiosHttpClient implements HttpClient {
     }
 
     private parseAxiosResponse(response: AxiosResponse<string>): HttpResponse {
-        this.logger.debug('RESPONSE', {status: response.status, payload: response.data});
+        this.logger.debug('RESPONSE', {
+            status: response.status,
+            payload: response.data,
+        });
 
         return {
             status: response.status,

@@ -16,7 +16,10 @@
 
 import { anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
-import { OpenKitConfiguration, PrivacyConfiguration } from '../../../src/core/config/Configuration';
+import {
+    OpenKitConfiguration,
+    PrivacyConfiguration,
+} from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { defaultNullAction } from '../../../src/core/impl/null/NullAction';
 import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
@@ -35,7 +38,6 @@ describe('SessionImpl', () => {
     let session: SessionImpl;
 
     beforeEach(() => {
-
         config = {
             loggerFactory: defaultNullLoggerFactory,
         };
@@ -44,7 +46,6 @@ describe('SessionImpl', () => {
         reset(timestampProvider);
 
         when(timestampProvider.getCurrentTimestamp()).thenReturn(7000, 9000);
-
 
         session = new SessionImpl(
             40,
@@ -57,7 +58,7 @@ describe('SessionImpl', () => {
 
     describe('creation', () => {
         it('should not be shutdown', () => {
-           expect(session.isShutdown()).toBeFalsy();
+            expect(session.isShutdown()).toBeFalsy();
         });
 
         it('should set the sessionId', () => {
@@ -82,7 +83,9 @@ describe('SessionImpl', () => {
             session.identifyUser('userTag');
 
             // then
-            verify(payloadBuilder.identifyUser(anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.identifyUser(anything(), anything(), anything()),
+            ).never();
         });
 
         it('should not be able to identify a user if DCL = Off', () => {
@@ -93,7 +96,9 @@ describe('SessionImpl', () => {
             session.identifyUser('userTag');
 
             // then
-            verify(payloadBuilder.identifyUser(anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.identifyUser(anything(), anything(), anything()),
+            ).never();
         });
 
         it('should not be able to identify a user if DCL = Performance', () => {
@@ -104,7 +109,9 @@ describe('SessionImpl', () => {
             session.identifyUser('userTag');
 
             // then
-            verify(payloadBuilder.identifyUser(anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.identifyUser(anything(), anything(), anything()),
+            ).never();
         });
 
         it('should not be able to identify a user if the tag is not a string', () => {
@@ -112,10 +119,12 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
 
             // when
-            session.identifyUser(null as unknown as string);
+            session.identifyUser((null as unknown) as string);
 
             // then
-            verify(payloadBuilder.identifyUser(anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.identifyUser(anything(), anything(), anything()),
+            ).never();
         });
 
         it('should not be able to identify a user if the tag is empty string', () => {
@@ -126,7 +135,9 @@ describe('SessionImpl', () => {
             session.identifyUser('');
 
             // then
-            verify(payloadBuilder.identifyUser(anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.identifyUser(anything(), anything(), anything()),
+            ).never();
         });
 
         it('should be able to identify a user', () => {
@@ -138,7 +149,9 @@ describe('SessionImpl', () => {
 
             // then
             verify(payloadBuilder.identifyUser('userTag', 2, 2000)).once();
-            verify(payloadBuilder.identifyUser(anything(), anything(), anything())).once();
+            verify(
+                payloadBuilder.identifyUser(anything(), anything(), anything()),
+            ).once();
         });
     });
 
@@ -153,12 +166,21 @@ describe('SessionImpl', () => {
             // then
             expect(action).toBe(defaultNullAction);
             expect(session._getOpenActions().indexOf(action)).toBe(-1);
-            verify(payloadBuilder.action(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to enter an action if DCL = Off', () => {
             // given
-            config.dataCollectionLevel =  DataCollectionLevel.Off;
+            config.dataCollectionLevel = DataCollectionLevel.Off;
 
             // when
             const action = session.enterAction('action');
@@ -166,7 +188,16 @@ describe('SessionImpl', () => {
             // then
             expect(action).toBe(defaultNullAction);
             expect(session._getOpenActions().indexOf(action)).toBe(-1);
-            verify(payloadBuilder.action(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should be able to enter an action if DCL = Performance', () => {
@@ -178,8 +209,19 @@ describe('SessionImpl', () => {
 
             // then
             expect(action).toBeInstanceOf(ActionImpl);
-            expect(session._getOpenActions().indexOf(action)).toBeGreaterThanOrEqual(0);
-            verify(payloadBuilder.action(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            expect(
+                session._getOpenActions().indexOf(action),
+            ).toBeGreaterThanOrEqual(0);
+            verify(
+                payloadBuilder.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should be able to enter an action if DCL = UserBehavior', () => {
@@ -191,8 +233,19 @@ describe('SessionImpl', () => {
 
             // then
             expect(action).toBeInstanceOf(ActionImpl);
-            expect(session._getOpenActions().indexOf(action)).toBeGreaterThanOrEqual(0);
-            verify(payloadBuilder.action(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            expect(
+                session._getOpenActions().indexOf(action),
+            ).toBeGreaterThanOrEqual(0);
+            verify(
+                payloadBuilder.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should be able to enter multiple actions', () => {
@@ -211,13 +264,24 @@ describe('SessionImpl', () => {
             expect(i2).toBeGreaterThanOrEqual(0);
 
             expect(i1).not.toBe(i2);
-            verify(payloadBuilder.action(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should be able to remove an action from the action-children', () => {
             // when, then
             const action = session.enterAction('action');
-            expect(session._getOpenActions().indexOf(action)).toBeGreaterThanOrEqual(0);
+            expect(
+                session._getOpenActions().indexOf(action),
+            ).toBeGreaterThanOrEqual(0);
 
             // when, then
             session._endAction(action);
@@ -235,7 +299,15 @@ describe('SessionImpl', () => {
             session.reportCrash('name', 'reason', 'stacktrace');
 
             // then
-            verify(payloadBuilder.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to enter reportCrash if the name is empty string', () => {
@@ -246,7 +318,15 @@ describe('SessionImpl', () => {
             session.reportCrash('', 'reason', 'stacktrace');
 
             // then
-            verify(payloadBuilder.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to enter reportCrash if the name is not a string', () => {
@@ -257,7 +337,15 @@ describe('SessionImpl', () => {
             session.reportCrash({} as string, 'reason', 'stacktrace');
 
             // then
-            verify(payloadBuilder.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to enter reportCrash if captureCrashes is OptOut in the config', () => {
@@ -268,7 +356,15 @@ describe('SessionImpl', () => {
             session.reportCrash('Crash Name', 'reason', 'stacktrace');
 
             // then
-            verify(payloadBuilder.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to enter reportCrash if captureCrashes is Off in the config', () => {
@@ -279,7 +375,15 @@ describe('SessionImpl', () => {
             session.reportCrash('Crash Name', 'reason', 'stacktrace');
 
             // then
-            verify(payloadBuilder.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should report the crash', () => {
@@ -290,11 +394,26 @@ describe('SessionImpl', () => {
             session.reportCrash('name', 'reason', 'stacktrace');
 
             // then
-            verify(payloadBuilder.reportCrash(anything(), anything(), anything(), anything(), anything())).once();
-            verify(payloadBuilder.reportCrash('name', 'reason', 'stacktrace', 2, 2000)).once();
+            verify(
+                payloadBuilder.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
+            verify(
+                payloadBuilder.reportCrash(
+                    'name',
+                    'reason',
+                    'stacktrace',
+                    2,
+                    2000,
+                ),
+            ).once();
         });
     });
-
 
     describe('reportError', () => {
         it('should not be possible to report an error if the name is not a string', () => {
@@ -303,7 +422,16 @@ describe('SessionImpl', () => {
             session.reportError(session, 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to report an error if the name is empty', () => {
@@ -311,7 +439,16 @@ describe('SessionImpl', () => {
             session.reportError('', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to report an error if the code is not a number', () => {
@@ -320,7 +457,16 @@ describe('SessionImpl', () => {
             session.reportError('name', 'invalid number', 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to report an error if DCL = Off', () => {
@@ -331,7 +477,16 @@ describe('SessionImpl', () => {
             session.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should be able to report an error if DCL = Performance', () => {
@@ -342,8 +497,19 @@ describe('SessionImpl', () => {
             session.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError('name', 'message', 1337, 0, 2, 2000)).once();
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything(), anything(), anything())).once();
+            verify(
+                payloadBuilder.reportError('name', 'message', 1337, 0, 2, 2000),
+            ).once();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
         });
 
         it('should be able to report an error if DCL = UserBehavior', () => {
@@ -354,8 +520,19 @@ describe('SessionImpl', () => {
             session.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError('name', 'message', 1337, 0, 2, 2000)).once();
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything(), anything(), anything())).once();
+            verify(
+                payloadBuilder.reportError('name', 'message', 1337, 0, 2, 2000),
+            ).once();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
         });
     });
 
@@ -389,7 +566,7 @@ describe('SessionImpl', () => {
             expect(wr).toBe(defaultNullWebRequestTracer);
         });
 
-        it('should return a webRequestTracer object with valid inputs and DCL = Performance', () =>{
+        it('should return a webRequestTracer object with valid inputs and DCL = Performance', () => {
             // given
             config.dataCollectionLevel = DataCollectionLevel.Performance;
 
@@ -400,7 +577,7 @@ describe('SessionImpl', () => {
             expect(wr).toBeInstanceOf(WebRequestTracerImpl);
         });
 
-        it('should return a webRequestTracer object with valid inputs and DCL = UserBehavior', () =>{
+        it('should return a webRequestTracer object with valid inputs and DCL = UserBehavior', () => {
             // given
             config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
 
@@ -460,7 +637,6 @@ describe('SessionImpl', () => {
             verify(action2Spy.leaveAction()).once();
             expect(session.isShutdown()).toBeTruthy();
         });
-
 
         it('should remove a single child from the children-array', () => {
             // given

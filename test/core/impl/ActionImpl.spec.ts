@@ -16,7 +16,10 @@
 
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
-import { OpenKitConfiguration, PrivacyConfiguration } from '../../../src/core/config/Configuration';
+import {
+    OpenKitConfiguration,
+    PrivacyConfiguration,
+} from '../../../src/core/config/Configuration';
 import { ActionImpl } from '../../../src/core/impl/ActionImpl';
 import { defaultNullWebRequestTracer } from '../../../src/core/impl/null/NullWebRequestTracer';
 import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
@@ -51,7 +54,9 @@ describe('ActionImpl', () => {
         when(timestampProviderMock.getCurrentTimestamp()).thenReturn(4500);
 
         const timestampInstance = instance(timestampProviderMock);
-        when(payloadBuilder.currentTimestamp()).thenCall(() => timestampInstance.getCurrentTimestamp());
+        when(payloadBuilder.currentTimestamp()).thenCall(() =>
+            timestampInstance.getCurrentTimestamp(),
+        );
 
         action = new ActionImpl(
             'my action',
@@ -63,10 +68,10 @@ describe('ActionImpl', () => {
     });
 
     it('should create the action', () => {
-       expect(action.name).toEqual('my action');
-       expect(action.startSequenceNumber).toBe(5);
-       expect(action.actionId).toBe(3);
-       expect(action.startTime).toEqual(1000);
+        expect(action.name).toEqual('my action');
+        expect(action.startSequenceNumber).toBe(5);
+        expect(action.actionId).toBe(3);
+        expect(action.startTime).toEqual(1000);
     });
 
     it('should set endSequenceNumber and endTime on leaveAction call', () => {
@@ -100,7 +105,13 @@ describe('ActionImpl', () => {
                 action.reportValue('Some Name', 'Some Value');
 
                 // then
-                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
+                verify(
+                    payloadBuilder.reportValue(
+                        anything(),
+                        anything(),
+                        anything(),
+                    ),
+                ).never();
             });
 
             it('should not report a value if DCL = Off', () => {
@@ -111,7 +122,13 @@ describe('ActionImpl', () => {
                 action.reportValue('Some Name', 'Some Value');
 
                 // then
-                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
+                verify(
+                    payloadBuilder.reportValue(
+                        anything(),
+                        anything(),
+                        anything(),
+                    ),
+                ).never();
             });
 
             it('should not report a value if DCL = Performance', () => {
@@ -122,22 +139,46 @@ describe('ActionImpl', () => {
                 action.reportValue('Some Name', 'Some Value');
 
                 // then
-                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
+                verify(
+                    payloadBuilder.reportValue(
+                        anything(),
+                        anything(),
+                        anything(),
+                    ),
+                ).never();
             });
 
             it('should not report a value if the name is not a string', () => {
-                action.reportValue(undefined as unknown as string, '');
-                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
+                action.reportValue((undefined as unknown) as string, '');
+                verify(
+                    payloadBuilder.reportValue(
+                        anything(),
+                        anything(),
+                        anything(),
+                    ),
+                ).never();
             });
 
             it('should not report a value if the name is empty', () => {
-                action.reportValue('',  '');
-                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
+                action.reportValue('', '');
+                verify(
+                    payloadBuilder.reportValue(
+                        anything(),
+                        anything(),
+                        anything(),
+                    ),
+                ).never();
             });
 
             it('should not report a value if the value not a string, number, null or undefined', () => {
-                action.reportValue('Name',  {} as unknown as undefined);
-                verify(payloadBuilder.reportValue(anything(), anything(), anything())).never();
+                action.reportValue('Name', ({} as unknown) as undefined);
+                verify(
+                    payloadBuilder.reportValue(
+                        anything(),
+                        anything(),
+                        anything(),
+                    ),
+                ).never();
             });
         });
 
@@ -145,7 +186,9 @@ describe('ActionImpl', () => {
             it('should report a value if the value is string', () => {
                 action.reportValue('Name', 'Value');
 
-                verify(payloadBuilder.reportValue(action, 'Name', 'Value')).once();
+                verify(
+                    payloadBuilder.reportValue(action, 'Name', 'Value'),
+                ).once();
             });
 
             it('should report a value if the value is a number', () => {
@@ -157,7 +200,9 @@ describe('ActionImpl', () => {
             it('should report a value if the value is undefined', () => {
                 action.reportValue('Name', undefined);
 
-                verify(payloadBuilder.reportValue(action, 'Name', undefined)).once();
+                verify(
+                    payloadBuilder.reportValue(action, 'Name', undefined),
+                ).once();
             });
 
             it('should report a value if the value is null', () => {
@@ -169,7 +214,7 @@ describe('ActionImpl', () => {
     });
 
     describe('reportEvent', () => {
-        it('should not be able to report an event if the action is closed', () =>{
+        it('should not be able to report an event if the action is closed', () => {
             // given
             action.leaveAction();
 
@@ -180,7 +225,7 @@ describe('ActionImpl', () => {
             verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
-        it('should not be able to report an event if the DCL = Off', () =>{
+        it('should not be able to report an event if the DCL = Off', () => {
             // given
             config.dataCollectionLevel = DataCollectionLevel.Off;
 
@@ -191,7 +236,7 @@ describe('ActionImpl', () => {
             verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
-        it('should not be able to report an event if the DCL = Performance', () =>{
+        it('should not be able to report an event if the DCL = Performance', () => {
             // given
             config.dataCollectionLevel = DataCollectionLevel.Performance;
 
@@ -202,7 +247,7 @@ describe('ActionImpl', () => {
             verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
-        it('should not be able to report an event if name is not a string', () =>{
+        it('should not be able to report an event if name is not a string', () => {
             // when
             // @ts-ignore
             action.reportEvent(action);
@@ -211,7 +256,7 @@ describe('ActionImpl', () => {
             verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
-        it('should not be able to report an event if name is an empty string', () =>{
+        it('should not be able to report an event if name is an empty string', () => {
             // when
             action.reportEvent('');
 
@@ -219,12 +264,14 @@ describe('ActionImpl', () => {
             verify(payloadBuilder.reportEvent(anything(), anything())).never();
         });
 
-        it('should be able to report an event', () =>{
+        it('should be able to report an event', () => {
             // when
             action.reportEvent('Some name');
 
             // then
-            verify(payloadBuilder.reportEvent(action.actionId, 'Some name')).once();
+            verify(
+                payloadBuilder.reportEvent(action.actionId, 'Some name'),
+            ).once();
             verify(payloadBuilder.reportEvent(anything(), anything())).once();
         });
     });
@@ -236,7 +283,14 @@ describe('ActionImpl', () => {
             action.reportError(action, 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to report an error if the name is empty', () => {
@@ -244,7 +298,14 @@ describe('ActionImpl', () => {
             action.reportError('', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to report an error if the code is not a number', () => {
@@ -253,7 +314,14 @@ describe('ActionImpl', () => {
             action.reportError('name', 'invalid number', 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should not be possible to report an error if the action is closed', () => {
@@ -264,7 +332,14 @@ describe('ActionImpl', () => {
             action.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).never();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
         });
 
         it('should be able to report an error', () => {
@@ -272,8 +347,22 @@ describe('ActionImpl', () => {
             action.reportError('name', 1337, 'message');
 
             // then
-            verify(payloadBuilder.reportError(action.actionId, 'name', 1337, 'message')).once();
-            verify(payloadBuilder.reportError(anything(), anything(), anything(), anything())).once();
+            verify(
+                payloadBuilder.reportError(
+                    action.actionId,
+                    'name',
+                    1337,
+                    'message',
+                ),
+            ).once();
+            verify(
+                payloadBuilder.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
         });
     });
 
@@ -305,7 +394,7 @@ describe('ActionImpl', () => {
             expect(wr).toBe(defaultNullWebRequestTracer);
         });
 
-        it('should return a webRequestTracer object with valid inputs', () =>{
+        it('should return a webRequestTracer object with valid inputs', () => {
             // when
             const wr = action.traceWebRequest('https://example.com');
 

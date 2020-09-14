@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import { anyOfClass, anything, instance, mock, reset, verify } from 'ts-mockito';
+import {
+    anyOfClass,
+    anything,
+    instance,
+    mock,
+    reset,
+    verify,
+} from 'ts-mockito';
 import { StatusRequest } from '../../../../../src/api';
 import { AxiosHttpClient } from '../../../../../src/core/communication/http/AxiosHttpClient';
 import { HttpCommunicationChannel } from '../../../../../src/core/communication/http/state/HttpCommunicationChannel';
@@ -33,13 +40,18 @@ const request: StatusRequest = {
 
 describe('OverloadPreventionState', () => {
     let context: StateContext;
-    let httpCommunicationChannelMock = mock(HttpCommunicationChannel);
-    let httpClientMock = mock(AxiosHttpClient);
+    const httpCommunicationChannelMock = mock(HttpCommunicationChannel);
+    const httpClientMock = mock(AxiosHttpClient);
 
     const buildState = (ra?: string) => {
-        const headers: Record<string, string> = ra !== undefined ? { 'retry-after': ra} : {};
+        const headers: Record<string, string> =
+            ra !== undefined ? { 'retry-after': ra } : {};
 
-        return new OverloadPreventionState(context, { status: 429, headers, payload: ''});
+        return new OverloadPreventionState(context, {
+            status: 429,
+            headers,
+            payload: '',
+        });
     };
 
     beforeEach(() => {
@@ -53,7 +65,7 @@ describe('OverloadPreventionState', () => {
         };
     });
 
-    it('should not redirect sendStatusRequest to a httpclient', async() => {
+    it('should not redirect sendStatusRequest to a httpclient', async () => {
         // when
         await buildState().sendStatusRequest('https://example.com', request);
 
@@ -62,16 +74,19 @@ describe('OverloadPreventionState', () => {
         verify(httpClientMock.post(anything(), anything())).never();
     });
 
-    it('should not redirect sendNewSessionRequest to a httpclient', async() => {
+    it('should not redirect sendNewSessionRequest to a httpclient', async () => {
         // when
-        await buildState().sendNewSessionRequest('https://example.com', request);
+        await buildState().sendNewSessionRequest(
+            'https://example.com',
+            request,
+        );
 
         // then
         verify(httpClientMock.get(anything())).never();
         verify(httpClientMock.post(anything(), anything())).never();
     });
 
-    it('should not redirect sendPayloadData to a httpclient', async() => {
+    it('should not redirect sendPayloadData to a httpclient', async () => {
         // when
         await buildState().sendPayloadData('https://example.com', request, '');
 
@@ -88,7 +103,9 @@ describe('OverloadPreventionState', () => {
 
         // then
         setTimeout(() => {
-            verify(httpCommunicationChannelMock.setNextState(anything())).never();
+            verify(
+                httpCommunicationChannelMock.setNextState(anything()),
+            ).never();
         }, 4000);
     });
 
@@ -100,7 +117,11 @@ describe('OverloadPreventionState', () => {
 
         // then
         setTimeout(() => {
-            verify(httpCommunicationChannelMock.setNextState(anyOfClass(SendingState))).once();
+            verify(
+                httpCommunicationChannelMock.setNextState(
+                    anyOfClass(SendingState),
+                ),
+            ).once();
         }, 1500);
     });
 });

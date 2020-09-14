@@ -20,12 +20,15 @@ import { defaultNullWebRequestTracer } from '../../../../src/core/impl/null/Null
 
 describe('NullSession', () => {
     it('should return the defaultNullAction on entering an action', () => {
-        expect(defaultNullSession.enterAction('someActionName'))
-            .toBe(defaultNullAction);
+        expect(defaultNullSession.enterAction('someActionName')).toBe(
+            defaultNullAction,
+        );
     });
 
-    it('should return the defaultNullWebRequestTracer on tracing a web request', () =>{
-       expect(defaultNullSession.traceWebRequest('https://any.url')).toBe(defaultNullWebRequestTracer);
+    it('should return the defaultNullWebRequestTracer on tracing a web request', () => {
+        expect(defaultNullSession.traceWebRequest('https://any.url')).toBe(
+            defaultNullWebRequestTracer,
+        );
     });
 
     it('should not crash if identifyUser is called', () => {

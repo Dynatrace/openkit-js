@@ -23,11 +23,13 @@ describe('LoggingUtils', () => {
     const reason = 'reason';
     const obj = { component, reason };
 
-    it('should report the values to logger.warn', () =>{
+    it('should report the values to logger.warn', () => {
         const loggerSpy = spy(defaultNullLogger);
 
         validationFailed(defaultNullLogger, component, reason, obj);
 
-        verify(loggerSpy.warn(component, 'Validation failed', reason, obj)).once();
+        verify(
+            loggerSpy.warn(component, 'Validation failed', reason, obj),
+        ).once();
     });
 });

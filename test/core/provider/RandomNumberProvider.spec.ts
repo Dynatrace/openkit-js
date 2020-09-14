@@ -21,13 +21,12 @@ describe('DefaultRandomNumberProvider', () => {
 
     const setupNextRandomValue = (value: number) => {
         const fn = jest.fn();
-        fn.mockReturnValue(.5);
+        fn.mockReturnValue(0.5);
         Math.random = fn;
     };
 
-
     it('should return the next random Integer', () => {
-        setupNextRandomValue(.5);
+        setupNextRandomValue(0.5);
         const next = 1073741824; // .5 * 2 ** 31 + 0;
 
         expect(random.nextPositiveInteger()).toBe(next);

@@ -24,7 +24,6 @@ import { Logger } from './Logger';
  * @see {@link NullLoggerFactory}
  */
 export interface LoggerFactory {
-
     /**
      * Creates a new logger
      *

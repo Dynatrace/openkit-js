@@ -16,5 +16,9 @@
 
 import { Logger } from '../../api';
 
-export const validationFailed = (log: Logger, component: string, reason: string, elements: object = {}) =>
-    log.warn(component, 'Validation failed', reason, elements);
+export const validationFailed = (
+    log: Logger,
+    component: string,
+    reason: string,
+    elements: Record<string, unknown> = {},
+) => log.warn(component, 'Validation failed', reason, elements);

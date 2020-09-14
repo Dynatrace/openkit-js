@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel, StatusRequest, StatusResponse } from '../../../../api';
+import {
+    CommunicationChannel,
+    StatusRequest,
+    StatusResponse,
+} from '../../../../api';
 import { HttpResponse } from '../HttpClient';
 import { SendingState } from './SendingState';
 import { StateContext } from './StateContext';
@@ -34,15 +38,25 @@ export class OverloadPreventionState implements CommunicationChannel {
         }, retryAfter);
     }
 
-    public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+    public async sendNewSessionRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse> {
         return { valid: true };
     }
 
-    public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+    public async sendPayloadData(
+        url: string,
+        request: StatusRequest,
+        query: string,
+    ): Promise<StatusResponse> {
         return { valid: true };
     }
 
-    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+    public async sendStatusRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse> {
         return { valid: true };
     }
 
@@ -51,6 +65,8 @@ export class OverloadPreventionState implements CommunicationChannel {
 
         const retryTimeout = parseInt(value, 10) * 1000;
 
-        return isNaN(retryTimeout) ? defaultRetryAfterInMilliseconds : retryTimeout;
+        return isNaN(retryTimeout)
+            ? defaultRetryAfterInMilliseconds
+            : retryTimeout;
     }
 }

@@ -2,10 +2,11 @@
 .idea
 *.iml
 
-# npm, yarn, lint
+# npm, yarn
 node_modules
 yarn-error.log
-**/.eslintcache
+yarn.lock
+.prettierignore
 
 # Build files
 build

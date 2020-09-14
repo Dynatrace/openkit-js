@@ -16,42 +16,52 @@
 
 import { StatusRequest } from '../../../src/api';
 import { StatusRequestImpl } from '../../../src/core/beacon/StatusRequestImpl';
-import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../../../src/core/PlatformConstants';
+import {
+    agentTechnologyType,
+    openKitVersion,
+    platformTypeOpenKit,
+} from '../../../src/core/PlatformConstants';
 
 describe('StatusRequestImpl', () => {
     let request: StatusRequest;
 
     beforeEach(() => {
-        request = new StatusRequestImpl('agentTechnology', 'app-id', 'version', 7, 42);
+        request = new StatusRequestImpl(
+            'agentTechnology',
+            'app-id',
+            'version',
+            7,
+            42,
+        );
     });
 
     it('should return the same agentTechnology as passed in the constructor', () => {
-       expect(request.agentTechnologyType).toEqual('agentTechnology');
+        expect(request.agentTechnologyType).toEqual('agentTechnology');
     });
 
     it('should return the same app-id as passed in the constructor', () => {
-       expect(request.applicationId).toEqual('app-id');
+        expect(request.applicationId).toEqual('app-id');
     });
 
     it('should return the same openkit-version as passed in the constructor', () => {
-       expect(request.openKitVersion).toEqual('version');
+        expect(request.openKitVersion).toEqual('version');
     });
 
     it('should return the same platform-type as passed in the constructor', () => {
-       expect(request.platformType).toEqual(7);
+        expect(request.platformType).toEqual(7);
     });
 
     it('should return the same server-id as passed in the constructor', () => {
-       expect(request.serverId).toEqual(42);
+        expect(request.serverId).toEqual(42);
     });
 
     it('should create the request from a state', () => {
-       const request = StatusRequestImpl.create('app-id', 8);
+        request = StatusRequestImpl.create('app-id', 8);
 
-       expect(request.agentTechnologyType).toEqual(agentTechnologyType);
-       expect(request.applicationId).toEqual('app-id');
-       expect(request.openKitVersion).toEqual(openKitVersion);
-       expect(request.platformType).toEqual(platformTypeOpenKit);
-       expect(request.serverId).toBe(8);
+        expect(request.agentTechnologyType).toEqual(agentTechnologyType);
+        expect(request.applicationId).toEqual('app-id');
+        expect(request.openKitVersion).toEqual(openKitVersion);
+        expect(request.platformType).toEqual(platformTypeOpenKit);
+        expect(request.serverId).toBe(8);
     });
 });

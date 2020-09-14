@@ -20,10 +20,10 @@ describe('Single Id provider', () => {
     it('should always return the same id', () => {
         const provider = new SingleIdProvider(1337);
 
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
-       expect(provider.next()).toBe(1337);
+        expect(provider.next()).toBe(1337);
+        expect(provider.next()).toBe(1337);
+        expect(provider.next()).toBe(1337);
+        expect(provider.next()).toBe(1337);
+        expect(provider.next()).toBe(1337);
     });
 });

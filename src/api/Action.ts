@@ -20,7 +20,6 @@ import { WebRequestTracer } from './WebRequestTracer';
  * Action public interface
  */
 export interface Action {
-
     /**
      * Report a value with given name to Dynatrace.
      * If the name or value is longer than 250 characters, it is truncated to this value.

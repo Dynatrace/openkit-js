@@ -21,7 +21,6 @@ import { WebRequestTracer } from './WebRequestTracer';
  * Session public interface
  */
 export interface Session {
-
     /**
      * Enter a new rootAction
      */
@@ -29,6 +28,7 @@ export interface Session {
 
     /**
      * Identify a user
+     *
      * @param userTag The tag to identify the user.
      */
     identifyUser(userTag: string): void;

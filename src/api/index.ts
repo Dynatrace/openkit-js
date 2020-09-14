@@ -1,4 +1,3 @@
-// tslint:disable:file-name-casing
 /*
  * Copyright 2019 Dynatrace LLC
  *
@@ -15,6 +14,7 @@
  * limitations under the License.
  */
 
+// eslint-disable-next-line unicorn/filename-case
 export * from './Action';
 export * from './CrashReportingLevel';
 export * from './DataCollectionLevel';

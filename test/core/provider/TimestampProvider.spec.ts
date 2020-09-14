@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { defaultTimestampProvider, TimestampProvider } from '../../../src/core/provider/TimestampProvider';
+import {
+    defaultTimestampProvider,
+    TimestampProvider,
+} from '../../../src/core/provider/TimestampProvider';
 
 describe('TimestampProvider', () => {
     it('should provide a defaultTimestampProvider', () => {

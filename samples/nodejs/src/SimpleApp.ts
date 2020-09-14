@@ -21,9 +21,9 @@ import { makeGetRequest } from './RequestUtil';
 executeSimpleApp();
 
 async function executeSimpleApp(): Promise<void> {
-    const endpointURL: string = '';   // the endpointURL can be found in the Dynatrace UI
+    const endpointURL: string = ''; // the endpointURL can be found in the Dynatrace UI
     const applicationID: string = ''; // the application id can be found in the Dynatrace UI
-    const deviceID: number = 42;      // an ID that uniquely identifies the device
+    const deviceID: number = 42; // an ID that uniquely identifies the device
 
     // create an OpenKit instance
     const openkit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
@@ -65,7 +65,6 @@ async function executeSimpleApp(): Promise<void> {
 
     // shutdown OpenKit
     openkit.shutdown();
-
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

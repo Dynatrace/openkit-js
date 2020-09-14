@@ -18,15 +18,21 @@ import { defaultNullWebRequestTracer } from '../../../../src/core/impl/null/Null
 
 describe('NullWebRequestTracer', () => {
     it('should return itself on setBytesReceived', () => {
-        expect(defaultNullWebRequestTracer.setBytesReceived(42)).toBe(defaultNullWebRequestTracer);
+        expect(defaultNullWebRequestTracer.setBytesReceived(42)).toBe(
+            defaultNullWebRequestTracer,
+        );
     });
 
     it('should return itself on setBytesSent', () => {
-        expect(defaultNullWebRequestTracer.setBytesSent(42)).toBe(defaultNullWebRequestTracer);
+        expect(defaultNullWebRequestTracer.setBytesSent(42)).toBe(
+            defaultNullWebRequestTracer,
+        );
     });
 
     it('should return itself on start', () => {
-        expect(defaultNullWebRequestTracer.start()).toBe(defaultNullWebRequestTracer);
+        expect(defaultNullWebRequestTracer.start()).toBe(
+            defaultNullWebRequestTracer,
+        );
     });
 
     it('should return an empty string as tag', () => {

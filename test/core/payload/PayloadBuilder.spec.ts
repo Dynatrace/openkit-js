@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-import {PayloadBuilder} from "../../../src/core/payload/PayloadBuilder";
-import {CommunicationState} from "../../../src/core/beacon/CommunicationState";
-import {CommunicationStateImpl} from "../../../src/core/beacon/CommunicationStateImpl";
-import {anything, instance, mock, spy, verify, when} from "ts-mockito";
-import {StaticPayloadBuilder} from "../../../src/core/payload/StaticPayloadBuilder";
-import {CaptureMode} from "../../../src/api";
-import {createTag} from "../../../src/core/impl/WebRequestTracerImpl";
-
+import { anything, instance, mock, spy, verify, when } from 'ts-mockito';
+import { PayloadBuilder } from '../../../src/core/payload/PayloadBuilder';
+import { CommunicationState } from '../../../src/core/beacon/CommunicationState';
+import { CommunicationStateImpl } from '../../../src/core/beacon/CommunicationStateImpl';
+import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
+import { CaptureMode } from '../../../src/api';
+import { createTag } from '../../../src/core/impl/WebRequestTracerImpl';
 
 describe('PayloadBuilder', () => {
     let builder: PayloadBuilder;
     let builderSpy: PayloadBuilder;
-    let state: CommunicationState = mock(CommunicationStateImpl);
+    const state: CommunicationState = mock(CommunicationStateImpl);
 
     let staticBuilderSpy: typeof StaticPayloadBuilder;
 
@@ -47,7 +46,15 @@ describe('PayloadBuilder', () => {
             builder.reportCrash('name', 'reason', 'stack', 6, 100);
 
             // then
-            verify(staticBuilderSpy.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -60,7 +67,15 @@ describe('PayloadBuilder', () => {
             builder.reportCrash('name', 'reason', 'stack', 6, 100);
 
             // then
-            verify(staticBuilderSpy.reportCrash(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -73,34 +88,45 @@ describe('PayloadBuilder', () => {
             builder.reportCrash('name', 'reason', 'stack', 6, 100);
 
             // then
-            verify(staticBuilderSpy.reportCrash(anything(), anything(), anything(), anything(), anything())).once();
-            verify(staticBuilderSpy.reportCrash('name', 'reason', 'stack', 6, 100)).once();
+            verify(
+                staticBuilderSpy.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
+            verify(
+                staticBuilderSpy.reportCrash('name', 'reason', 'stack', 6, 100),
+            ).once();
             verify(builderSpy._push(anything())).once();
         });
 
         it('should not truncate the stacktrace payload if longer than 250 chars', () => {
             // given
-            const stacktrace = "javax.servlet.ServletException: Something bad happened\n" +
-                "    at com.example.myproject.OpenSessionInViewFilter.doFilter(OpenSessionInViewFilter.java:60)\n" +
-                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
-                "    at com.example.myproject.ExceptionHandlerFilter.doFilter(ExceptionHandlerFilter.java:28)\n" +
-                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
-                "    at com.example.myproject.OutputBufferFilter.doFilter(OutputBufferFilter.java:33)\n" +
-                "    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n" +
-                "    at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:388)\n" +
-                "    at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)\n" +
-                "    at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:182)\n" +
-                "    at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)\n" +
-                "    at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:418)\n" +
-                "    at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)\n" +
-                "    at org.mortbay.jetty.Server.handle(Server.java:326)\n" +
-                "    at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:542)\n" +
-                "    at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:943)\n" +
-                "    at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:756)\n" +
-                "    at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:218)\n" +
-                "    at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)\n" +
-                "    at org.mortbay.jetty.bio.SocketConnector$Connection.run(SocketConnector.java:228)\n" +
-                "    at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:582)\n";
+            const stacktrace =
+                'javax.servlet.ServletException: Something bad happened\n' +
+                '    at com.example.myproject.OpenSessionInViewFilter.doFilter(OpenSessionInViewFilter.java:60)\n' +
+                '    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n' +
+                '    at com.example.myproject.ExceptionHandlerFilter.doFilter(ExceptionHandlerFilter.java:28)\n' +
+                '    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n' +
+                '    at com.example.myproject.OutputBufferFilter.doFilter(OutputBufferFilter.java:33)\n' +
+                '    at org.mortbay.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1157)\n' +
+                '    at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:388)\n' +
+                '    at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)\n' +
+                '    at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:182)\n' +
+                '    at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)\n' +
+                '    at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:418)\n' +
+                '    at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)\n' +
+                '    at org.mortbay.jetty.Server.handle(Server.java:326)\n' +
+                '    at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:542)\n' +
+                '    at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:943)\n' +
+                '    at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:756)\n' +
+                '    at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:218)\n' +
+                '    at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)\n' +
+                '    at org.mortbay.jetty.bio.SocketConnector$Connection.run(SocketConnector.java:228)\n' +
+                '    at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:582)\n';
             when(state.capture).thenReturn(CaptureMode.On);
             when(state.captureCrashes).thenReturn(CaptureMode.On);
 
@@ -108,10 +134,26 @@ describe('PayloadBuilder', () => {
             builder.reportCrash('name', 'reason', stacktrace, 6, 100);
 
             // then
-            verify(staticBuilderSpy.reportCrash(anything(), anything(), anything(), anything(), anything())).once();
-            verify(staticBuilderSpy.reportCrash('name', 'reason', stacktrace, 6, 100)).once();
+            verify(
+                staticBuilderSpy.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
+            verify(
+                staticBuilderSpy.reportCrash(
+                    'name',
+                    'reason',
+                    stacktrace,
+                    6,
+                    100,
+                ),
+            ).once();
             verify(builderSpy._push(anything())).once();
-        })
+        });
     });
 
     describe('reportNamedEvent', () => {
@@ -123,7 +165,14 @@ describe('PayloadBuilder', () => {
             builder.reportNamedEvent('name', 5, 6, 100);
 
             // then
-            verify(staticBuilderSpy.reportNamedEvent(anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.reportNamedEvent(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -135,7 +184,14 @@ describe('PayloadBuilder', () => {
             builder.reportNamedEvent('name', 5, 6, 100);
 
             // then
-            verify(staticBuilderSpy.reportNamedEvent(anything(), anything(), anything(), anything())).once();
+            verify(
+                staticBuilderSpy.reportNamedEvent(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
             verify(staticBuilderSpy.reportNamedEvent('name', 5, 6, 100)).once();
             verify(builderSpy._push(anything())).once();
         });
@@ -151,7 +207,16 @@ describe('PayloadBuilder', () => {
             builder.reportError('name', 'reason', 200, 6, 100, 500);
 
             // then
-            verify(staticBuilderSpy.reportError(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -164,7 +229,16 @@ describe('PayloadBuilder', () => {
             builder.reportError('name', 'reason', 200, 6, 100, 500);
 
             // then
-            verify(staticBuilderSpy.reportError(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -177,8 +251,26 @@ describe('PayloadBuilder', () => {
             builder.reportError('name', 'reason', 200, 6, 100, 500);
 
             // then
-            verify(staticBuilderSpy.reportError(anything(), anything(), anything(), anything(), anything(), anything())).once();
-            verify(staticBuilderSpy.reportError('name', 6, 100, 500, 'reason', 200)).once();
+            verify(
+                staticBuilderSpy.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
+            verify(
+                staticBuilderSpy.reportError(
+                    'name',
+                    6,
+                    100,
+                    500,
+                    'reason',
+                    200,
+                ),
+            ).once();
             verify(builderSpy._push(anything())).once();
         });
     });
@@ -192,7 +284,15 @@ describe('PayloadBuilder', () => {
             builder.reportValue('name', 5, 6, 100, 500);
 
             // then
-            verify(staticBuilderSpy.reportValue(anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.reportValue(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -204,7 +304,15 @@ describe('PayloadBuilder', () => {
             builder.reportValue('name', 5, 6, 100, 500);
 
             // then
-            verify(staticBuilderSpy.reportValue(anything(), anything(), anything(), anything(), anything())).once();
+            verify(
+                staticBuilderSpy.reportValue(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
             verify(staticBuilderSpy.reportValue(6, 'name', 5, 100, 500)).once();
             verify(builderSpy._push(anything())).once();
         });
@@ -219,7 +327,13 @@ describe('PayloadBuilder', () => {
             builder.identifyUser('name', 5, 6);
 
             // then
-            verify(staticBuilderSpy.identifyUser(anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.identifyUser(
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -231,7 +345,13 @@ describe('PayloadBuilder', () => {
             builder.identifyUser('name', 5, 6);
 
             // then
-            verify(staticBuilderSpy.identifyUser(anything(), anything(), anything())).once();
+            verify(
+                staticBuilderSpy.identifyUser(
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
             verify(staticBuilderSpy.identifyUser('name', 5, 6)).once();
             verify(builderSpy._push(anything())).once();
         });
@@ -246,7 +366,16 @@ describe('PayloadBuilder', () => {
             builder.action('name', 5, 6, 7, 600, 1000);
 
             // then
-            verify(staticBuilderSpy.action(anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -258,7 +387,16 @@ describe('PayloadBuilder', () => {
             builder.action('name', 5, 6, 7, 600, 1000);
 
             // then
-            verify(staticBuilderSpy.action(anything(), anything(), anything(), anything(), anything(), anything())).once();
+            verify(
+                staticBuilderSpy.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
             verify(staticBuilderSpy.action('name', 5, 6, 7, 600, 1000)).once();
             verify(builderSpy._push(anything())).once();
         });
@@ -324,10 +462,32 @@ describe('PayloadBuilder', () => {
             when(state.capture).thenReturn(CaptureMode.Off);
 
             // when
-            builder.webRequest('https://example.com', 6, 4, 100, 5, 6000, 100, 200, 300);
+            builder.webRequest(
+                'https://example.com',
+                6,
+                4,
+                100,
+                5,
+                6000,
+                100,
+                200,
+                300,
+            );
 
             // then
-            verify(staticBuilderSpy.webRequest(anything(), anything(), anything(), anything(), anything(), anything(), anything(), anything(), anything())).never();
+            verify(
+                staticBuilderSpy.webRequest(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
             verify(builderSpy._push(anything())).never();
         });
 
@@ -336,11 +496,45 @@ describe('PayloadBuilder', () => {
             when(state.capture).thenReturn(CaptureMode.On);
 
             // when
-            builder.webRequest('https://example.com', 6, 4, 100, 5, 6000, 100, 200, 300);
+            builder.webRequest(
+                'https://example.com',
+                6,
+                4,
+                100,
+                5,
+                6000,
+                100,
+                200,
+                300,
+            );
 
             // then
-            verify(staticBuilderSpy.webRequest(anything(), anything(), anything(), anything(), anything(), anything(), anything(), anything(), anything())).once();
-            verify(staticBuilderSpy.webRequest('https://example.com', 6, 4, 100, 5, 6000, 100, 200, 300)).once();
+            verify(
+                staticBuilderSpy.webRequest(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).once();
+            verify(
+                staticBuilderSpy.webRequest(
+                    'https://example.com',
+                    6,
+                    4,
+                    100,
+                    5,
+                    6000,
+                    100,
+                    200,
+                    300,
+                ),
+            ).once();
             verify(builderSpy._push(anything())).once();
         });
     });
@@ -369,10 +563,16 @@ describe('PayloadBuilder', () => {
             const prefix = 'mocked-prefix=true';
             const mutablePrefix = 'mocked-mutable=true';
             const mockedPayload = 'mocked=payload';
-            const completeLength = [prefix, mutablePrefix, mockedPayload].join('&').length;
+            const completeLength = [prefix, mutablePrefix, mockedPayload].join(
+                '&',
+            ).length;
 
-            StaticPayloadBuilder.identifyUser = jest.fn().mockReturnValue(mockedPayload);
-            StaticPayloadBuilder.mutable = jest.fn().mockReturnValue(mutablePrefix);
+            StaticPayloadBuilder.identifyUser = jest
+                .fn()
+                .mockReturnValue(mockedPayload);
+            StaticPayloadBuilder.mutable = jest
+                .fn()
+                .mockReturnValue(mutablePrefix);
 
             when(state.capture).thenReturn(CaptureMode.On);
             when(state.maxBeaconSize).thenReturn(completeLength);
@@ -406,7 +606,13 @@ describe('PayloadBuilder', () => {
         it('should return from the createTag method', () => {
             when(state.serverId).thenReturn(55);
 
-            const tag = builder.getWebRequestTracerTag(6, 4, 50, '42', 'app-id');
+            const tag = builder.getWebRequestTracerTag(
+                6,
+                4,
+                50,
+                '42',
+                'app-id',
+            );
             const cT = createTag(6, 4, 50, 55, '42', 'app-id');
 
             expect(tag).toEqual(cT);

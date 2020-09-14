@@ -30,7 +30,7 @@ describe('SequenceIdProvider', () => {
     });
 
     it('if the initial value exceeds 2^31, the next value is 1', () => {
-        const provider = new SequenceIdProvider(2**31 + 1);
+        const provider = new SequenceIdProvider(2 ** 31 + 1);
 
         expect(provider.next()).toBe(1);
     });

@@ -15,13 +15,13 @@
  *
  */
 
-"use strict";
+'use strict';
 
 function getInputData() {
-    const endpointURL = document.getElementById('endpointURL').value;     // the endpointURL can be found in the Dynatrace UI
+    const endpointURL = document.getElementById('endpointURL').value; // the endpointURL can be found in the Dynatrace UI
     const applicationID = document.getElementById('applicationID').value; // the application id can be found in the Dynatrace UI
-    const deviceID = document.getElementById('deviceID').value || 42;     // an ID that uniquely identifies the device
-    const targetURL = document.getElementById('targetURL').value;         // target URL for example web request
+    const deviceID = document.getElementById('deviceID').value || 42; // an ID that uniquely identifies the device
+    const targetURL = document.getElementById('targetURL').value; // target URL for example web request
 
     createMainOpenKit(applicationID, deviceID, endpointURL, targetURL);
 }
@@ -32,8 +32,12 @@ function getInputData() {
  *
  * Warning: For simplicity no exception handling is performed in this example!
  */
-async function createMainOpenKit(applicationID, deviceID, endpointURL, targetURL) {
-
+async function createMainOpenKit(
+    applicationID,
+    deviceID,
+    endpointURL,
+    targetURL,
+) {
     // create an OpenKit instance
     const openkit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
         .withApplicationName('exampleApp')
@@ -79,7 +83,8 @@ async function createMainOpenKit(applicationID, deviceID, endpointURL, targetURL
             // shutdown OpenKit
             openkit.shutdown();
         } else {
-            document.getElementById('response').innerHTML = 'Endpoint URL and Application ID don\'t match';
+            document.getElementById('response').innerHTML =
+                "Endpoint URL and Application ID don't match";
         }
     });
 }
@@ -97,7 +102,7 @@ async function executeAndTraceWebRequest(link, action) {
     const disabledCorsLink = `https://cors-anywhere.herokuapp.com/${link}`;
     const request = new Request(disabledCorsLink, {
         method: 'GET',
-        headers: headers
+        headers: headers,
     });
 
     // start timing for web request
@@ -107,16 +112,17 @@ async function executeAndTraceWebRequest(link, action) {
     const response = await fetch(request);
 
     if (response.ok) {
-        document.getElementById('response').innerHTML = 'Web request was executed successfully';
+        document.getElementById('response').innerHTML =
+            'Web request was executed successfully';
     } else {
         document.getElementById('response').innerHTML = 'Web request failed';
     }
 
     // set bytesSent, bytesReceived and response code
     tracer
-        .setBytesSent(byteLength(disabledCorsLink))                 // fetch API does not expose the request headers
+        .setBytesSent(byteLength(disabledCorsLink)) // fetch API does not expose the request headers
         .setBytesReceived(await approximateResponseBytes(response)) // bytes processed
-        .stop(response.status);                                     // stop the tracer
+        .stop(response.status); // stop the tracer
 }
 
 /**
@@ -129,11 +135,14 @@ const approximateResponseBytes = async (response) => {
     let bytesReceived = 0;
 
     // #1: HTTP Version + Status code + Status message\r\n
-    bytesReceived += byteLength(`HTTP/X.Y ${response.status} ${response.statusText}`) + 4;
+    bytesReceived +=
+        byteLength(`HTTP/X.Y ${response.status} ${response.statusText}`) + 4;
 
     // Headers assuming the following format:
     // key: value\r\n
-    response.headers.forEach((value, key) => bytesReceived += byteLength(`${key}: ${value}`) + 4);
+    response.headers.forEach(
+        (value, key) => (bytesReceived += byteLength(`${key}: ${value}`) + 4),
+    );
 
     // Empty line separating headers & message
     bytesReceived += 2;
@@ -152,4 +161,4 @@ const approximateResponseBytes = async (response) => {
 
 const textEncoder = new TextEncoder('utf-8');
 const byteLength = (str) => textEncoder.encode(str).length;
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -15,9 +15,32 @@
  */
 
 import { StatusRequest } from '../../api';
-import { agentTechnologyType, openKitVersion, platformTypeOpenKit } from '../PlatformConstants';
+import {
+    agentTechnologyType,
+    openKitVersion,
+    platformTypeOpenKit,
+} from '../PlatformConstants';
 
 export class StatusRequestImpl implements StatusRequest {
+    public readonly agentTechnologyType: string;
+    public readonly applicationId: string;
+    public readonly openKitVersion: string;
+    public readonly platformType: number;
+    public readonly serverId: number;
+
+    constructor(
+        agentTechnology: string,
+        applicationId: string,
+        version: string,
+        platformType: number,
+        serverId: number,
+    ) {
+        this.agentTechnologyType = agentTechnology;
+        this.applicationId = applicationId;
+        this.openKitVersion = version;
+        this.platformType = platformType;
+        this.serverId = serverId;
+    }
 
     public static create(appId: string, serverId: number): StatusRequestImpl {
         return new StatusRequestImpl(
@@ -25,25 +48,7 @@ export class StatusRequestImpl implements StatusRequest {
             appId,
             openKitVersion,
             platformTypeOpenKit,
-            serverId);
-    }
-
-    public readonly agentTechnologyType: string;
-    public readonly applicationId: string;
-    public readonly openKitVersion: string;
-    public readonly platformType: number;
-    public readonly serverId: number;
-
-    constructor(agentTechnology: string,
-                applicationId: string,
-                version: string,
-                platformType: number,
-                serverId: number) {
-
-        this.agentTechnologyType = agentTechnology;
-        this.applicationId = applicationId;
-        this.openKitVersion = version;
-        this.platformType = platformType;
-        this.serverId = serverId;
+            serverId,
+        );
     }
 }

@@ -15,7 +15,10 @@
  */
 
 import { Action, LogLevel, OpenKit, OpenKitBuilder, Session } from '../src';
-import { HttpClient, HttpResponse } from '../src/core/communication/http/HttpClient';
+import {
+    HttpClient,
+    HttpResponse,
+} from '../src/core/communication/http/HttpClient';
 import { HttpCommunicationChannel } from '../src/core/communication/http/state/HttpCommunicationChannel';
 import { ConsoleLoggerFactory } from '../src/core/logging/ConsoleLoggerFactory';
 import { EventType } from '../src/core/protocol/EventType';
@@ -30,15 +33,15 @@ class MockHttpClient implements HttpClient {
     public readonly records: RequestRecord[] = [];
 
     public async get(url: string): Promise<HttpResponse> {
-        this.records.push({url});
+        this.records.push({ url });
 
-        return {status: 200, payload: 'type=m', headers: {}};
+        return { status: 200, payload: 'type=m', headers: {} };
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
-        this.records.push({url, payload});
+        this.records.push({ url, payload });
 
-        return {status: 200, payload: 'type=m', headers: {}};
+        return { status: 200, payload: 'type=m', headers: {} };
     }
 
     public recordUrls(): string[] {
@@ -46,11 +49,15 @@ class MockHttpClient implements HttpClient {
     }
 
     public recordDefinedPayloads(): string[] {
-        return this.records.map((e) => e.payload).filter((p) => p !== undefined) as string[];
+        return this.records
+            .map((e) => e.payload)
+            .filter((p) => p !== undefined) as string[];
     }
 
     public recordDefinedPayloadsWithEventType(et: EventType): string[] {
-        return this.recordDefinedPayloads().filter((p) => p.indexOf(`et=${et}&`) !== -1);
+        return this.recordDefinedPayloads().filter(
+            (p) => p.indexOf(`et=${et}&`) !== -1,
+        );
     }
 }
 
@@ -64,8 +71,16 @@ describe('ShutdownBeforeSessionSend', () => {
     beforeEach(async () => {
         client = new MockHttpClient();
 
-        const builder = new OpenKitBuilder('https://example.com/beaconEndpoint', '1234-56-78-90-123456', '42')
-            .withCommunicationChannel(new HttpCommunicationChannel(client, new ConsoleLoggerFactory(LogLevel.Info)));
+        const builder = new OpenKitBuilder(
+            'https://example.com/beaconEndpoint',
+            '1234-56-78-90-123456',
+            '42',
+        ).withCommunicationChannel(
+            new HttpCommunicationChannel(
+                client,
+                new ConsoleLoggerFactory(LogLevel.Info),
+            ),
+        );
 
         ok = builder.build();
 
@@ -96,10 +111,16 @@ describe('ShutdownBeforeSessionSend', () => {
     });
 
     it('should have sent the action to the server', () => {
-        expect(client.recordDefinedPayloadsWithEventType(EventType.ManualAction).length).toBe(1);
+        expect(
+            client.recordDefinedPayloadsWithEventType(EventType.ManualAction)
+                .length,
+        ).toBe(1);
     });
 
     it('should have sent the identifyuser to the server', () => {
-        expect(client.recordDefinedPayloadsWithEventType(EventType.IdentifyUser).length).toBe(1);
+        expect(
+            client.recordDefinedPayloadsWithEventType(EventType.IdentifyUser)
+                .length,
+        ).toBe(1);
     });
 });

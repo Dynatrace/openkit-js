@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-import { DataCollectionLevel, InitCallback, Logger, OpenKit, Session } from '../../api';
+import {
+    DataCollectionLevel,
+    InitCallback,
+    Logger,
+    OpenKit,
+    Session,
+} from '../../api';
 import { BeaconSenderImpl } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
 import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
-import { Configuration, OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import {
+    Configuration,
+    OpenKitConfiguration,
+    PrivacyConfiguration,
+} from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
 import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
-import { StaticPayloadBuilder as StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
+import { StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
@@ -32,7 +42,9 @@ import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
 
 const createIdProvider = (dcl: DataCollectionLevel) =>
-    dcl === DataCollectionLevel.UserBehavior ? new SequenceIdProvider() : new SingleIdProvider(1);
+    dcl === DataCollectionLevel.UserBehavior
+        ? new SequenceIdProvider()
+        : new SingleIdProvider(1);
 
 /**
  * Implementation of the {@link OpenKit} interface.
@@ -53,16 +65,25 @@ export class OpenKitImpl implements OpenKit {
 
     /**
      * Creates a new OpenKit instance with a copy of the configuration.
+     *
      * @param config The app configuration.
      */
     constructor(private readonly config: Configuration) {
         this.logger = config.openKit.loggerFactory.createLogger('OpenKitImpl');
 
-        this.sessionIdProvider = createIdProvider(config.privacy.dataCollectionLevel);
-        this.sessionConfig = {...config.privacy, ...config.openKit};
-        this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(this.config);
+        this.sessionIdProvider = createIdProvider(
+            config.privacy.dataCollectionLevel,
+        );
+        this.sessionConfig = { ...config.privacy, ...config.openKit };
+        this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(
+            this.config,
+        );
 
-        this.beaconSender = new BeaconSenderImpl(this, this.cache, config.openKit);
+        this.beaconSender = new BeaconSenderImpl(
+            this,
+            this.cache,
+            config.openKit,
+        );
     }
 
     /**
@@ -97,23 +118,42 @@ export class OpenKitImpl implements OpenKit {
         // activity is recorded.
 
         if (this.isShutdown) {
-            validationFailed(this.logger, 'createSession', 'OpenKit is already shutdown');
+            validationFailed(
+                this.logger,
+                'createSession',
+                'OpenKit is already shutdown',
+            );
 
             return defaultNullSession;
         }
 
-        this.logger.debug('createSession', {clientIP});
+        this.logger.debug('createSession', { clientIP });
 
         const sessionId = this.createSessionId();
         const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
-        const sessionPrefix = StaticPayloadBuilder.sessionPrefix(this.applicationWidePrefix, sessionId, clientIP, sessionStartTime);
+        const sessionPrefix = StaticPayloadBuilder.sessionPrefix(
+            this.applicationWidePrefix,
+            sessionId,
+            clientIP,
+            sessionStartTime,
+        );
 
         const communicationState = new CommunicationStateImpl();
         const payloadBuilder = new PayloadBuilder(communicationState);
 
-        const session = new SessionImpl(sessionId, payloadBuilder, sessionStartTime, this.sessionConfig);
+        const session = new SessionImpl(
+            sessionId,
+            payloadBuilder,
+            sessionStartTime,
+            this.sessionConfig,
+        );
 
-        const cacheEntry = this.cache.register(session, sessionPrefix, payloadBuilder, communicationState);
+        const cacheEntry = this.cache.register(
+            session,
+            sessionPrefix,
+            payloadBuilder,
+            communicationState,
+        );
 
         this.beaconSender.sessionAdded(cacheEntry);
 

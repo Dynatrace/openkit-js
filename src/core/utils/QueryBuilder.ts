@@ -18,7 +18,7 @@ import { PayloadKey } from '../protocol/PayloadKey';
 import { QueryKey } from '../protocol/QueryKey';
 import { truncate } from './Utils';
 
-export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
+export abstract class QueryBuilder<T extends QueryKey | PayloadKey> {
     private readonly options: Record<string, string> = {};
 
     public add(key: T, value: string | number, maxLength?: number): this {
@@ -35,7 +35,10 @@ export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
         return this;
     }
 
-    public addIfDefinedAndNotNull(key: T, value: string | number | undefined | null): this {
+    public addIfDefinedAndNotNull(
+        key: T,
+        value: string | number | undefined | null,
+    ): this {
         if (value !== undefined && value !== null) {
             this.add(key, value);
         }
@@ -52,9 +55,13 @@ export abstract class QueryBuilder<T extends (QueryKey | PayloadKey)> {
     }
 
     public build(): string {
-        return Object
-            .keys(this.options)
-            .map((key: string) => `${encodeURIComponent(key)}=${encodeURIComponent(this.options[key])}`)
+        return Object.keys(this.options)
+            .map(
+                (key: string) =>
+                    `${encodeURIComponent(key)}=${encodeURIComponent(
+                        this.options[key],
+                    )}`,
+            )
             .join('&');
     }
 }

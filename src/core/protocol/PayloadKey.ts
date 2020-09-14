@@ -66,5 +66,4 @@ export const enum PayloadKey {
     ResponseCode = 'rc',
     BytesSent = 'bs',
     BytesReceived = 'br',
-
 }

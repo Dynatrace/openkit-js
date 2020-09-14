@@ -35,6 +35,8 @@ describe('NullAction', () => {
     });
 
     it('should return defaultNullWebRequestTracer on traceWebRequest', () => {
-        expect(defaultNullAction.traceWebRequest('any string')).toBe(defaultNullWebRequestTracer);
-    })
+        expect(defaultNullAction.traceWebRequest('any string')).toBe(
+            defaultNullWebRequestTracer,
+        );
+    });
 });

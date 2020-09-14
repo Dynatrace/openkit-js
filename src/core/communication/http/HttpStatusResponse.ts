@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { CaptureMode, Logger, LoggerFactory, StatusResponse } from '../../../api';
+import {
+    CaptureMode,
+    Logger,
+    LoggerFactory,
+    StatusResponse,
+} from '../../../api';
 import { ResponseKey } from '../../protocol/ResponseKey';
 import { PayloadDecoder } from '../../utils/PayloadDecoder';
 import { HttpResponse } from './HttpClient';
@@ -59,24 +64,29 @@ export class HttpStatusResponse implements StatusResponse {
     }
 
     private decodeEntries(entries: Readonly<Record<string, string>>): void {
-        Object.keys(entries).forEach((key) => this.decodeEntry(key, entries[key]));
+        Object.keys(entries).forEach((key) =>
+            this.decodeEntry(key, entries[key]),
+        );
     }
 
     private decodeEntry(key: string, value: string): void {
         switch (key) {
             case ResponseKey.Capture:
                 // 1 is on, 0 is off. If another value is passed, we disable it to be on the safe side.
-                this.captureMode = value === '1' ? CaptureMode.On : CaptureMode.Off;
+                this.captureMode =
+                    value === '1' ? CaptureMode.On : CaptureMode.Off;
                 break;
 
             case ResponseKey.CaptureCrashes:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
-                this.captureCrashes = value === '1' ? CaptureMode.On : CaptureMode.Off;
+                this.captureCrashes =
+                    value === '1' ? CaptureMode.On : CaptureMode.Off;
                 break;
 
             case ResponseKey.CaptureErrors:
                 // 1 (always on) and 2 (only on WiFi) are treated the same
-                this.captureErrors = value === '1' ? CaptureMode.On : CaptureMode.Off;
+                this.captureErrors =
+                    value === '1' ? CaptureMode.On : CaptureMode.Off;
                 break;
 
             case ResponseKey.MaxBeaconSize:

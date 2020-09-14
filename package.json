@@ -1,51 +1,70 @@
 {
-  "name": "@dynatrace/openkit-js",
-  "version": "1.1.0-SNAPSHOT",
-  "description": "OpenKit-JavaScript reference implementation",
-  "author": "Dynatrace",
-  "types": "dist/types/index.d.ts",
-  "main": "dist/node/index.js",
-  "browser": "dist/browser/openkit.js",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Dynatrace/openkit-js"
-  },
-  "scripts": {
-    "test": "jest",
-    "lint": "tslint --project ./tsconfig.base.json -c tslint.json",
-    "lint:spec": "tslint --project ./tsconfig.base.json -c tslint.spec.json",
-    "docs": "yarn docs:markdown --plugin none",
-    "docs:markdown": "typedoc --out docs src/OpenKitBuilder.ts src/index.ts src/api --tsconfig tsconfig.base.json --exclude src/core --excludePrivate --excludeNotExported --excludeExternals --disableOutputCheck",
-    "build": "yarn build:browser && yarn build:node",
-    "build:node": "tsc -p tsconfig.node.json",
-    "build:browser": "webpack --mode production",
-    "build:browser:dev": "webpack"
-  },
-  "devDependencies": {
-    "@types/jest": "^25.1.4",
-    "@types/node": "^12.12.14",
-    "codelyzer": "^5.2.0",
-    "jest": "^25.1.0",
-    "ts-jest": "^25.2.1",
-    "ts-loader": "^5.3.3",
-    "ts-mockito": "^2.3.1",
-    "tslint": "^5.14.0",
-    "typedoc": "^0.15.4",
-    "typedoc-plugin-markdown": "^2.2.14",
-    "typescript": "^3.7.3",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0",
-    "yarn": "^1.13.0"
-  },
-  "dependencies": {
-    "axios": "^0.18.0"
-  },
-  "resolutions": {
-    "minimist": "^1.2.0"
-  },
-  "files": [
-    "dist",
-    "docs"
-  ]
+    "name": "@dynatrace/openkit-js",
+    "version": "1.1.0-SNAPSHOT",
+    "description": "OpenKit-JavaScript reference implementation",
+    "author": "Dynatrace",
+    "types": "dist/types/index.d.ts",
+    "main": "dist/node/index.js",
+    "browser": "dist/browser/openkit.js",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Dynatrace/openkit-js"
+    },
+    "scripts": {
+        "test": "jest",
+        "lint": "eslint --cache src/**/*.ts --ignore-pattern .gitignore",
+        "lint:spec": "eslint --cache test/**/*.ts --cache-file test/.eslintcache --ignore-pattern .gitignore",
+        "docs": "yarn docs:markdown --plugin none",
+        "docs:markdown": "typedoc --out docs src/OpenKitBuilder.ts src/index.ts src/api --tsconfig tsconfig.base.json --exclude src/core --excludePrivate --excludeNotExported --excludeExternals --disableOutputCheck",
+        "build": "yarn build:browser && yarn build:node",
+        "build:node": "tsc -p tsconfig.node.json",
+        "build:browser": "webpack --mode production",
+        "build:browser:dev": "webpack"
+    },
+    "devDependencies": {
+        "@types/jest": "^25.1.4",
+        "@types/node": "^12.12.14",
+        "@typescript-eslint/eslint-plugin": "^4.1.0",
+        "@typescript-eslint/parser": "^4.1.0",
+        "codelyzer": "^5.2.0",
+        "eslint": "^7.8.1",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-import": "^2.22.0",
+        "eslint-plugin-jsdoc": "^30.4.0",
+        "eslint-plugin-prefer-arrow": "^1.2.2",
+        "eslint-plugin-unicorn": "^21.0.0",
+        "husky": ">=4",
+        "jest": "^25.1.0",
+        "lint-staged": ">=10",
+        "prettier": "2.1.1",
+        "ts-jest": "^25.2.1",
+        "ts-loader": "^5.3.3",
+        "ts-mockito": "^2.3.1",
+        "typedoc": "^0.15.4",
+        "typedoc-plugin-markdown": "^2.2.14",
+        "typescript": "^3.7.3",
+        "webpack": "^4.29.6",
+        "webpack-cli": "^3.3.0",
+        "yarn": "^1.13.0"
+    },
+    "dependencies": {
+        "axios": "^0.18.0"
+    },
+    "resolutions": {
+        "minimist": "^1.2.0"
+    },
+    "files": [
+        "dist",
+        "docs"
+    ],
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.ts": "eslint --cache --fix",
+        "**/*": "prettier --write"
+    }
 }

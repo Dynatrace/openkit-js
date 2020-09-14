@@ -17,18 +17,18 @@
 import { removeElement } from '../../../src/core/utils/Utils';
 
 describe('Utils', () => {
-   describe('removeElement', () => {
-       it('should remove the element if it is in the array', () => {
-           const array = [1,2,3,4];
-           removeElement(array, 3);
+    describe('removeElement', () => {
+        it('should remove the element if it is in the array', () => {
+            const array = [1, 2, 3, 4];
+            removeElement(array, 3);
 
-           expect(array).toEqual([1,2,4]);
-       });
-       it('should not remove any element if it is not in the array', () => {
-           const array = [1,2,3,4];
-           removeElement(array, 6);
+            expect(array).toEqual([1, 2, 4]);
+        });
+        it('should not remove any element if it is not in the array', () => {
+            const array = [1, 2, 3, 4];
+            removeElement(array, 6);
 
-           expect(array).toEqual([1,2,3,4]);
-       });
-   });
+            expect(array).toEqual([1, 2, 3, 4]);
+        });
+    });
 });

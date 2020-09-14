@@ -16,13 +16,11 @@
 
 import { RandomNumberProvider } from '../../api';
 
-const random = (low: number, high: number): number => {
-    return Math.random() * (high - low) + low;
-};
+const random = (low: number, high: number): number =>
+    Math.random() * (high - low) + low;
 
-const randomInteger = (low: number, high: number): number => {
-    return Math.floor(random(low, high));
-};
+const randomInteger = (low: number, high: number): number =>
+    Math.floor(random(low, high));
 
 /**
  * Default RandomNumberProvider.
@@ -30,11 +28,10 @@ const randomInteger = (low: number, high: number): number => {
  * @see RandomNumberProvider
  */
 export class DefaultRandomNumberProvider implements RandomNumberProvider {
-
     /**
      * @inheritDoc
      */
     public nextPositiveInteger(): number {
-            return randomInteger(0, 2 ** 31);
+        return randomInteger(0, 2 ** 31);
     }
 }

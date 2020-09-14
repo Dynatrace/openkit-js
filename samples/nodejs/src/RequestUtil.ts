@@ -26,17 +26,21 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
  * @param action Action to create the web request tracer
  * @param session If supplied, it will report network exceptions as crash. Exception are not rethrown.
  */
-export const makeGetRequest = async (url: string, action: Action, session?: Session) => {
+export const makeGetRequest = async (
+    url: string,
+    action: Action,
+    session?: Session,
+) => {
     let response: AxiosResponse | undefined;
 
     // get the tracer
     const tracer = action.traceWebRequest(url);
 
     // add dynatrace tag to headers
-    const headers = {'X-dynaTrace': tracer.getTag()};
+    const headers = { 'X-dynaTrace': tracer.getTag() };
 
     // prepare web request
-    const requestConfig: AxiosRequestConfig = {headers};
+    const requestConfig: AxiosRequestConfig = { headers };
 
     // start timing for web request
     tracer.start();
@@ -50,7 +54,7 @@ export const makeGetRequest = async (url: string, action: Action, session?: Sess
 
         // set bytesSent, bytesReceived
         tracer
-            .setBytesSent(Buffer.byteLength(requestHeader))        // bytes sent
+            .setBytesSent(Buffer.byteLength(requestHeader)) // bytes sent
             .setBytesReceived(approximateResponseBytes(response)); // bytes processed
 
         // set response code and stop the tracer
@@ -58,7 +62,11 @@ export const makeGetRequest = async (url: string, action: Action, session?: Sess
     } catch (e) {
         if (session !== undefined) {
             // Report HTTP issue as crash
-            session.reportCrash(`Error while requesting "${url}" (GET)`, e.message, e.stack);
+            session.reportCrash(
+                `Error while requesting "${url}" (GET)`,
+                e.message,
+                e.stack,
+            );
         }
 
         // set response code and stop the tracer
@@ -75,7 +83,10 @@ const approximateResponseBytes = (response: AxiosResponse): number => {
     let bytesReceived = 0;
 
     // #1: HTTP Version + Status code + Status message\r\n
-    bytesReceived += Buffer.byteLength(`HTTP/X.Y ${response.status} ${response.statusText}`) + 4;
+    bytesReceived +=
+        Buffer.byteLength(
+            `HTTP/X.Y ${response.status} ${response.statusText}`,
+        ) + 4;
 
     // Headers
     bytesReceived += approximateHeaderBytes(response.headers);

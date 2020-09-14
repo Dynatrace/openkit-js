@@ -1,25 +1,25 @@
 {
-  "name": "openkitjs-simple-sample",
-  "version": "1.0.0",
-  "description": "OpenKit-JS simple sample",
-  "scripts": {
-    "clean": "rimraf dist",
-    "build": "tsc",
-    "start": "node dist/SimpleApp.js"
-  },
-  "keywords": [],
-  "author": "Dynatrace",
-  "license": "Apache-2.0",
-  "dependencies": {
-    "@dynatrace/openkit-js": "latest",
-    "axios": "^0.18.0"
-  },
-  "devDependencies": {
-    "@types/node": "^12.7.1",
-    "typescript": "^3.6.2"
-  },
-  "files": [
-    "dist"
-  ],
-  "types": "dist/types/index.d.ts"
+    "name": "openkitjs-simple-sample",
+    "version": "1.0.0",
+    "description": "OpenKit-JS simple sample",
+    "scripts": {
+        "clean": "rimraf dist",
+        "build": "tsc",
+        "start": "node dist/SimpleApp.js"
+    },
+    "keywords": [],
+    "author": "Dynatrace",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@dynatrace/openkit-js": "latest",
+        "axios": "^0.18.0"
+    },
+    "devDependencies": {
+        "@types/node": "^12.7.1",
+        "typescript": "^3.6.2"
+    },
+    "files": [
+        "dist"
+    ],
+    "types": "dist/types/index.d.ts"
 }

@@ -28,7 +28,10 @@ export interface CommunicationChannel {
      * @param request The request parameters for the status request.
      * @returns A status response.
      */
-    sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse>;
+    sendStatusRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse>;
 
     /**
      * Send a new session request to the dynatrace server.
@@ -37,7 +40,10 @@ export interface CommunicationChannel {
      * @param request The request parameters for the status request.
      * @returns A status response
      */
-    sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse>;
+    sendNewSessionRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse>;
 
     /**
      * Send payload data to the dynatrace server.
@@ -47,5 +53,9 @@ export interface CommunicationChannel {
      * @param query The query which should be send to the server.
      * @returns A status response.
      */
-    sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse>;
+    sendPayloadData(
+        url: string,
+        request: StatusRequest,
+        query: string,
+    ): Promise<StatusResponse>;
 }

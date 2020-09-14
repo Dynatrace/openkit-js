@@ -1,0 +1,15 @@
+// This file was duplicated from the root directory to make ESlint work in Jetbrains IDEs
+// TODO remove this duplicate when https://youtrack.jetbrains.com/issue/WEB-47258 is resolved
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "../dist/types",
+        "declarationMap": true,
+        "strict": true,
+        "target": "es5",
+        "lib": ["es5", "es2015.promise"]
+    },
+    "include": ["**/*"]
+}

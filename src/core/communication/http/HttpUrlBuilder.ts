@@ -18,8 +18,12 @@ import { StatusRequest } from '../../../api';
 import { QueryKey } from '../../protocol/QueryKey';
 import { UrlBuilder } from './UrlBuilder';
 
-export const buildHttpUrl = (url: string, statusRequest: StatusRequest, newSession: boolean) => {
-    return new UrlBuilder(url)
+export const buildHttpUrl = (
+    url: string,
+    statusRequest: StatusRequest,
+    newSession: boolean,
+) =>
+    new UrlBuilder(url)
         .add(QueryKey.Type, 'm')
         .add(QueryKey.ServerId, statusRequest.serverId)
         .add(QueryKey.Application, statusRequest.applicationId)
@@ -28,4 +32,3 @@ export const buildHttpUrl = (url: string, statusRequest: StatusRequest, newSessi
         .add(QueryKey.AgentTechnologyType, statusRequest.agentTechnologyType)
         .addIfDefined(QueryKey.NewSession, newSession ? 1 : undefined)
         .build();
-};

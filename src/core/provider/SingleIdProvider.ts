@@ -20,7 +20,6 @@ import { IdProvider } from './IdProvider';
  * Provides an IdProvider which a fixed identification number.
  */
 export class SingleIdProvider implements IdProvider {
-
     /**
      * Create a new singleIdProvider with a fixed identification number.
      *

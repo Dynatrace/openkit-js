@@ -42,9 +42,11 @@ export class CommunicationStateImpl implements CommunicationState {
     }
 
     public updateFromResponse(response: StatusResponse): void {
-
         // Check validity
-        if (response.valid === false || response.captureMode === CaptureMode.Off) {
+        if (
+            response.valid === false ||
+            response.captureMode === CaptureMode.Off
+        ) {
             this.disableCapture();
 
             return;
@@ -61,12 +63,16 @@ export class CommunicationStateImpl implements CommunicationState {
 
         // Server id
         if (response.serverId !== undefined && this.serverIdLocked === false) {
-            this.serverId = response.serverId >= 0 ? response.serverId : defaultServerId;
+            this.serverId =
+                response.serverId >= 0 ? response.serverId : defaultServerId;
         }
 
         // Max beacon size
         if (response.maxBeaconSizeInKb !== undefined) {
-            this.maxBeaconSize = response.maxBeaconSizeInKb >= 0 ? response.maxBeaconSizeInKb * 1024 : defaultMaxBeaconSize;
+            this.maxBeaconSize =
+                response.maxBeaconSizeInKb >= 0
+                    ? response.maxBeaconSizeInKb * 1024
+                    : defaultMaxBeaconSize;
         }
 
         // Capture Errors

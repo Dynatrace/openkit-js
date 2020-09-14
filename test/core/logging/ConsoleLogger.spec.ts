@@ -17,6 +17,8 @@
 import { LogLevel } from '../../../src/api';
 import { ConsoleLogger } from '../../../src/core/logging/ConsoleLogger';
 
+/* eslint-disable no-console */
+
 describe('ConsoleLogger', () => {
     beforeEach(() => {
         console.info = jest.fn();

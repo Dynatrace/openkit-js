@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel, StatusRequest, StatusResponse } from '../../../../api';
+import {
+    CommunicationChannel,
+    StatusRequest,
+    StatusResponse,
+} from '../../../../api';
 import { timeout } from '../../../utils/Utils';
 import { defaultInvalidHttpResponse, HttpResponse } from '../HttpClient';
 import { HttpStatusResponse } from '../HttpStatusResponse';
@@ -26,23 +30,31 @@ const timeouts = [1000, 2000];
 const httpTooManyRequests = 429;
 
 export class SendingState implements CommunicationChannel {
-    constructor(
-        private readonly context: StateContext,
-    ) {}
+    constructor(private readonly context: StateContext) {}
 
-    public async sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+    public async sendNewSessionRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse> {
         const httpUrl = buildHttpUrl(url, request, true);
 
         return this.retry(() => this.context.client.get(httpUrl));
     }
 
-    public async sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+    public async sendPayloadData(
+        url: string,
+        request: StatusRequest,
+        query: string,
+    ): Promise<StatusResponse> {
         const httpUrl = buildHttpUrl(url, request, false);
 
         return this.retry(() => this.context.client.post(httpUrl, query));
     }
 
-    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+    public async sendStatusRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse> {
         const httpUrl = buildHttpUrl(url, request, false);
 
         return this.retry(() => this.context.client.get(httpUrl));
@@ -54,7 +66,9 @@ export class SendingState implements CommunicationChannel {
      *
      * @param callback
      */
-    private async retry(callback: () => Promise<HttpResponse>): Promise<StatusResponse> {
+    private async retry(
+        callback: () => Promise<HttpResponse>,
+    ): Promise<StatusResponse> {
         {
             let response: HttpResponse;
             let i = -1;
@@ -79,14 +93,18 @@ export class SendingState implements CommunicationChannel {
     }
 
     private handleHttpToManyRequests(response: HttpResponse): StatusResponse {
-        this.context.stateMachine.setNextState(new OverloadPreventionState(this.context, response));
+        this.context.stateMachine.setNextState(
+            new OverloadPreventionState(this.context, response),
+        );
 
         // Return a valid response, but do not disable capturing, because this would shutdown the complete session,
         // and could not recover
         return { valid: true };
     }
 
-    private async tryExecute(callback: () => Promise<HttpResponse>): Promise<HttpResponse> {
+    private async tryExecute(
+        callback: () => Promise<HttpResponse>,
+    ): Promise<HttpResponse> {
         try {
             // We have to await here, in case the promise throws an exception
             return await callback();

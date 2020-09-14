@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-import { anyString, anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
+import {
+    anyString,
+    anything,
+    instance,
+    mock,
+    reset,
+    spy,
+    verify,
+    when,
+} from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
 import { BeaconSenderImpl } from '../../../src/core/beacon/BeaconSender';
 import { AbstractSendingStrategy } from '../../../src/core/beacon/strategies/SendingStrategy';
@@ -47,7 +56,7 @@ describe('OpenKitImpl', () => {
                 sendingStrategies: [instance(ss)],
                 beaconURL: 'http://example.com',
             },
-            
+
             privacy: {
                 crashReportingLevel: CrashReportingLevel.OptInCrashes,
                 dataCollectionLevel: DataCollectionLevel.UserBehavior,
@@ -56,13 +65,21 @@ describe('OpenKitImpl', () => {
             meta: {},
         };
 
-        when(comm.sendStatusRequest(anything(), anything())).thenResolve({valid: true});
-        when(comm.sendNewSessionRequest(anything(), anything())).thenResolve({valid: true});
-        when(comm.sendPayloadData(anything(), anything(), anything())).thenResolve({valid: true});
+        when(comm.sendStatusRequest(anything(), anything())).thenResolve({
+            valid: true,
+        });
+        when(comm.sendNewSessionRequest(anything(), anything())).thenResolve({
+            valid: true,
+        });
+        when(
+            comm.sendPayloadData(anything(), anything(), anything()),
+        ).thenResolve({
+            valid: true,
+        });
 
         ok = new OpenKitImpl(config);
     });
-    
+
     describe('initial', () => {
         it('should be not initialized and not shutdown', () => {
             expect(ok.isInitialized()).toBeFalsy();
@@ -118,7 +135,7 @@ describe('OpenKitImpl', () => {
     });
 
     describe('notifyInitialized', () => {
-        it('should set initialized to true', () =>{
+        it('should set initialized to true', () => {
             // when
             ok.notifyInitialized(false);
 
@@ -129,7 +146,7 @@ describe('OpenKitImpl', () => {
         it('should resolve all waiting listeners with the passed boolean value (true)', () => {
             // given
             let value: any;
-            const cb = (tf: any) => value = tf;
+            const cb = (tf: any) => (value = tf);
             ok.waitForInit(cb);
 
             // when
@@ -142,7 +159,7 @@ describe('OpenKitImpl', () => {
         it('should resolve all waiting listeners with the passed boolean value (false)', () => {
             // given
             let value: any;
-            const cb = (tf: any) => value = tf;
+            const cb = (tf: any) => (value = tf);
             ok.waitForInit(cb);
 
             // when
@@ -179,8 +196,8 @@ describe('OpenKitImpl', () => {
         let v1: boolean | undefined;
         let v2: boolean | undefined;
 
-        const cb1 = (tf: boolean) => v1 = tf;
-        const cb2 = (tf: boolean) => v2 = tf;
+        const cb1 = (tf: boolean) => (v1 = tf);
+        const cb2 = (tf: boolean) => (v2 = tf);
 
         beforeEach(() => {
             v1 = undefined;
@@ -234,7 +251,7 @@ describe('OpenKitImpl', () => {
             }, 1000);
         });
 
-        it('should also resolve multiple callbacks', async() => {
+        it('should also resolve multiple callbacks', async () => {
             jest.setTimeout(5000);
 
             // given
@@ -251,7 +268,7 @@ describe('OpenKitImpl', () => {
         });
     });
 
-    describe('createSession',  () => {
+    describe('createSession', () => {
         it('should return defaultNullSession if ok is shutdown', () => {
             // given
             ok.shutdown();
@@ -274,8 +291,10 @@ describe('OpenKitImpl', () => {
             // then
             expect(session).toBeInstanceOf(SessionImpl);
             verify(sender.sessionAdded(anything())).once();
-            verify(cache.register(session, anyString(), anything(), anything())).once();
+            verify(
+                cache.register(session, anyString(), anything(), anything()),
+            ).once();
             expect(session.sessionId).toBe(1);
-        })
+        });
     });
 });

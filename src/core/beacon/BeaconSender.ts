@@ -61,16 +61,27 @@ export class BeaconSenderImpl implements BeaconSender {
     public async init(): Promise<void> {
         this.logger.debug('init');
 
-        const response =
-            await this.channel.sendStatusRequest(this.beaconUrl, StatusRequestImpl.create(this.appId, this.okServerId));
+        const response = await this.channel.sendStatusRequest(
+            this.beaconUrl,
+            StatusRequestImpl.create(this.appId, this.okServerId),
+        );
 
         if (response.valid) {
             this.initialized = true;
-            this.okServerId = response.serverId === undefined ? defaultServerId : response.serverId;
+            this.okServerId =
+                response.serverId === undefined
+                    ? defaultServerId
+                    : response.serverId;
 
-            this.cache.getEntriesCopy().forEach((entry) => entry.communicationState.setServerId(this.okServerId));
+            this.cache
+                .getEntriesCopy()
+                .forEach((entry) =>
+                    entry.communicationState.setServerId(this.okServerId),
+                );
 
-            this.sendingStrategies.forEach((strategy) => strategy.init(this, this.cache));
+            this.sendingStrategies.forEach((strategy) =>
+                strategy.init(this, this.cache),
+            );
         }
 
         this.openKit.notifyInitialized(response.valid);
@@ -79,7 +90,9 @@ export class BeaconSenderImpl implements BeaconSender {
     public sessionAdded(entry: CacheEntry): void {
         entry.communicationState.setServerId(this.okServerId);
 
-        this.sendingStrategies.forEach((strategy) => strategy.entryAdded(entry));
+        this.sendingStrategies.forEach((strategy) =>
+            strategy.entryAdded(entry),
+        );
     }
 
     public isInitialized(): boolean {
@@ -118,7 +131,6 @@ export class BeaconSenderImpl implements BeaconSender {
     }
 
     public async flushImmediate(): Promise<void> {
-
         if (this.initialized) {
             await this.sendNewSessionRequests(true);
             await this.sendPayloadData();
@@ -144,7 +156,11 @@ export class BeaconSenderImpl implements BeaconSender {
 
     private async sendNewSessionRequest(entry: CacheEntry): Promise<void> {
         const response = await this.channel.sendNewSessionRequest(
-            this.beaconUrl, StatusRequestImpl.create(this.appId, entry.communicationState.serverId),
+            this.beaconUrl,
+            StatusRequestImpl.create(
+                this.appId,
+                entry.communicationState.serverId,
+            ),
         );
 
         if (response.valid) {
@@ -174,11 +190,23 @@ export class BeaconSenderImpl implements BeaconSender {
 
     private async sendPayload(entry: CacheEntry): Promise<void> {
         let payload: Payload | undefined;
-        // tslint:disable-next-line
-        while (payload = entry.builder.getNextPayload(entry.prefix, this.timestampProvider.getCurrentTimestamp())) {
-            const request = StatusRequestImpl.create(this.appId, entry.communicationState.serverId);
+        while (
+            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions,no-cond-assign
+            (payload = entry.builder.getNextPayload(
+                entry.prefix,
+                this.timestampProvider.getCurrentTimestamp(),
+            ))
+        ) {
+            const request = StatusRequestImpl.create(
+                this.appId,
+                entry.communicationState.serverId,
+            );
 
-            const response = await this.channel.sendPayloadData(this.beaconUrl, request, payload);
+            const response = await this.channel.sendPayloadData(
+                this.beaconUrl,
+                request,
+                payload,
+            );
 
             entry.communicationState.updateFromResponse(response);
         }

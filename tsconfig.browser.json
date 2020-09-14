@@ -1,12 +1,8 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist/browser",
-    "target": "es5",
-    "lib": [
-      "es5",
-      "dom",
-      "es2015.promise"
-    ]
-  }
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist/browser",
+        "target": "es5",
+        "lib": ["es5", "dom", "es2015.promise"]
+    }
 }

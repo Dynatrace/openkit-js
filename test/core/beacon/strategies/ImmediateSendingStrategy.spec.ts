@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-import { anything, instance, mock, reset, spy, verify } from "ts-mockito";
-import { BeaconSender, BeaconSenderImpl } from "../../../../src/core/beacon/BeaconSender";
-import { CommunicationState } from "../../../../src/core/beacon/CommunicationState";
-import { BeaconCacheImpl, CacheEntry } from "../../../../src/core/beacon/strategies/BeaconCache";
-import { ImmediateSendingStrategy } from "../../../../src/core/beacon/strategies/ImmediateSendingStrategy";
-import { PayloadBuilder } from "../../../../src/core/payload/PayloadBuilder";
+import { anything, instance, mock, reset, spy, verify } from 'ts-mockito';
+import {
+    BeaconSender,
+    BeaconSenderImpl,
+} from '../../../../src/core/beacon/BeaconSender';
+import { CommunicationState } from '../../../../src/core/beacon/CommunicationState';
+import {
+    BeaconCacheImpl,
+    CacheEntry,
+} from '../../../../src/core/beacon/strategies/BeaconCache';
+import { ImmediateSendingStrategy } from '../../../../src/core/beacon/strategies/ImmediateSendingStrategy';
+import { PayloadBuilder } from '../../../../src/core/payload/PayloadBuilder';
 
 describe('ImmediateSendingStrategy', () => {
     let strategy: ImmediateSendingStrategy;
-    let sender: BeaconSender = mock(BeaconSenderImpl);
-    let cache: BeaconCacheImpl = mock(BeaconCacheImpl);
+    const sender: BeaconSender = mock(BeaconSenderImpl);
+    const cache: BeaconCacheImpl = mock(BeaconCacheImpl);
 
     beforeEach(() => {
         strategy = new ImmediateSendingStrategy();
@@ -52,7 +58,7 @@ describe('ImmediateSendingStrategy', () => {
 
         // when
         strategy.entryAdded({
-            builder: builder,
+            builder,
         } as CacheEntry);
 
         // then
@@ -83,7 +89,7 @@ describe('ImmediateSendingStrategy', () => {
         verify(sender.flush()).once();
     });
 
-    it('should not flush if not initialized', async() => {
+    it('should not flush if not initialized', async () => {
         // when
         await strategy.added('et=18&mocked=payload');
 
@@ -91,7 +97,7 @@ describe('ImmediateSendingStrategy', () => {
         verify(sender.flush()).never();
     });
 
-    it('should flush on end if initialized', async() => {
+    it('should flush on end if initialized', async () => {
         // given
         init();
         reset(sender);
@@ -110,5 +116,4 @@ describe('ImmediateSendingStrategy', () => {
         // then
         verify(sender.flush()).never();
     });
-
 });

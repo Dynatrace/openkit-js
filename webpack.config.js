@@ -6,10 +6,10 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './dist/browser'),
         filename: 'openkit.js',
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
     },
     resolve: {
-        extensions: ['.ts', '.js']
+        extensions: ['.ts', '.js'],
     },
     module: {
         rules: [
@@ -18,9 +18,9 @@ module.exports = {
                 exclude: [/node_modules/],
                 loader: 'ts-loader',
                 options: {
-                    configFile: 'tsconfig.browser.json'
-                }
-            }
-        ]
-    }
+                    configFile: 'tsconfig.browser.json',
+                },
+            },
+        ],
+    },
 };

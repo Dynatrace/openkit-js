@@ -15,7 +15,10 @@
  */
 
 import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
-import { BeaconSender, BeaconSenderImpl } from '../../../src/core/beacon/BeaconSender';
+import {
+    BeaconSender,
+    BeaconSenderImpl,
+} from '../../../src/core/beacon/BeaconSender';
 import { BeaconCacheImpl } from '../../../src/core/beacon/strategies/BeaconCache';
 import { HttpCommunicationChannel } from '../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OpenKitConfiguration } from '../../../src/core/config/Configuration';
@@ -25,9 +28,9 @@ import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFa
 const requestUrl = 'https://example.com';
 
 describe('BeaconSender', () => {
-    let communication = mock(HttpCommunicationChannel);
-    let ok = mock(OpenKitImpl);
-    let cache = mock(BeaconCacheImpl);
+    const communication = mock(HttpCommunicationChannel);
+    const ok = mock(OpenKitImpl);
+    const cache = mock(BeaconCacheImpl);
     let config: Partial<OpenKitConfiguration>;
     let sender: BeaconSenderImpl;
 
@@ -50,9 +53,13 @@ describe('BeaconSender', () => {
         );
     });
 
-    it('should send the initial request to dynatrace on init', async() => {
+    it('should send the initial request to dynatrace on init', async () => {
         // given
-        when(communication.sendStatusRequest(requestUrl, anything())).thenResolve({valid: true});
+        when(
+            communication.sendStatusRequest(requestUrl, anything()),
+        ).thenResolve({
+            valid: true,
+        });
         when(cache.getEntriesCopy()).thenReturn([]);
 
         // when
@@ -63,9 +70,13 @@ describe('BeaconSender', () => {
         expect(sender.isInitialized()).toBe(true);
     });
 
-    it('should send the initial request to dynatrace on init', async() => {
+    it('should send the initial request to dynatrace on init', async () => {
         // given
-        when(communication.sendStatusRequest(requestUrl, anything())).thenResolve({valid: false});
+        when(
+            communication.sendStatusRequest(requestUrl, anything()),
+        ).thenResolve({
+            valid: false,
+        });
 
         // when
         await sender.init();

@@ -19,7 +19,7 @@ import { CommunicationState } from '../beacon/CommunicationState';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { combinePayloads, Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
-import { StaticPayloadBuilder as StaticPayloadBuilder } from './StaticPayloadBuilder';
+import { StaticPayloadBuilder } from './StaticPayloadBuilder';
 
 export interface PayloadBuilderListener {
     added(payload: Payload): void;
@@ -31,13 +31,23 @@ export class PayloadBuilder {
 
     constructor(private readonly commState: CommunicationState) {}
 
-    public reportNamedEvent(name: string, actionId: number, sequenceNumber: number, timeSinceSessionStart: number): void {
+    public reportNamedEvent(
+        name: string,
+        actionId: number,
+        sequenceNumber: number,
+        timeSinceSessionStart: number,
+    ): void {
         if (this.isCaptureDisabled()) {
             return;
         }
 
         this._push(
-            StaticPayloadBuilder.reportNamedEvent(name, actionId, sequenceNumber, timeSinceSessionStart),
+            StaticPayloadBuilder.reportNamedEvent(
+                name,
+                actionId,
+                sequenceNumber,
+                timeSinceSessionStart,
+            ),
         );
     }
 
@@ -53,7 +63,13 @@ export class PayloadBuilder {
         }
 
         this._push(
-            StaticPayloadBuilder.reportCrash(errorName, reason, stacktrace, startSequenceNumber, timeSinceSessionStart),
+            StaticPayloadBuilder.reportCrash(
+                errorName,
+                reason,
+                stacktrace,
+                startSequenceNumber,
+                timeSinceSessionStart,
+            ),
         );
     }
 
@@ -70,7 +86,14 @@ export class PayloadBuilder {
         }
 
         this._push(
-            StaticPayloadBuilder.reportError(name, parentActionId, startSequenceNumber, timeSinceSessionStart, reason, errorValue),
+            StaticPayloadBuilder.reportError(
+                name,
+                parentActionId,
+                startSequenceNumber,
+                timeSinceSessionStart,
+                reason,
+                errorValue,
+            ),
         );
     }
 
@@ -86,17 +109,31 @@ export class PayloadBuilder {
         }
 
         this._push(
-            StaticPayloadBuilder.reportValue(actionId, name, value, sequenceNumber, timeSinceSessionStart),
+            StaticPayloadBuilder.reportValue(
+                actionId,
+                name,
+                value,
+                sequenceNumber,
+                timeSinceSessionStart,
+            ),
         );
     }
 
-    public identifyUser(userTag: string, startSequenceNumber: number, timeSinceSessionStart: number): void {
+    public identifyUser(
+        userTag: string,
+        startSequenceNumber: number,
+        timeSinceSessionStart: number,
+    ): void {
         if (this.isCaptureDisabled()) {
             return;
         }
 
         this._push(
-            StaticPayloadBuilder.identifyUser(userTag, startSequenceNumber, timeSinceSessionStart),
+            StaticPayloadBuilder.identifyUser(
+                userTag,
+                startSequenceNumber,
+                timeSinceSessionStart,
+            ),
         );
     }
 
@@ -113,7 +150,14 @@ export class PayloadBuilder {
         }
 
         this._push(
-            StaticPayloadBuilder.action(name, actionId, startSequenceNumber, endSequenceNumber, timeSinceSessionStart, duration),
+            StaticPayloadBuilder.action(
+                name,
+                actionId,
+                startSequenceNumber,
+                endSequenceNumber,
+                timeSinceSessionStart,
+                duration,
+            ),
         );
     }
 
@@ -122,9 +166,7 @@ export class PayloadBuilder {
             return;
         }
 
-        this._push(
-            StaticPayloadBuilder.startSession(startSequenceNumber),
-        );
+        this._push(StaticPayloadBuilder.startSession(startSequenceNumber));
     }
 
     public endSession(startSequenceNumber: number, duration: number): void {
@@ -152,13 +194,25 @@ export class PayloadBuilder {
             return;
         }
 
-        const payload = StaticPayloadBuilder.webRequest(url, parentActionId, startSequenceNumber, timeSinceSessionStart,
-            endSequenceNumber, duration, bytesSent, bytesReceived, responseCode);
+        const payload = StaticPayloadBuilder.webRequest(
+            url,
+            parentActionId,
+            startSequenceNumber,
+            timeSinceSessionStart,
+            endSequenceNumber,
+            duration,
+            bytesSent,
+            bytesReceived,
+            responseCode,
+        );
 
         this._push(payload);
     }
 
-    public getNextPayload(prefix: Payload, transmissionTime: number): Payload | undefined {
+    public getNextPayload(
+        prefix: Payload,
+        transmissionTime: number,
+    ): Payload | undefined {
         if (this.queue.isEmpty()) {
             return undefined;
         }
@@ -185,7 +239,14 @@ export class PayloadBuilder {
         deviceId: string,
         appId: string,
     ): string {
-        return createTag(actionId, sessionNumber, sequenceNumber, this.commState.serverId, deviceId, appId);
+        return createTag(
+            actionId,
+            sessionNumber,
+            sequenceNumber,
+            this.commState.serverId,
+            deviceId,
+            appId,
+        );
     }
 
     public register(listener: PayloadBuilderListener): void {
@@ -195,17 +256,21 @@ export class PayloadBuilder {
     public _push(payload: Payload): void {
         this.queue.push(payload);
 
-        this.listeners.forEach(
-            (listener) => listener.added(payload),
-        );
+        this.listeners.forEach((listener) => listener.added(payload));
     }
 
     public _getQueue(): PayloadQueue {
         return this.queue;
     }
 
-    private getCompletePrefix(prefix: Payload, transmissionTime: number): Payload {
-        const mutable = StaticPayloadBuilder.mutable(this.commState.multiplicity, transmissionTime);
+    private getCompletePrefix(
+        prefix: Payload,
+        transmissionTime: number,
+    ): Payload {
+        const mutable = StaticPayloadBuilder.mutable(
+            this.commState.multiplicity,
+            transmissionTime,
+        );
 
         return combinePayloads(prefix, mutable);
     }
@@ -215,10 +280,16 @@ export class PayloadBuilder {
     }
 
     private isCaptureErrorsDisabled(): boolean {
-        return this.commState.captureErrors === CaptureMode.Off || this.isCaptureDisabled();
+        return (
+            this.commState.captureErrors === CaptureMode.Off ||
+            this.isCaptureDisabled()
+        );
     }
 
     private isCaptureCrashesDisabled(): boolean {
-        return this.commState.captureCrashes === CaptureMode.Off || this.isCaptureDisabled();
+        return (
+            this.commState.captureCrashes === CaptureMode.Off ||
+            this.isCaptureDisabled()
+        );
     }
 }

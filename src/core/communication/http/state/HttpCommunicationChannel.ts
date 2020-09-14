@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { CommunicationChannel, Logger, LoggerFactory, StatusRequest, StatusResponse } from '../../../../api';
+import {
+    CommunicationChannel,
+    Logger,
+    LoggerFactory,
+    StatusRequest,
+    StatusResponse,
+} from '../../../../api';
 import { HttpClient } from '../HttpClient';
 import { SendingState } from './SendingState';
 import { StateContext } from './StateContext';
@@ -26,7 +32,6 @@ export class HttpCommunicationChannel implements CommunicationChannel {
     private state: CommunicationChannel;
 
     constructor(client: HttpClient, loggerFactory: LoggerFactory) {
-
         this.logger = loggerFactory.createLogger('HttpCommunicationChannel');
 
         this.context = {
@@ -38,15 +43,25 @@ export class HttpCommunicationChannel implements CommunicationChannel {
         this.state = new SendingState(this.context);
     }
 
-    public sendNewSessionRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+    public sendNewSessionRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse> {
         return this.state.sendNewSessionRequest(url, request);
     }
 
-    public sendPayloadData(url: string, request: StatusRequest, query: string): Promise<StatusResponse> {
+    public sendPayloadData(
+        url: string,
+        request: StatusRequest,
+        query: string,
+    ): Promise<StatusResponse> {
         return this.state.sendPayloadData(url, request, query);
     }
 
-    public async sendStatusRequest(url: string, request: StatusRequest): Promise<StatusResponse> {
+    public async sendStatusRequest(
+        url: string,
+        request: StatusRequest,
+    ): Promise<StatusResponse> {
         return this.state.sendStatusRequest(url, request);
     }
 

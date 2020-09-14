@@ -16,7 +16,7 @@
 
 import { Logger, LogLevel } from '../../api';
 
-// tslint:disable:no-console
+/* eslint-disable no-console */
 /**
  * Logger to log messages to the `console` object.
  *

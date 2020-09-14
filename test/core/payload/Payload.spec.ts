@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { combinePayloads, getEventType } from '../../../src/core/payload/Payload';
+import {
+    combinePayloads,
+    getEventType,
+} from '../../../src/core/payload/Payload';
 import { EventType } from '../../../src/core/protocol/EventType';
 
-const makePayload = (type: EventType) => {
-    return `et=${type}&some-random=suffix`;
-};
+const makePayload = (type: EventType) => `et=${type}&some-random=suffix`;
 
 describe('Payload', () => {
-    describe('combinePayloads', () =>{
+    describe('combinePayloads', () => {
         const p1 = makePayload(EventType.ValueString);
         const p2 = makePayload(EventType.WebRequest);
 
@@ -30,10 +31,14 @@ describe('Payload', () => {
     });
 
     describe('getEventType', () => {
-        const types = [EventType.WebRequest, EventType.SessionStart, EventType.ValueString];
+        const types = [
+            EventType.WebRequest,
+            EventType.SessionStart,
+            EventType.ValueString,
+        ];
 
         it('should get the correct event types', () => {
-            for(const type of types) {
+            for (const type of types) {
                 const pl = makePayload(type);
 
                 expect(getEventType(pl)).toBe(type);
@@ -42,6 +47,6 @@ describe('Payload', () => {
 
         it('should return undefined if no event type could be found', () => {
             expect(getEventType('somePayload')).toBeUndefined();
-        })
+        });
     });
 });

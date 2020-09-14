@@ -29,11 +29,15 @@ describe('HttpUrlBuilder', () => {
     it('should build the status request url', () => {
         const url = buildHttpUrl('https://example.com', request, false);
 
-        expect(url).toEqual('https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs');
+        expect(url).toEqual(
+            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs',
+        );
     });
     it('should build the status request url for a new session', () => {
         const url = buildHttpUrl('https://example.com', request, true);
 
-        expect(url).toEqual('https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&ns=1');
+        expect(url).toEqual(
+            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&ns=1',
+        );
     });
 });

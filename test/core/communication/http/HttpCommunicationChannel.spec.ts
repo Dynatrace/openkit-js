@@ -16,7 +16,10 @@
 
 import { anyString, instance, mock, spy, verify, when } from 'ts-mockito';
 import { CommunicationChannel, StatusRequest } from '../../../../src/api';
-import { HttpClient, HttpResponse } from '../../../../src/core/communication/http/HttpClient';
+import {
+    HttpClient,
+    HttpResponse,
+} from '../../../../src/core/communication/http/HttpClient';
 import { HttpCommunicationChannel } from '../../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OverloadPreventionState } from '../../../../src/core/communication/http/state/OverloadPreventionState';
 import { SendingState } from '../../../../src/core/communication/http/state/SendingState';
@@ -32,20 +35,23 @@ const request: StatusRequest = {
 
 class StubHttpClient implements HttpClient {
     public async get(url: string): Promise<HttpResponse> {
-        return {status: 200, payload: 'type=m', headers: {}};
+        return { status: 200, payload: 'type=m', headers: {} };
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
-        return {status: 200, payload: 'type=m', headers: {}};
+        return { status: 200, payload: 'type=m', headers: {} };
     }
 }
 
 describe('HttpCommunicationChannel', () => {
     let channel: CommunicationChannel;
-    let clientMock: HttpClient = mock(StubHttpClient);
+    const clientMock: HttpClient = mock(StubHttpClient);
 
     beforeEach(() => {
-        channel = new HttpCommunicationChannel(instance(clientMock), defaultNullLoggerFactory);
+        channel = new HttpCommunicationChannel(
+            instance(clientMock),
+            defaultNullLoggerFactory,
+        );
     });
 
     describe('state changes', () => {
@@ -53,33 +59,54 @@ describe('HttpCommunicationChannel', () => {
             expect((channel as any).state).toBeInstanceOf(SendingState);
         });
 
-        it('should switch to OverloadPreventionState if a request returns 429', async() => {
+        it('should switch to OverloadPreventionState if a request returns 429', async () => {
             // given
-            when(clientMock.get(anyString())).thenResolve({status: 429, headers: {}, payload: ''});
+            when(clientMock.get(anyString())).thenResolve({
+                status: 429,
+                headers: {},
+                payload: '',
+            });
 
             // when
             await channel.sendStatusRequest('https://example.com', request);
 
             // then
-            expect((channel as any).state).toBeInstanceOf(OverloadPreventionState);
+            expect((channel as any).state).toBeInstanceOf(
+                OverloadPreventionState,
+            );
         });
 
-        [400, 404, 500].forEach(status => {
-            it('should not switch to OverloadPreventionState if a request returns ' + status, async() => {
-                // given
-                when(clientMock.get(anyString())).thenResolve({status, headers: {}, payload: ''});
+        [400, 404, 500].forEach((status) => {
+            it(
+                'should not switch to OverloadPreventionState if a request returns ' +
+                    status,
+                async () => {
+                    // given
+                    when(clientMock.get(anyString())).thenResolve({
+                        status,
+                        headers: {},
+                        payload: '',
+                    });
 
-                // when
-                await channel.sendStatusRequest('https://example.com', request);
+                    // when
+                    await channel.sendStatusRequest(
+                        'https://example.com',
+                        request,
+                    );
 
-                // then
-                expect((channel as any).state).toBeInstanceOf(SendingState);
-            })
+                    // then
+                    expect((channel as any).state).toBeInstanceOf(SendingState);
+                },
+            );
         });
 
         it('should switch back to SendingState after the retry timeout ran out', (done) => {
             // given
-            when(clientMock.get(anyString())).thenResolve({status: 429, headers: { 'retry-after': '1'}, payload: ''});
+            when(clientMock.get(anyString())).thenResolve({
+                status: 429,
+                headers: { 'retry-after': '1' },
+                payload: '',
+            });
 
             // when
             channel.sendStatusRequest('https://example.com', request);
@@ -95,40 +122,72 @@ describe('HttpCommunicationChannel', () => {
     });
 
     describe('redirecting requests', () => {
-        it('should redirect sendStatusRequest requests to the current state', async() => {
+        it('should redirect sendStatusRequest requests to the current state', async () => {
             // given
-            when(clientMock.get(anyString())).thenResolve({status: 200, payload: 'type=m', headers: {}});
-            const stateSpy = spy((channel as any).state) as CommunicationChannel;
+            when(clientMock.get(anyString())).thenResolve({
+                status: 200,
+                payload: 'type=m',
+                headers: {},
+            });
+            const stateSpy = spy(
+                (channel as any).state,
+            ) as CommunicationChannel;
 
             // when
             await channel.sendStatusRequest('https://example.com', request);
 
             // then
-            verify(stateSpy.sendStatusRequest('https://example.com', request)).once();
+            verify(
+                stateSpy.sendStatusRequest('https://example.com', request),
+            ).once();
         });
 
-        it('should redirect sendStatusRequest requests to the current state', async() => {
+        it('should redirect sendStatusRequest requests to the current state', async () => {
             // given
-            when(clientMock.get(anyString())).thenResolve({status: 200, payload: 'type=m', headers: {}});
-            const stateSpy = spy((channel as any).state) as CommunicationChannel;
+            when(clientMock.get(anyString())).thenResolve({
+                status: 200,
+                payload: 'type=m',
+                headers: {},
+            });
+            const stateSpy = spy(
+                (channel as any).state,
+            ) as CommunicationChannel;
 
             // when
             await channel.sendNewSessionRequest('https://example.com', request);
 
             // then
-            verify(stateSpy.sendNewSessionRequest('https://example.com', request)).once();
+            verify(
+                stateSpy.sendNewSessionRequest('https://example.com', request),
+            ).once();
         });
 
-        it('should redirect sendStatusRequest requests to the current state', async() => {
+        it('should redirect sendStatusRequest requests to the current state', async () => {
             // given
-            when(clientMock.post(anyString(), anyString())).thenResolve({status: 200, payload: 'type=m', headers: {}});
-            const stateSpy = spy((channel as any).state) as CommunicationChannel;
+            when(clientMock.post(anyString(), anyString())).thenResolve({
+                status: 200,
+                payload: 'type=m',
+                headers: {},
+            });
+            const stateSpy = spy(
+                (channel as any).state,
+            ) as CommunicationChannel;
 
             // when
-            await channel.sendPayloadData('https://example.com', request, 'query');
+            await channel.sendPayloadData(
+                'https://example.com',
+                request,
+                'query',
+            );
 
             // then
-            verify(stateSpy.sendPayloadData('https://example.com', request, 'query')).once();
+            verify(
+                stateSpy.sendPayloadData(
+                    'https://example.com',
+                    request,
+                    'query',
+                ),
+            ).once();
         });
     });
 });

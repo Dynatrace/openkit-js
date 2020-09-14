@@ -78,7 +78,11 @@ export class OpenKitBuilder {
      * @param applicationId The id of the custom application
      * @param deviceId The id of the current device, which must be a number between 1 and 19 digits inclusive.
      */
-    constructor(beaconURL: string, applicationId: string, deviceId: number | string) {
+    constructor(
+        beaconURL: string,
+        applicationId: string,
+        deviceId: number | string,
+    ) {
         this.beaconUrl = beaconURL;
         this.applicationId = applicationId;
         this.deviceId = String(deviceId);
@@ -136,8 +140,14 @@ export class OpenKitBuilder {
      * @param dataCollectionLevel The data collection level
      * @returns The current OpenKitBuilder
      */
-    public withDataCollectionLevel(dataCollectionLevel: DataCollectionLevel): this {
-        if (typeof dataCollectionLevel === 'number' && dataCollectionLevel >= 0 && dataCollectionLevel <= 2) {
+    public withDataCollectionLevel(
+        dataCollectionLevel: DataCollectionLevel,
+    ): this {
+        if (
+            typeof dataCollectionLevel === 'number' &&
+            dataCollectionLevel >= 0 &&
+            dataCollectionLevel <= 2
+        ) {
             this.dataCollectionLevel = dataCollectionLevel;
         }
         return this;
@@ -156,8 +166,14 @@ export class OpenKitBuilder {
      *
      * @param crashReportingLevel
      */
-    public withCrashReportingLevel(crashReportingLevel: CrashReportingLevel): this {
-        if (typeof crashReportingLevel === 'number' && crashReportingLevel >= 0 && crashReportingLevel <= 2) {
+    public withCrashReportingLevel(
+        crashReportingLevel: CrashReportingLevel,
+    ): this {
+        if (
+            typeof crashReportingLevel === 'number' &&
+            crashReportingLevel >= 0 &&
+            crashReportingLevel <= 2
+        ) {
             this.crashReportingLevel = crashReportingLevel;
         }
 
@@ -169,8 +185,13 @@ export class OpenKitBuilder {
      *
      * @param communicationChannel
      */
-    public withCommunicationChannel(communicationChannel: CommunicationChannel): this {
-        if (communicationChannel !== null && communicationChannel !== undefined) {
+    public withCommunicationChannel(
+        communicationChannel: CommunicationChannel,
+    ): this {
+        if (
+            communicationChannel !== null &&
+            communicationChannel !== undefined
+        ) {
             this.communicationChannel = communicationChannel;
         }
 
@@ -184,7 +205,7 @@ export class OpenKitBuilder {
      */
     public withRandomNumberProvider(random: RandomNumberProvider): this {
         if (random !== null && random !== undefined) {
-           this.randomNumberProvider = random;
+            this.randomNumberProvider = random;
         }
 
         return this;
@@ -256,7 +277,10 @@ export class OpenKitBuilder {
      * @param orientation The orientation. 'p' || 'l'.
      */
     public withScreenOrientation(orientation: Orientation): this {
-        if (orientation === Orientation.Landscape || orientation === Orientation.Portrait) {
+        if (
+            orientation === Orientation.Landscape ||
+            orientation === Orientation.Portrait
+        ) {
             this.orientation = orientation;
         }
 
@@ -312,15 +336,25 @@ export class OpenKitBuilder {
     }
 
     private buildConfig(): Readonly<Configuration> {
-        const loggerFactory = this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
+        const loggerFactory =
+            this.loggerFactory || new ConsoleLoggerFactory(this.logLevel);
 
-        const communicationChannel = this.communicationChannel ||
-            new HttpCommunicationChannel(new AxiosHttpClient(loggerFactory), loggerFactory);
+        const communicationChannel =
+            this.communicationChannel ||
+            new HttpCommunicationChannel(
+                new AxiosHttpClient(loggerFactory),
+                loggerFactory,
+            );
 
-        const random = this.randomNumberProvider || new DefaultRandomNumberProvider();
+        const random =
+            this.randomNumberProvider || new DefaultRandomNumberProvider();
 
         // user does not allow data tracking
-        const deviceId = normalizeDeviceId(this.deviceId, this.dataCollectionLevel, random);
+        const deviceId = normalizeDeviceId(
+            this.deviceId,
+            this.dataCollectionLevel,
+            random,
+        );
         const sendingStrategies = getContextBasedSendingStrategies();
 
         return {
@@ -357,9 +391,16 @@ export class OpenKitBuilder {
     }
 }
 
-const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: RandomNumberProvider): string => {
+const normalizeDeviceId = (
+    deviceId: string,
+    dcl: DataCollectionLevel,
+    random: RandomNumberProvider,
+): string => {
     // Check if we may capture the device id
-    let id = dcl !== DataCollectionLevel.UserBehavior ? String(random.nextPositiveInteger()) : deviceId;
+    let id =
+        dcl !== DataCollectionLevel.UserBehavior
+            ? String(random.nextPositiveInteger())
+            : deviceId;
 
     // remove a possible '+' at the start
     if (id.charAt(0) === '+') {
@@ -373,7 +414,10 @@ const normalizeDeviceId = (deviceId: string, dcl: DataCollectionLevel, random: R
     return id;
 };
 
-const isNodeJs = (): boolean => typeof process !== 'undefined' && process.release && process.release.name === 'node';
+const isNodeJs = (): boolean =>
+    typeof process !== 'undefined' &&
+    process.release &&
+    process.release.name === 'node';
 
 const getContextBasedSendingStrategies = (): SendingStrategy[] => {
     if (isNodeJs()) {

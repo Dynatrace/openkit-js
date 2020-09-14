@@ -35,8 +35,12 @@ export interface BeaconCache {
 export class BeaconCacheImpl implements BeaconCache {
     private readonly entries: CacheEntry[] = [];
 
-    public register(session: SessionImpl, prefix: string, payloadBuilder: PayloadBuilder, state: CommunicationState): CacheEntry {
-
+    public register(
+        session: SessionImpl,
+        prefix: string,
+        payloadBuilder: PayloadBuilder,
+        state: CommunicationState,
+    ): CacheEntry {
         const entry: CacheEntry = {
             session,
             initialized: false,
@@ -55,7 +59,9 @@ export class BeaconCacheImpl implements BeaconCache {
     }
 
     public getAllClosedSessions(): CacheEntry[] {
-        return this.entries.filter((entry) => entry.initialized && entry.session.isShutdown());
+        return this.entries.filter(
+            (entry) => entry.initialized && entry.session.isShutdown(),
+        );
     }
 
     public getAllInitializedSessions(): CacheEntry[] {

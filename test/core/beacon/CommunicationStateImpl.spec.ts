@@ -22,7 +22,7 @@ describe('CommunicationStateImpl', () => {
     let state: CommunicationState;
 
     beforeEach(() => {
-       state = new CommunicationStateImpl();
+        state = new CommunicationStateImpl();
     });
 
     describe('default values', () => {
@@ -53,63 +53,88 @@ describe('CommunicationStateImpl', () => {
 
     describe('updateState with a status request', () => {
         it('should update the serverId', () => {
-            state.updateFromResponse({ valid: true, serverId: 7});
+            state.updateFromResponse({ valid: true, serverId: 7 });
             expect(state.serverId).toBe(7);
         });
 
         it('should update maxBeaconSize with the multiplier of 1024', () => {
-            state.updateFromResponse({ valid: true, maxBeaconSizeInKb: 10});
+            state.updateFromResponse({ valid: true, maxBeaconSizeInKb: 10 });
             expect(state.maxBeaconSize).toBe(10240);
         });
 
         it('should update multiplicity', () => {
-            state.updateFromResponse({ valid: true, multiplicity: 7});
+            state.updateFromResponse({ valid: true, multiplicity: 7 });
             expect(state.multiplicity).toBe(7);
         });
 
         it('should not update any values, if the status is not 200', () => {
-           state.updateFromResponse({ valid: true, serverId: 5, maxBeaconSizeInKb: 5, multiplicity: 5});
-           state.updateFromResponse({ valid: false, serverId: 1, maxBeaconSizeInKb: 1, multiplicity: 1});
+            state.updateFromResponse({
+                valid: true,
+                serverId: 5,
+                maxBeaconSizeInKb: 5,
+                multiplicity: 5,
+            });
+            state.updateFromResponse({
+                valid: false,
+                serverId: 1,
+                maxBeaconSizeInKb: 1,
+                multiplicity: 1,
+            });
 
-           expect(state.multiplicity).toBe(5);
-           expect(state.maxBeaconSize).toBe(5120);
-           expect(state.serverId).toBe(5);
+            expect(state.multiplicity).toBe(5);
+            expect(state.maxBeaconSize).toBe(5120);
+            expect(state.serverId).toBe(5);
         });
 
         it('should update captureErrors', () => {
             // when, then
-           state.updateFromResponse({valid: true, captureErrors: CaptureMode.On});
-           expect(state.captureErrors).toBe(CaptureMode.On);
+            state.updateFromResponse({
+                valid: true,
+                captureErrors: CaptureMode.On,
+            });
+            expect(state.captureErrors).toBe(CaptureMode.On);
 
             // when, then
-            state.updateFromResponse({valid: true, captureErrors: CaptureMode.Off});
+            state.updateFromResponse({
+                valid: true,
+                captureErrors: CaptureMode.Off,
+            });
             expect(state.captureErrors).toBe(CaptureMode.Off);
 
             // when, then
-            state.updateFromResponse({valid: true, captureErrors: CaptureMode.On});
+            state.updateFromResponse({
+                valid: true,
+                captureErrors: CaptureMode.On,
+            });
             expect(state.captureErrors).toBe(CaptureMode.On);
         });
 
         it('should update captureCrashes', () => {
             // when, then
-            state.updateFromResponse({valid: true, captureCrashes: CaptureMode.On});
-            expect(state.captureCrashes)
-                .toBe(CaptureMode.On);
+            state.updateFromResponse({
+                valid: true,
+                captureCrashes: CaptureMode.On,
+            });
+            expect(state.captureCrashes).toBe(CaptureMode.On);
 
             // when, then
-            state.updateFromResponse({valid: true, captureCrashes: CaptureMode.Off});
-            expect(state.captureCrashes)
-                .toBe(CaptureMode.Off);
+            state.updateFromResponse({
+                valid: true,
+                captureCrashes: CaptureMode.Off,
+            });
+            expect(state.captureCrashes).toBe(CaptureMode.Off);
 
             // when, then
-            state.updateFromResponse({valid: true, captureCrashes: CaptureMode.On});
-            expect(state.captureCrashes)
-                .toBe(CaptureMode.On);
+            state.updateFromResponse({
+                valid: true,
+                captureCrashes: CaptureMode.On,
+            });
+            expect(state.captureCrashes).toBe(CaptureMode.On);
         });
 
         it('should disable capture if multiplicity = 0', () => {
             // when
-            state.updateFromResponse({valid: true, multiplicity: 0});
+            state.updateFromResponse({ valid: true, multiplicity: 0 });
 
             // then
             expect(state.capture).toBe(CaptureMode.Off);
@@ -146,9 +171,9 @@ describe('CommunicationStateImpl', () => {
         });
 
         it('should make the serverId unmodifiable, after setServerIdLocked is called', () => {
-            state.updateFromResponse({ valid: true, serverId: 4});
+            state.updateFromResponse({ valid: true, serverId: 4 });
             state.setServerIdLocked();
-            state.updateFromResponse({ valid: true, serverId: 7});
+            state.updateFromResponse({ valid: true, serverId: 7 });
 
             expect(state.serverId).toBe(4);
         });

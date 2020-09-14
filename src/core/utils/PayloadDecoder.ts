@@ -26,9 +26,7 @@ export class PayloadDecoder {
     }
 
     private decode(query: string): void {
-        query
-            .split('&')
-            .forEach((entry) => this.decodeEntry(entry));
+        query.split('&').forEach((entry) => this.decodeEntry(entry));
     }
 
     private decodeEntry(entry: string): void {

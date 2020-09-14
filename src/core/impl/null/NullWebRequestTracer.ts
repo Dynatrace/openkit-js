@@ -16,7 +16,7 @@
 
 import { WebRequestTracer } from '../../../api';
 
-class NullWebRequestTracer implements  WebRequestTracer {
+class NullWebRequestTracer implements WebRequestTracer {
     public getTag(): string {
         return '';
     }

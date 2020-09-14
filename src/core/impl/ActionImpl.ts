@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-import { Action, DataCollectionLevel, Logger, WebRequestTracer } from '../../api';
-import { OpenKitConfiguration, PrivacyConfiguration } from '../config/Configuration';
+import {
+    Action,
+    DataCollectionLevel,
+    Logger,
+    WebRequestTracer,
+} from '../../api';
+import {
+    OpenKitConfiguration,
+    PrivacyConfiguration,
+} from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
 import { isFinite } from '../utils/Utils';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
@@ -45,34 +53,56 @@ export class ActionImpl implements Action {
         this.startSequenceNumber = this.payloadBuilder.createSequenceNumber();
         this.actionId = this.payloadBuilder.createActionId();
 
-        this.logger = config.loggerFactory.createLogger(`ActionImpl (sessionId=${session.sessionId}, actionId=${this.actionId})`);
+        this.logger = config.loggerFactory.createLogger(
+            `ActionImpl (sessionId=${session.sessionId}, actionId=${this.actionId})`,
+        );
 
-        this.logger.debug('created', {name});
+        this.logger.debug('created', { name });
     }
 
     /**
      * @inheritDoc
      */
-    public reportValue(name: string, value: number | string | null | undefined): void {
-        if (this.isActionLeft() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
-
+    public reportValue(
+        name: string,
+        value: number | string | null | undefined,
+    ): void {
+        if (
+            this.isActionLeft() ||
+            this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior
+        ) {
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            validationFailed(this.logger, 'reportValue', 'Name must be a non empty string', {name});
+            validationFailed(
+                this.logger,
+                'reportValue',
+                'Name must be a non empty string',
+                { name },
+            );
 
             return;
         }
 
         const type = typeof value;
-        if (type !== 'string' && type !== 'number' && value !== null && value !== undefined) {
-            validationFailed(this.logger, 'reportValue', 'Value is not a valid type', {value});
+        if (
+            type !== 'string' &&
+            type !== 'number' &&
+            value !== null &&
+            value !== undefined
+        ) {
+            validationFailed(
+                this.logger,
+                'reportValue',
+                'Value is not a valid type',
+                { value },
+            );
 
             return;
         }
 
-        this.logger.debug('reportValue', {name, value});
+        this.logger.debug('reportValue', { name, value });
 
         this.payloadBuilder.reportValue(this, name, value);
     }
@@ -81,18 +111,25 @@ export class ActionImpl implements Action {
      * @inheritDoc
      */
     public reportEvent(name: string): void {
-        if (this.isActionLeft() || this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
-
+        if (
+            this.isActionLeft() ||
+            this.config.dataCollectionLevel !== DataCollectionLevel.UserBehavior
+        ) {
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            validationFailed(this.logger, 'reportEvent', 'Name must be a non empty string', {name});
+            validationFailed(
+                this.logger,
+                'reportEvent',
+                'Name must be a non empty string',
+                { name },
+            );
 
             return;
         }
 
-        this.logger.debug('reportEvent', {name});
+        this.logger.debug('reportEvent', { name });
 
         this.payloadBuilder.reportEvent(this.actionId, name);
     }
@@ -102,44 +139,72 @@ export class ActionImpl implements Action {
      */
     public reportError(name: string, code: number, message: string): void {
         if (this.isActionLeft()) {
-            validationFailed(this.logger, 'reportError', 'Action is already closed');
+            validationFailed(
+                this.logger,
+                'reportError',
+                'Action is already closed',
+            );
 
             return;
         }
 
         if (typeof name !== 'string' || name.length === 0) {
-            validationFailed(this.logger, 'reportError', 'Name must be a non empty string', {name});
+            validationFailed(
+                this.logger,
+                'reportError',
+                'Name must be a non empty string',
+                { name },
+            );
 
             return;
         }
 
         if (!isFinite(code)) {
-            validationFailed(this.logger, 'reportError', 'Code must be a finite number', {code});
+            validationFailed(
+                this.logger,
+                'reportError',
+                'Code must be a finite number',
+                { code },
+            );
 
             return;
         }
 
-        this.logger.debug('reportError', {name, code, message});
+        this.logger.debug('reportError', { name, code, message });
 
-        this.payloadBuilder.reportError(this.actionId, name, code, String(message));
+        this.payloadBuilder.reportError(
+            this.actionId,
+            name,
+            code,
+            String(message),
+        );
     }
 
     public traceWebRequest(url: string): WebRequestTracer {
         if (this.isActionLeft()) {
-            validationFailed(this.logger, 'traceWebRequest', 'Action is already closed');
+            validationFailed(
+                this.logger,
+                'traceWebRequest',
+                'Action is already closed',
+            );
 
             return defaultNullWebRequestTracer;
         }
 
         if (typeof url !== 'string' || url.length === 0) {
-            validationFailed(this.logger, 'traceWebRequest', 'Url must be a non empty string', {url});
+            validationFailed(
+                this.logger,
+                'traceWebRequest',
+                'Url must be a non empty string',
+                { url },
+            );
 
             return defaultNullWebRequestTracer;
         }
 
-        this.logger.debug('traceWebRequest', {url});
+        this.logger.debug('traceWebRequest', { url });
 
-        const {deviceId, applicationId, loggerFactory } = this.config;
+        const { deviceId, applicationId, loggerFactory } = this.config;
 
         return new WebRequestTracerImpl(
             this.payloadBuilder,
@@ -154,7 +219,6 @@ export class ActionImpl implements Action {
 
     public leaveAction(): null {
         if (this.isActionLeft()) {
-
             return null;
         }
 

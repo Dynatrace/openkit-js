@@ -16,7 +16,10 @@
 
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
-import { defaultTimestampProvider, TimestampProvider } from '../provider/TimestampProvider';
+import {
+    defaultTimestampProvider,
+    TimestampProvider,
+} from '../provider/TimestampProvider';
 import { ActionImpl } from './ActionImpl';
 import { WebRequestTracerImpl } from './WebRequestTracerImpl';
 
@@ -30,8 +33,8 @@ export class PayloadBuilderHelper {
     constructor(
         public readonly payloadBuilder: PayloadBuilder,
         private readonly sessionStartTime: number,
-        private readonly timestampProvider: TimestampProvider = defaultTimestampProvider) {
-    }
+        private readonly timestampProvider: TimestampProvider = defaultTimestampProvider,
+    ) {}
 
     public createActionId(): number {
         return this.nextId.next();
@@ -67,7 +70,11 @@ export class PayloadBuilderHelper {
         );
     }
 
-    public reportValue(action: ActionImpl, name: string, value: number | string | null | undefined): void {
+    public reportValue(
+        action: ActionImpl,
+        name: string,
+        value: number | string | null | undefined,
+    ): void {
         this.payloadBuilder.reportValue(
             name,
             value,
@@ -78,10 +85,19 @@ export class PayloadBuilderHelper {
     }
 
     public identifyUser(userTag: string): void {
-        this.payloadBuilder.identifyUser(userTag, this.createSequenceNumber(), this.timeSinceSessionStart());
+        this.payloadBuilder.identifyUser(
+            userTag,
+            this.createSequenceNumber(),
+            this.timeSinceSessionStart(),
+        );
     }
 
-    public reportError(parentActionId: number, name: string, code: number, message: string): void {
+    public reportError(
+        parentActionId: number,
+        name: string,
+        code: number,
+        message: string,
+    ): void {
         this.payloadBuilder.reportError(
             name,
             message,
@@ -92,7 +108,11 @@ export class PayloadBuilderHelper {
         );
     }
 
-    public reportCrash(errorName: string, reason: string, stacktrace: string): void {
+    public reportCrash(
+        errorName: string,
+        reason: string,
+        stacktrace: string,
+    ): void {
         this.payloadBuilder.reportCrash(
             errorName,
             reason,
@@ -104,10 +124,10 @@ export class PayloadBuilderHelper {
 
     public reportEvent(actionId: number, name: string): void {
         this.payloadBuilder.reportNamedEvent(
-          name,
-          actionId,
-          this.createSequenceNumber(),
-          this.timeSinceSessionStart(),
+            name,
+            actionId,
+            this.createSequenceNumber(),
+            this.timeSinceSessionStart(),
         );
     }
 
@@ -115,7 +135,10 @@ export class PayloadBuilderHelper {
         return this.timestampProvider.getCurrentTimestamp();
     }
 
-    public addWebRequest(webRequest: WebRequestTracerImpl, parentActionId: number): void {
+    public addWebRequest(
+        webRequest: WebRequestTracerImpl,
+        parentActionId: number,
+    ): void {
         this.payloadBuilder.webRequest(
             webRequest.getUrl(),
             parentActionId,
@@ -136,7 +159,13 @@ export class PayloadBuilderHelper {
         deviceId: string,
         appId: string,
     ): string {
-        return this.payloadBuilder.getWebRequestTracerTag(actionId, sessionNumber, sequenceNumber, deviceId, appId);
+        return this.payloadBuilder.getWebRequestTracerTag(
+            actionId,
+            sessionNumber,
+            sequenceNumber,
+            deviceId,
+            appId,
+        );
     }
 
     private timeSinceSessionStart(): number {

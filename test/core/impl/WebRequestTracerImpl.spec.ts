@@ -16,11 +16,14 @@
 
 import { anything, instance, mock, reset, when } from 'ts-mockito';
 import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelper';
-import { createTag, WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
+import {
+    createTag,
+    WebRequestTracerImpl,
+} from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 
 describe('WebRequestTracerImpl', () => {
-    let payloadBuilder = mock(PayloadBuilderHelper);
+    const payloadBuilder = mock(PayloadBuilderHelper);
     let webRequest: WebRequestTracerImpl;
 
     beforeEach(() => {
@@ -28,9 +31,30 @@ describe('WebRequestTracerImpl', () => {
 
         when(payloadBuilder.createSequenceNumber()).thenReturn(6, 9);
         when(payloadBuilder.currentTimestamp()).thenReturn(500, 800, 1400);
-        when(payloadBuilder.getWebRequestTracerTag(anything(), anything(), anything(), anything(), anything()))
-            .thenCall((actionId: number,sessionNumber: number, sequenceNumber: number,deviceId: string,appId: string,) =>
-                createTag(actionId, sessionNumber, sequenceNumber, 5, deviceId, appId),
+        when(
+            payloadBuilder.getWebRequestTracerTag(
+                anything(),
+                anything(),
+                anything(),
+                anything(),
+                anything(),
+            ),
+        ).thenCall(
+            (
+                actionId: number,
+                sessionNumber: number,
+                sequenceNumber: number,
+                deviceId: string,
+                appId: string,
+            ) =>
+                createTag(
+                    actionId,
+                    sessionNumber,
+                    sequenceNumber,
+                    5,
+                    deviceId,
+                    appId,
+                ),
         );
 
         webRequest = new WebRequestTracerImpl(
@@ -99,35 +123,35 @@ describe('WebRequestTracerImpl', () => {
     });
 
     describe('start', () => {
-       it('should have the sequenceNumber and startTime without call of start()', () => {
-           // then
-           expect(webRequest.getStart()).toBe(500);
-           expect(webRequest.getStartSequenceNumber()).toBe(6);
-       });
+        it('should have the sequenceNumber and startTime without call of start()', () => {
+            // then
+            expect(webRequest.getStart()).toBe(500);
+            expect(webRequest.getStartSequenceNumber()).toBe(6);
+        });
 
-       it('should set update startTime after a call to start()', () => {
-           // when
-           webRequest.start();
+        it('should set update startTime after a call to start()', () => {
+            // when
+            webRequest.start();
 
-           // then
-           expect(webRequest.getStart()).toBe(800);
-           expect(webRequest.getStartSequenceNumber()).toBe(6);
-       });
+            // then
+            expect(webRequest.getStart()).toBe(800);
+            expect(webRequest.getStartSequenceNumber()).toBe(6);
+        });
 
-       it('should not update startTime if the webRequest is stopped', () => {
-           // when
-           webRequest.stop(200);
-           webRequest.start();
+        it('should not update startTime if the webRequest is stopped', () => {
+            // when
+            webRequest.stop(200);
+            webRequest.start();
 
-           // then
-           expect(webRequest.getStart()).toBe(500);
-           expect(webRequest.getStartSequenceNumber()).toBe(6);
-       });
+            // then
+            expect(webRequest.getStart()).toBe(500);
+            expect(webRequest.getStartSequenceNumber()).toBe(6);
+        });
 
-       it('should return itself as return value', () => {
-           // then
-           expect(webRequest.start()).toBe(webRequest);
-       });
+        it('should return itself as return value', () => {
+            // then
+            expect(webRequest.start()).toBe(webRequest);
+        });
     });
 
     describe('stop', () => {
@@ -168,12 +192,12 @@ describe('WebRequestTracerImpl', () => {
     });
 
     describe('duration', () => {
-        it('should return -1 if the webRequest is not stopped', () =>{
+        it('should return -1 if the webRequest is not stopped', () => {
             // then
             expect(webRequest.getDuration()).toBe(-1);
         });
 
-        it('should return the duration if the webRequest is stopped', () =>{
+        it('should return the duration if the webRequest is stopped', () => {
             // when
             webRequest.stop(200);
 
@@ -188,12 +212,12 @@ describe('WebRequestTracerImpl', () => {
     });
 
     describe('tag', () => {
-       it('should build a valid tag', () => {
-           // when
-           const tag = webRequest.getTag();
+        it('should build a valid tag', () => {
+            // when
+            const tag = webRequest.getTag();
 
-           // then
-           expect(tag).toEqual('MT_3_5_123456_98765_1234-65434-86123_70_1_6');
-       });
+            // then
+            expect(tag).toEqual('MT_3_5_123456_98765_1234-65434-86123_70_1_6');
+        });
     });
 });

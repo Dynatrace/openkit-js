@@ -20,13 +20,13 @@ describe('CallbackHolder', () => {
     let holder: CallbackHolder<boolean>;
 
     beforeEach(() => {
-       holder = new CallbackHolder<boolean>();
+        holder = new CallbackHolder<boolean>();
     });
 
     it('should be able to add and resolve callbacks', () => {
-        let value = undefined;
+        let value;
 
-        holder.add(tf => value = tf);
+        holder.add((tf) => (value = tf));
 
         holder.resolve(true);
 
@@ -34,46 +34,46 @@ describe('CallbackHolder', () => {
     });
 
     it('should be able to remove a callback which should not be called', () => {
-       let value = undefined;
+        let value;
 
-       const cb = (tf: boolean) => value = tf;
+        const cb = (tf: boolean) => (value = tf);
 
-       holder.add(cb);
-       holder.remove(cb);
+        holder.add(cb);
+        holder.remove(cb);
 
-       holder.resolve(true);
+        holder.resolve(true);
 
-       expect(value).toBe(undefined);
+        expect(value).toBe(undefined);
     });
 
     it('should be able to add multiple cb and remove some', () => {
         // given
-       let value1 = undefined;
-       let value2 = undefined;
+        let value1;
+        let value2;
 
-       const cb1 = (tf: boolean) => value1 = tf;
+        const cb1 = (tf: boolean) => (value1 = tf);
 
-       holder.add(cb1);
-       holder.add(tf => value2 = tf);
+        holder.add(cb1);
+        holder.add((tf) => (value2 = tf));
 
-       // when
-       holder.remove(cb1);
-       holder.resolve(true);
+        // when
+        holder.remove(cb1);
+        holder.resolve(true);
 
-       // then
-       expect(value1).toBeUndefined();
-       expect(value2).toBe(true);
+        // then
+        expect(value1).toBeUndefined();
+        expect(value2).toBe(true);
     });
 
     it('should not resolve callbacks twice', () => {
-       let value = undefined;
+        let value;
 
-       holder.add(tf => value = tf);
+        holder.add((tf) => (value = tf));
 
-       holder.resolve(true);
-       holder.resolve(false);
+        holder.resolve(true);
+        holder.resolve(false);
 
-       expect(value).toBe(true);
+        expect(value).toBe(true);
     });
 
     describe('contains', () => {

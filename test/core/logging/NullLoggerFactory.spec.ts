@@ -19,6 +19,8 @@ import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFa
 
 describe('NullLoggerFactory', () => {
     it('should return defaultNullLogger on create', () => {
-        expect(defaultNullLoggerFactory.createLogger('name')).toBe(defaultNullLogger);
+        expect(defaultNullLoggerFactory.createLogger('name')).toBe(
+            defaultNullLogger,
+        );
     });
 });

@@ -46,21 +46,25 @@ describe('UrlBuilder', () => {
         it('should build a query with a single string value', () => {
             builder.add(QueryKey.Version, 'actionname');
 
-            expect(builder.build()).toEqual('https://example.com?va=actionname');
+            expect(builder.build()).toEqual(
+                'https://example.com?va=actionname',
+            );
         });
 
         it('should concat queries with "&" if multiple values are present', () => {
             builder.add(QueryKey.Version, 'myModel');
             builder.add(QueryKey.AgentTechnologyType, '1.0.4');
 
-            expect(builder.build()).toEqual('https://example.com?va=myModel&tt=1.0.4');
+            expect(builder.build()).toEqual(
+                'https://example.com?va=myModel&tt=1.0.4',
+            );
         });
 
         it('should overwrite already set values', () => {
             builder.add(QueryKey.Version, 1);
             builder.add(QueryKey.Version, 2);
 
-            expect(builder.build()).toEqual('https://example.com?va=2')
+            expect(builder.build()).toEqual('https://example.com?va=2');
         });
     });
 
@@ -81,7 +85,9 @@ describe('UrlBuilder', () => {
             builder.addIfDefined(QueryKey.Version, '1.0');
             builder.addIfDefined(QueryKey.AgentTechnologyType, 'myOs');
 
-            expect(builder.build()).toEqual('https://example.com?va=1.0&tt=myOs')
+            expect(builder.build()).toEqual(
+                'https://example.com?va=1.0&tt=myOs',
+            );
         });
 
         it('should add the query with multiple defined and undefined values', () => {
@@ -89,21 +95,23 @@ describe('UrlBuilder', () => {
             builder.addIfDefined(QueryKey.AgentTechnologyType, 'myOs');
             builder.addIfDefined(QueryKey.Type, undefined);
 
-            expect(builder.build()).toEqual('https://example.com?va=1.0&tt=myOs')
+            expect(builder.build()).toEqual(
+                'https://example.com?va=1.0&tt=myOs',
+            );
         });
 
         it('should overwrite already set values, if the value is also defined', () => {
             builder.addIfDefined(QueryKey.Version, 1);
             builder.addIfDefined(QueryKey.Version, 0);
 
-            expect(builder.build()).toEqual('https://example.com?va=0')
+            expect(builder.build()).toEqual('https://example.com?va=0');
         });
 
         it('should not overwrite already set values, if the value is not defined', () => {
             builder.addIfDefined(QueryKey.Version, 1);
             builder.addIfDefined(QueryKey.Version, undefined);
 
-            expect(builder.build()).toEqual('https://example.com?va=1')
+            expect(builder.build()).toEqual('https://example.com?va=1');
         });
     });
 
@@ -117,7 +125,9 @@ describe('UrlBuilder', () => {
         it('should encode UTF-16-characters into UTF-8-characters', () => {
             builder.add(QueryKey.Version, '😉');
 
-            expect(builder.build()).toEqual('https://example.com?va=%F0%9F%98%89');
+            expect(builder.build()).toEqual(
+                'https://example.com?va=%F0%9F%98%89',
+            );
         });
     });
 });
