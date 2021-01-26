@@ -20,6 +20,7 @@ import {
     Logger,
     OpenKit,
     Session,
+    ShutdownCallback,
 } from '../../api';
 import { BeaconSenderImpl } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
@@ -99,7 +100,7 @@ export class OpenKitImpl implements OpenKit {
     /**
      * @inheritDoc
      */
-    public shutdown(): void {
+    public shutdown(callback?: ShutdownCallback): void {
         if (this.isShutdown) {
             return;
         }
@@ -107,7 +108,15 @@ export class OpenKitImpl implements OpenKit {
 
         this.logger.debug('shutdown');
 
-        this.beaconSender.shutdown();
+        this.beaconSender.shutdown().then(() => {
+            // Wait for the beaconSender to resolve its shutdown
+            // before notifying the shutdown callback.
+            // This means all data has been sent and it is safe to
+            // terminate the process.
+            if (callback) {
+                callback();
+            }
+        });
     }
 
     /**

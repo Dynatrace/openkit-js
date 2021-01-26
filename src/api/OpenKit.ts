@@ -19,6 +19,8 @@ import { Session } from './Session';
 
 export type InitCallback = (success: boolean) => void;
 
+export type ShutdownCallback = () => void;
+
 /**
  * OpenKit public interface
  */
@@ -51,6 +53,8 @@ export interface OpenKit {
     /**
      * Shutdown OpenKit.
      * All open session are closed and send to the Beacon.
+     *
+     * @param callback The callback when the shutdown has finished sending to the Beacon.
      */
-    shutdown(): void;
+    shutdown(callback?: ShutdownCallback): void;
 }

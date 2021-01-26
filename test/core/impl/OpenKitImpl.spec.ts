@@ -132,6 +132,20 @@ describe('OpenKitImpl', () => {
             // then
             verify(sender.shutdown()).never();
         });
+
+        it('should call shutdownCallback when beaconsender is shut down', async () => {
+            jest.setTimeout(3500);
+            const spy = jest.fn();
+
+            // given
+            ok.shutdown(spy);
+
+            // when
+            await timeout(3000);
+
+            // then
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('notifyInitialized', () => {
