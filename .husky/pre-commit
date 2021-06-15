@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd public
+npx --no-install prettier && npx --no-install eslint
+yarn lint-staged
