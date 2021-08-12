@@ -280,6 +280,27 @@ describe('OpenKitImpl', () => {
             expect(v1).toBe(false);
             expect(v2).toBe(true);
         });
+
+        it('should resolve immedeately even with timeout', async (done) => {
+            jest.setTimeout(5000);
+
+            const startTime = new Date().getTime();
+
+            // given
+            ok.waitForInit((cb: boolean) => {
+                const duration = new Date().getTime() - startTime;
+
+                expect(duration).toBeLessThan(1500);
+                expect(cb).toBe(true);
+
+                done();
+            }, 3000);
+
+            // when
+            await timeout(1000);
+            expect(v1).toBe(undefined);
+            ok.notifyInitialized(true);
+        });
     });
 
     describe('createSession', () => {
