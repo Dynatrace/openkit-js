@@ -1,6 +1,8 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.0.0...HEAD)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.1.0...HEAD)
+## 1.1.0 [Release date: 2021-01-11]
+[GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.1.0)
 
 ### Added
 
@@ -23,4 +25,4 @@
 
 [GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.0.0)
 
-### Initial public release
+### Initial public release 
