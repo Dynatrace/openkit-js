@@ -1,5 +1,15 @@
 # OpenKit JS Changelog
 
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.3.0...HEAD)
+
+## 1.3.0 [Release date: 2021-12-10]
+
+[GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.3.0)
+
+### Improved
+
+-   waitForInit with timeout fixed
+
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.2.0...HEAD)
 
 ## 1.2.0 [Release date: 2021-01-26]
