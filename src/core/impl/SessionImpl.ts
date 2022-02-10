@@ -22,6 +22,7 @@ import {
     Session,
     WebRequestTracer,
 } from '../../api';
+import { JSONObject } from '../../api/Json';
 import {
     OpenKitConfiguration,
     PrivacyConfiguration,
@@ -32,7 +33,11 @@ import {
     defaultTimestampProvider,
     TimestampProvider,
 } from '../provider/TimestampProvider';
-import { removeElement } from '../utils/Utils';
+import {
+    EVENT_MAX_PAYLOAD,
+    isEventPayloadTooBig,
+    removeElement,
+} from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
@@ -245,6 +250,85 @@ export class SessionImpl implements Session {
             applicationId,
             this.sessionId,
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    sendEvent(name: string, attributes: JSONObject): void {
+        if (
+            this.isShutdown() ||
+            this.config.dataCollectionLevel === DataCollectionLevel.Off
+        ) {
+            return;
+        }
+
+        if (typeof name !== 'string' || name.length === 0) {
+            validationFailed(
+                this.logger,
+                'sendEvent',
+                'Name must be a non empty string',
+                { name },
+            );
+
+            return;
+        }
+
+        if (
+            typeof attributes !== 'object' ||
+            attributes === null ||
+            Array.isArray(attributes)
+        ) {
+            validationFailed(
+                this.logger,
+                'sendEvent',
+                'Payload toplevel must be an object!',
+                { attributes },
+            );
+
+            return;
+        }
+
+        if (Object.keys(attributes).includes('name')) {
+            // Warning because name will be overridden
+            this.logger.debug(
+                'sendEvent',
+                'name property in the payload will be overridden',
+                { name },
+            );
+        }
+
+        const jsonPayload = JSON.stringify(
+            { ...attributes, name },
+            (key, value) => {
+                // Sorting out Null Json Values as they are not important
+                if (
+                    value !== value ||
+                    value === Infinity ||
+                    value === -Infinity ||
+                    value === null
+                ) {
+                    return;
+                }
+
+                return value;
+            },
+        );
+
+        if (isEventPayloadTooBig(jsonPayload)) {
+            validationFailed(
+                this.logger,
+                'sendEvent',
+                'Payload is limited to ' + EVENT_MAX_PAYLOAD + 'bytes',
+                { jsonPayload },
+            );
+
+            return;
+        }
+
+        this.logger.debug('sendEvent', { jsonPayload });
+
+        this.payloadData.sendEvent(jsonPayload);
     }
 
     public isShutdown(): boolean {

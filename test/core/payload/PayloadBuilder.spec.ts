@@ -618,4 +618,31 @@ describe('PayloadBuilder', () => {
             expect(tag).toEqual(cT);
         });
     });
+
+    describe('sendEvent', () => {
+        it('should not create the payload if capture is disabled', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.Off);
+
+            // when
+            builder.sendEvent('{"name":"eventName"}');
+
+            // then
+            verify(staticBuilderSpy.sendEvent(anything())).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
+        it('should build the payload and add it to the queue', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+
+            // when
+            builder.sendEvent('{"name":"eventName"}');
+
+            // then
+            verify(staticBuilderSpy.sendEvent(anything())).once();
+            verify(staticBuilderSpy.sendEvent('{"name":"eventName"}')).once();
+            verify(builderSpy._push(anything())).once();
+        });
+    });
 });

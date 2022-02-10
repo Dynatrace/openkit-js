@@ -15,6 +15,7 @@
  */
 
 import { Action } from './Action';
+import { JSONObject } from './Json';
 import { WebRequestTracer } from './WebRequestTracer';
 
 /**
@@ -64,6 +65,14 @@ export interface Session {
      * @return a WebRequestTracer which allows getting the tag value and adding timing information
      */
     traceWebRequest(url: string): WebRequestTracer;
+
+    /**
+     * Sending an event with JSON payload
+     *
+     * @param name Name of the event
+     * @param attributes Payload of the event
+     */
+    // sendEvent(name: string, attributes: JSONObject): void;
 
     /**
      * Ends the session and sends all remaining data.

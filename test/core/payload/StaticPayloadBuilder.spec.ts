@@ -849,6 +849,35 @@ describe('PayloadBuilder', () => {
         });
     });
 
+    describe('sendEvent', () => {
+        it('should build the payload', () => {
+            // given
+            const payload = StaticPayloadBuilder.sendEvent(
+                '{"name":"eventName"}',
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+
+            // then
+            payloadKeysExpect(keys, [
+                PayloadKey.EventType,
+                PayloadKey.EventPayload,
+            ]);
+
+            payloadExpect(
+                pairs,
+                PayloadKey.EventType,
+                EventType.Event.toString(),
+            );
+            payloadExpect(
+                pairs,
+                PayloadKey.EventPayload,
+                '{"name":"eventName"}',
+            );
+        });
+    });
+
     describe('webRequest', () => {
         it('should build the payload with all optional values', () => {
             // given

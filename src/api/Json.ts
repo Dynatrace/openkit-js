@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-export const enum EventType {
-    ManualAction = 1,
+type Primitive = string | number | boolean;
+type JSONArray = JSONValue[];
+type JSONValue = Primitive | JSONArray | JSONObject;
 
-    NamedEvent = 10,
-    ValueString = 11,
-    ValueDouble = 13,
-
-    SessionStart = 18,
-    SessionEnd = 19,
-
-    WebRequest = 30,
-    Error = 40,
-    Crash = 50,
-    IdentifyUser = 60,
-
-    Event = 98,
+/**
+ * JSON Object which can be used for sendEvent API
+ */
+export interface JSONObject {
+    [key: string]: JSONValue;
 }

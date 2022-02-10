@@ -51,6 +51,14 @@ export class PayloadBuilder {
         );
     }
 
+    public sendEvent(jsonPayload: string) {
+        if (this.isCaptureDisabled()) {
+            return;
+        }
+
+        this._push(StaticPayloadBuilder.sendEvent(jsonPayload));
+    }
+
     public reportCrash(
         errorName: string,
         reason: string,

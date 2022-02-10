@@ -168,6 +168,10 @@ export class PayloadBuilderHelper {
         );
     }
 
+    public sendEvent(jsonPayload: string): void {
+        this.payloadBuilder.sendEvent(jsonPayload);
+    }
+
     private timeSinceSessionStart(): number {
         return this.currentTimestamp() - this.sessionStartTime;
     }

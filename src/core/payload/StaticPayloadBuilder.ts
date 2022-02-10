@@ -49,6 +49,7 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.ErrorTechnologyType, errorTechnologyType)
             .build();
     }
+
     public static startSession(sequenceNumber: number): Payload {
         return StaticPayloadBuilder.basicEventData(EventType.SessionStart)
             .add(PayloadKey.ParentActionId, 0)
@@ -96,6 +97,13 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)
+            .build();
+    }
+
+    public static sendEvent(jsonPayload: string): Payload {
+        return new PayloadQueryBuilder()
+            .add(PayloadKey.EventType, EventType.Event)
+            .add(PayloadKey.EventPayload, jsonPayload)
             .build();
     }
 

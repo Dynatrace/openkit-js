@@ -415,6 +415,116 @@ describe('SessionImpl', () => {
         });
     });
 
+    describe('sendEvent', () => {
+        it('should not be possible to send an event if the name is not a string', () => {
+            // when
+            // @ts-ignore
+            session.sendEvent(1337, {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an event if the name is empty', () => {
+            // when
+            // @ts-ignore
+            session.sendEvent('', {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an event if payload contains top-level array', () => {
+            // when
+            // @ts-ignore
+            session.sendEvent('name', []);
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an event if payload is too big', () => {
+            // when
+            const jsonObject: { [key: string]: string } = {};
+
+            for (let i = 0; i < 1000; i++) {
+                jsonObject['Test' + i] =
+                    'This is a Test String, so the payload is big enough';
+            }
+
+            // @ts-ignore
+            session.sendEvent('EventName', jsonObject);
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an event if payload has no top-level json or invalid json', () => {
+            // when
+            // @ts-ignore
+            session.sendEvent('eventName', []);
+            // @ts-ignore
+            session.sendEvent('eventName', NaN);
+            // @ts-ignore
+            session.sendEvent('eventName', 17);
+            // @ts-ignore
+            session.sendEvent('eventName', 'test');
+            // @ts-ignore
+            session.sendEvent('eventName', true);
+            // @ts-ignore
+            session.sendEvent('eventName', undefined);
+            // @ts-ignore
+            session.sendEvent('eventName', null);
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an event if DCL = Off', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Off;
+
+            // when
+            session.sendEvent('name', {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should be able to send an event if DCL = Performance', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Performance;
+
+            // when
+            session.sendEvent('name', {});
+
+            // then
+            verify(payloadBuilder.sendEvent('{"name":"name"}')).once();
+            verify(payloadBuilder.sendEvent(anything())).once();
+        });
+
+        it('should be able to send an event if DCL = UserBehavior', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
+
+            // when
+            session.sendEvent('name', {});
+
+            // then
+            verify(payloadBuilder.sendEvent('{"name":"name"}')).once();
+            verify(payloadBuilder.sendEvent(anything())).once();
+        });
+
+        it('should override name if provided in payload', () => {
+            // when
+            session.sendEvent('myCustomName', { name: 'eventName' });
+
+            // then
+            verify(payloadBuilder.sendEvent('{"name":"myCustomName"}')).once();
+            verify(payloadBuilder.sendEvent(anything())).once();
+        });
+    });
+
     describe('reportError', () => {
         it('should not be possible to report an error if the name is not a string', () => {
             // when
