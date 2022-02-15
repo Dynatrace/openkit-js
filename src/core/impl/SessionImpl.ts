@@ -319,7 +319,7 @@ export class SessionImpl implements Session {
             validationFailed(
                 this.logger,
                 'sendEvent',
-                'Payload is limited to ' + EVENT_MAX_PAYLOAD + 'bytes',
+                'Payload is limited to ' + EVENT_MAX_PAYLOAD + ' bytes',
                 { jsonPayload },
             );
 

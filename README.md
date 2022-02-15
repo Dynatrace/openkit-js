@@ -68,9 +68,9 @@ For browsers a mirroring service like [jsDelivr](https://www.jsdelivr.com/packag
 ></script>
 ```
 
-## Development
+## Contribution & Development
 
-See [development.md](development.md).
+See [contribution.md](contribution.md) and [development.md](development.md).
 
 ## General Concepts
 
