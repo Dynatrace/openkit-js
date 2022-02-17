@@ -42,4 +42,10 @@ export interface StatusRequest {
      * The agent technology type.
      */
     readonly agentTechnologyType: string;
+
+    /**
+     * Timestamp (ms since 1970) of current configuration used by the agent.
+     * 0 ms when no configuration was yet received.
+     */
+    readonly timestamp: number;
 }

@@ -57,6 +57,16 @@ export interface StatusResponse {
     readonly multiplicity?: number;
 
     /**
+     * The application which this configuration applies to.
+     */
+    readonly applicationId?: string;
+
+    /**
+     * Timestamp of the configuration
+     */
+    readonly timestamp?: number;
+
+    /**
      * Flag if the response is valid. If it is not, all communication stops immediately for the current session.
      */
     readonly valid: boolean;

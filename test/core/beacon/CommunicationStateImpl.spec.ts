@@ -22,7 +22,7 @@ describe('CommunicationStateImpl', () => {
     let state: CommunicationState;
 
     beforeEach(() => {
-        state = new CommunicationStateImpl();
+        state = new CommunicationStateImpl('Test App Id');
     });
 
     describe('default values', () => {
@@ -49,6 +49,10 @@ describe('CommunicationStateImpl', () => {
         it('should have capture = On', () => {
             expect(state.capture).toBe(CaptureMode.On);
         });
+
+        it('should return a configuration timestamp of 0', () => {
+            expect(state.timestamp).toBe(CaptureMode.On);
+        });
     });
 
     describe('updateState with a status request', () => {
@@ -67,23 +71,31 @@ describe('CommunicationStateImpl', () => {
             expect(state.multiplicity).toBe(7);
         });
 
+        it('should update timestamp', () => {
+            state.updateFromResponse({ valid: true, timestamp: 7 });
+            expect(state.timestamp).toBe(7);
+        });
+
         it('should not update any values, if the status is not 200', () => {
             state.updateFromResponse({
                 valid: true,
                 serverId: 5,
                 maxBeaconSizeInKb: 5,
                 multiplicity: 5,
+                timestamp: 5,
             });
             state.updateFromResponse({
                 valid: false,
                 serverId: 1,
                 maxBeaconSizeInKb: 1,
                 multiplicity: 1,
+                timestamp: 1,
             });
 
             expect(state.multiplicity).toBe(5);
             expect(state.maxBeaconSize).toBe(5120);
             expect(state.serverId).toBe(5);
+            expect(state.timestamp).toBe(5);
         });
 
         it('should update captureErrors', () => {
@@ -138,6 +150,36 @@ describe('CommunicationStateImpl', () => {
 
             // then
             expect(state.capture).toBe(CaptureMode.Off);
+        });
+
+        it('should disable capture if application Id is different', () => {
+            // when
+            state.updateFromResponse({
+                valid: true,
+                applicationId: 'Other App Id',
+            });
+
+            // then
+            expect(state.capture).toBe(CaptureMode.Off);
+        });
+
+        it('should not disable capture if application Id is the same', () => {
+            // when
+            state.updateFromResponse({
+                valid: true,
+                applicationId: 'Test App Id',
+            });
+
+            // then
+            expect(state.capture).toBe(CaptureMode.On);
+        });
+
+        it('should not disable capture if application Id is not available', () => {
+            // when
+            state.updateFromResponse({ valid: true });
+
+            // then
+            expect(state.capture).toBe(CaptureMode.On);
         });
     });
 

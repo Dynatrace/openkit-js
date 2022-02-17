@@ -21,7 +21,8 @@ import {
 } from '../../../../api';
 import { timeout } from '../../../utils/Utils';
 import { defaultInvalidHttpResponse, HttpResponse } from '../HttpClient';
-import { HttpStatusResponse } from '../HttpStatusResponse';
+import { HttpStatusResponseJson } from '../HttpStatusResponseJson';
+import { HttpStatusResponseKeyValue } from '../HttpStatusResponseKeyValue';
 import { buildHttpUrl } from '../HttpUrlBuilder';
 import { OverloadPreventionState } from './OverloadPreventionState';
 import { StateContext } from './StateContext';
@@ -88,7 +89,17 @@ export class SendingState implements CommunicationChannel {
                 i++;
             } while (response.status !== 200 && i < timeouts.length);
 
-            return new HttpStatusResponse(response, this.context.loggerFactory);
+            if (response.payload.startsWith('type=m')) {
+                return new HttpStatusResponseKeyValue(
+                    response,
+                    this.context.loggerFactory,
+                );
+            } else {
+                return new HttpStatusResponseJson(
+                    response,
+                    this.context.loggerFactory,
+                );
+            }
         }
     }
 

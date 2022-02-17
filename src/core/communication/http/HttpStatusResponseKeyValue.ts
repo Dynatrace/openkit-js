@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    CaptureMode,
-    Logger,
-    LoggerFactory,
-    StatusResponse,
-} from '../../../api';
+import { CaptureMode } from '../../../api';
 import { ResponseKey } from '../../protocol/ResponseKey';
 import { PayloadDecoder } from '../../utils/PayloadDecoder';
-import { HttpResponse } from './HttpClient';
+import { HttpStatusResponseBase } from './HttpStatusResponseBase';
 
 const parsePositiveInt = (str: string, defaultValue: number): number => {
     const parsed = parseInt(str, 10);
@@ -30,29 +25,14 @@ const parsePositiveInt = (str: string, defaultValue: number): number => {
     return parsed >= 0 ? parsed : defaultValue;
 };
 
-export class HttpStatusResponse implements StatusResponse {
-    public captureCrashes: CaptureMode | undefined;
-    public captureErrors: CaptureMode | undefined;
-    public captureMode: CaptureMode | undefined;
-    public maxBeaconSizeInKb: number | undefined;
-    public multiplicity: number | undefined;
-    public serverId: number | undefined;
+/**
+ * Class which is checking the old key value response and is sanitizing
+ * the values if they are wrong.
+ */
+export class HttpStatusResponseKeyValue extends HttpStatusResponseBase {
+    protected parsePayload(payload: string): void {
+        const entries = new PayloadDecoder(payload).getEntries();
 
-    public valid = true;
-
-    private readonly logger: Logger;
-
-    constructor(response: HttpResponse, loggerFactory: LoggerFactory) {
-        this.logger = loggerFactory.createLogger('HttpStatusResponse');
-
-        if (response.status !== 200) {
-            this.valid = false;
-            this.logger.debug('Invalid response status:', response.status);
-
-            return;
-        }
-
-        const entries = new PayloadDecoder(response.payload).getEntries();
         if (entries.type !== 'm') {
             this.valid = false;
             this.logger.debug('Invalid response type:', entries.type);

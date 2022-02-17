@@ -32,6 +32,7 @@ describe('StatusRequestImpl', () => {
             'version',
             7,
             42,
+            23,
         );
     });
 
@@ -55,13 +56,18 @@ describe('StatusRequestImpl', () => {
         expect(request.serverId).toEqual(42);
     });
 
+    it('should return the same timestamp as passed in the constructor', () => {
+        expect(request.timestamp).toEqual(23);
+    });
+
     it('should create the request from a state', () => {
-        request = StatusRequestImpl.create('app-id', 8);
+        request = StatusRequestImpl.create('app-id', 8, 42);
 
         expect(request.agentTechnologyType).toEqual(agentTechnologyType);
         expect(request.applicationId).toEqual('app-id');
         expect(request.openKitVersion).toEqual(openKitVersion);
         expect(request.platformType).toEqual(platformTypeOpenKit);
         expect(request.serverId).toBe(8);
+        expect(request.timestamp).toBe(42);
     });
 });

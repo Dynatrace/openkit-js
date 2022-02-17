@@ -147,7 +147,9 @@ export class OpenKitImpl implements OpenKit {
             sessionStartTime,
         );
 
-        const communicationState = new CommunicationStateImpl();
+        const communicationState = new CommunicationStateImpl(
+            this.config.openKit.applicationId,
+        );
         const payloadBuilder = new PayloadBuilder(communicationState);
 
         const session = new SessionImpl(

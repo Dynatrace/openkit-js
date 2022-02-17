@@ -30,8 +30,12 @@ export class CommunicationStateImpl implements CommunicationState {
     public captureCrashes: CaptureMode = defaultCrashReportingMode;
     public captureErrors: CaptureMode = defaultCaptureErrors;
     public capture: CaptureMode = CaptureMode.On;
+    public timestamp: number = 0;
+    private serverIdLocked: boolean;
 
-    private serverIdLocked = false;
+    constructor(private readonly applicationId: string) {
+        this.serverIdLocked = false;
+    }
 
     public setServerIdLocked(): void {
         this.serverIdLocked = true;
@@ -61,6 +65,14 @@ export class CommunicationStateImpl implements CommunicationState {
             }
         }
 
+        // Application Id
+        if (
+            response.applicationId !== undefined &&
+            response.applicationId !== this.applicationId
+        ) {
+            this.disableCapture();
+        }
+
         // Server id
         if (response.serverId !== undefined && this.serverIdLocked === false) {
             this.serverId =
@@ -83,6 +95,11 @@ export class CommunicationStateImpl implements CommunicationState {
         // Crash reporting level
         if (response.captureCrashes !== undefined) {
             this.captureCrashes = response.captureCrashes;
+        }
+
+        // Timestap
+        if (response.timestamp !== undefined) {
+            this.timestamp = response.timestamp;
         }
     }
 

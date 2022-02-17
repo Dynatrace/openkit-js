@@ -48,6 +48,11 @@ export interface CommunicationState {
     readonly capture: CaptureMode;
 
     /**
+     * Timestamp of the current configuration
+     */
+    readonly timestamp: number;
+
+    /**
      * Locks the server id so it can't change.
      */
     setServerIdLocked(): void;

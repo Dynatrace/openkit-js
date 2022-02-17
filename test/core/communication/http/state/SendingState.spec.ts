@@ -38,6 +38,7 @@ const request: StatusRequest = {
     openKitVersion: '1.0',
     applicationId: '2.0',
     agentTechnologyType: 'okjs',
+    timestamp: 0,
 };
 
 describe('SendingState', () => {
@@ -58,6 +59,31 @@ describe('SendingState', () => {
 
         state = new SendingState(context);
     });
+
+    it(
+        'should redirect a json status request to the http client ' +
+            'and return the response immediately if the request was successful',
+        async () => {
+            // given
+            when(httpClient.get(anyString())).thenResolve({
+                status: 200,
+                headers: {},
+                payload: '{}',
+            });
+
+            // when
+            const response = await state.sendStatusRequest(
+                'https://example.com',
+                request,
+            );
+
+            // then
+            expect(response.valid).toBe(true);
+            verify(httpClient.get(match(/^https:\/\/example\.com/))).once();
+            verify(httpClient.get(anything())).once();
+            verify(httpClient.post(anything(), anything())).never();
+        },
+    );
 
     it(
         'should redirect a status request to the http client ' +

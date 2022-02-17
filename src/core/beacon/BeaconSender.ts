@@ -63,7 +63,7 @@ export class BeaconSenderImpl implements BeaconSender {
 
         const response = await this.channel.sendStatusRequest(
             this.beaconUrl,
-            StatusRequestImpl.create(this.appId, this.okServerId),
+            StatusRequestImpl.create(this.appId, this.okServerId, 0),
         );
 
         if (response.valid) {
@@ -73,11 +73,9 @@ export class BeaconSenderImpl implements BeaconSender {
                     ? defaultServerId
                     : response.serverId;
 
-            this.cache
-                .getEntriesCopy()
-                .forEach((entry) =>
-                    entry.communicationState.setServerId(this.okServerId),
-                );
+            this.cache.getEntriesCopy().forEach((entry) => {
+                entry.communicationState.setServerId(this.okServerId);
+            });
 
             this.sendingStrategies.forEach((strategy) =>
                 strategy.init(this, this.cache),
@@ -160,6 +158,7 @@ export class BeaconSenderImpl implements BeaconSender {
             StatusRequestImpl.create(
                 this.appId,
                 entry.communicationState.serverId,
+                entry.communicationState.timestamp,
             ),
         );
 
@@ -200,6 +199,7 @@ export class BeaconSenderImpl implements BeaconSender {
             const request = StatusRequestImpl.create(
                 this.appId,
                 entry.communicationState.serverId,
+                entry.communicationState.timestamp,
             );
 
             const response = await this.channel.sendPayloadData(

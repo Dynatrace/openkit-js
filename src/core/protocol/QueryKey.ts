@@ -22,4 +22,6 @@ export const enum QueryKey {
     PlatformType = 'pt',
     AgentTechnologyType = 'tt',
     NewSession = 'ns',
+    ConfigurationTimestamp = 'cts',
+    ResponseFormat = 'resp',
 }

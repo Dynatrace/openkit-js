@@ -23,6 +23,7 @@ const request: StatusRequest = {
     openKitVersion: '1.0',
     platformType: 1,
     serverId: 5,
+    timestamp: 5,
 };
 
 describe('HttpUrlBuilder', () => {
@@ -30,14 +31,14 @@ describe('HttpUrlBuilder', () => {
         const url = buildHttpUrl('https://example.com', request, false);
 
         expect(url).toEqual(
-            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs',
+            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&cts=5&resp=json',
         );
     });
     it('should build the status request url for a new session', () => {
         const url = buildHttpUrl('https://example.com', request, true);
 
         expect(url).toEqual(
-            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&ns=1',
+            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&cts=5&resp=json&ns=1',
         );
     });
 });

@@ -31,6 +31,7 @@ const request: StatusRequest = {
     openKitVersion: '1.0',
     applicationId: '2.0',
     agentTechnologyType: 'okjs',
+    timestamp: 5,
 };
 
 class StubHttpClient implements HttpClient {

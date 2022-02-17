@@ -36,6 +36,7 @@ const request: StatusRequest = {
     openKitVersion: '1.0',
     applicationId: '2.0',
     agentTechnologyType: 'okjs',
+    timestamp: 0,
 };
 
 describe('OverloadPreventionState', () => {

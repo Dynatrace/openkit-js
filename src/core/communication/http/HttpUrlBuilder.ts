@@ -30,5 +30,7 @@ export const buildHttpUrl = (
         .add(QueryKey.Version, statusRequest.openKitVersion)
         .add(QueryKey.PlatformType, statusRequest.platformType)
         .add(QueryKey.AgentTechnologyType, statusRequest.agentTechnologyType)
+        .add(QueryKey.ConfigurationTimestamp, statusRequest.timestamp)
+        .add(QueryKey.ResponseFormat, 'json')
         .addIfDefined(QueryKey.NewSession, newSession ? 1 : undefined)
         .build();

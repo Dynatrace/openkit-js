@@ -27,6 +27,7 @@ export class StatusRequestImpl implements StatusRequest {
     public readonly openKitVersion: string;
     public readonly platformType: number;
     public readonly serverId: number;
+    public readonly timestamp: number;
 
     constructor(
         agentTechnology: string,
@@ -34,21 +35,28 @@ export class StatusRequestImpl implements StatusRequest {
         version: string,
         platformType: number,
         serverId: number,
+        timestamp: number,
     ) {
         this.agentTechnologyType = agentTechnology;
         this.applicationId = applicationId;
         this.openKitVersion = version;
         this.platformType = platformType;
         this.serverId = serverId;
+        this.timestamp = timestamp;
     }
 
-    public static create(appId: string, serverId: number): StatusRequestImpl {
+    public static create(
+        appId: string,
+        serverId: number,
+        timestamp: number,
+    ): StatusRequestImpl {
         return new StatusRequestImpl(
             agentTechnologyType,
             appId,
             openKitVersion,
             platformTypeOpenKit,
             serverId,
+            timestamp,
         );
     }
 }
