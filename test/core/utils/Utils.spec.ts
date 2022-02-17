@@ -15,6 +15,7 @@
  */
 
 import {
+    getVersionNumber,
     isEventPayloadTooBig,
     removeElement,
 } from '../../../src/core/utils/Utils';
@@ -53,6 +54,14 @@ describe('Utils', () => {
             expect(isEventPayloadTooBig(JSON.stringify(jsonObject))).toEqual(
                 true,
             );
+        });
+    });
+
+    describe('getVersionNumber', () => {
+        it('should return version number', () => {
+            expect(
+                getVersionNumber(8, 237, { major: 1, minor: 3, build: 0 }),
+            ).toBe('8.237.10300');
         });
     });
 });

@@ -15,6 +15,15 @@
  */
 
 /**
+ * Interface which represents the version used for OpenKit.
+ */
+export interface OpenKitVersion {
+    major: number;
+    minor: number;
+    build: number;
+}
+
+/**
  * Maximum size of all values passed to Dynatrace.
  */
 const MAX_VALUE_LENGTH = 250;
@@ -77,4 +86,22 @@ export const isEventPayloadTooBig = (str: string): boolean => {
     }
 
     return s > EVENT_MAX_PAYLOAD;
+};
+
+/**
+ * Returns the correct version string for OpenKit that is used in the basic data
+ *
+ * @param major Major version which should be reported
+ * @param sprint Sprint version which should be reported
+ * @param version Current OK version which should be used for calculating version string
+ * @returns Version string which will be used in basic data e.g. 8.205.20100
+ */
+export const getVersionNumber = (
+    major: number,
+    sprint: number,
+    version: OpenKitVersion,
+): string => {
+    const versionString =
+        version.major * 10000 + version.minor * 100 + version.build;
+    return `${major}.${sprint}.${versionString}`;
 };
