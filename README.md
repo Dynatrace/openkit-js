@@ -149,15 +149,21 @@ const openKit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
     .withModelId('MyModelId')
     .build();
 
-const clientIP = '8.8.8.8';
-const session = openKit.createSession(clientIP);
+const timeoutInMilliseconds = 10 * 1000;
 
-session.identifyUser('jane.doe@example.com');
+openKit.waitForInit((success) => {
+    if (success) {
+        const clientIP = '8.8.8.8';
+        const session = openKit.createSession(clientIP);
 
-const actionName = 'rootActionName';
-const action = session.enterAction(actionName);
+        session.identifyUser('jane.doe@example.com');
 
-action.leaveAction();
-session.end();
-openKit.shutdown();
+        const actionName = 'rootActionName';
+        const action = session.enterAction(actionName);
+
+        action.leaveAction();
+        session.end();
+        openKit.shutdown();
+    }
+}, timeoutInMilliseconds);
 ```
