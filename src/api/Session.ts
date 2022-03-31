@@ -15,7 +15,6 @@
  */
 
 import { Action } from './Action';
-import { JSONObject } from './Json';
 import { WebRequestTracer } from './WebRequestTracer';
 
 /**

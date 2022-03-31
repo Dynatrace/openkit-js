@@ -34,7 +34,7 @@ import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
-import { isFinite, truncate } from './core/utils/Utils';
+import { isFinite, truncate, isNode } from './core/utils/Utils';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
@@ -414,13 +414,8 @@ const normalizeDeviceId = (
     return id;
 };
 
-const isNodeJs = (): boolean =>
-    typeof process !== 'undefined' &&
-    process.release &&
-    process.release.name === 'node';
-
 const getContextBasedSendingStrategies = (): SendingStrategy[] => {
-    if (isNodeJs()) {
+    if (isNode) {
         return [new IntervalSendingStrategy()];
     } else {
         return [new ImmediateSendingStrategy()];

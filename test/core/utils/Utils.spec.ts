@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    getVersionNumber,
-    isEventPayloadTooBig,
-    removeElement,
-} from '../../../src/core/utils/Utils';
+import { getVersionNumber, removeElement } from '../../../src/core/utils/Utils';
 
 describe('Utils', () => {
     describe('removeElement', () => {
@@ -33,27 +29,6 @@ describe('Utils', () => {
             removeElement(array, 6);
 
             expect(array).toEqual([1, 2, 3, 4]);
-        });
-    });
-
-    describe('isEventPayloadTooBig', () => {
-        it('should return false when payload is small enough', () => {
-            const payloadStr = '{}';
-
-            expect(isEventPayloadTooBig(payloadStr)).toEqual(false);
-        });
-
-        it('should return true when payload is too big', () => {
-            const jsonObject: { [key: string]: string } = {};
-
-            for (let i = 0; i < 1000; i++) {
-                jsonObject['Test' + i] =
-                    'This is a Test String, so the payload is big enough';
-            }
-
-            expect(isEventPayloadTooBig(JSON.stringify(jsonObject))).toEqual(
-                true,
-            );
         });
     });
 

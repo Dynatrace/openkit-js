@@ -31,6 +31,7 @@ import {
     PrivacyConfiguration,
 } from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
+import { EventPayload } from '../payload/EventPayload';
 import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
@@ -139,7 +140,7 @@ export class OpenKitImpl implements OpenKit {
         this.logger.debug('createSession', { clientIP });
 
         const sessionId = this.createSessionId();
-        const sessionStartTime = defaultTimestampProvider.getCurrentTimestamp();
+        const sessionStartTime = defaultTimestampProvider.getCurrentTimestampMs();
         const sessionPrefix = StaticPayloadBuilder.sessionPrefix(
             this.applicationWidePrefix,
             sessionId,
@@ -150,13 +151,20 @@ export class OpenKitImpl implements OpenKit {
         const communicationState = new CommunicationStateImpl(
             this.config.openKit.applicationId,
         );
+
         const payloadBuilder = new PayloadBuilder(communicationState);
+        const eventsPayload = new EventPayload(
+            this.config,
+            defaultTimestampProvider,
+        );
 
         const session = new SessionImpl(
             sessionId,
             payloadBuilder,
             sessionStartTime,
             this.sessionConfig,
+            defaultTimestampProvider,
+            eventsPayload,
         );
 
         const cacheEntry = this.cache.register(

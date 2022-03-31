@@ -20,6 +20,7 @@ import { OpenKitImpl } from '../impl/OpenKitImpl';
 import { Payload } from '../payload/Payload';
 import { defaultServerId } from '../PlatformConstants';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
+import { SEND_TIMESTAMP_PLACEHOLDER } from '../utils/EventPayloadUtils';
 import { StatusRequestImpl } from './StatusRequestImpl';
 import { BeaconCacheImpl, CacheEntry } from './strategies/BeaconCache';
 import { SendingStrategy } from './strategies/SendingStrategy';
@@ -193,13 +194,19 @@ export class BeaconSenderImpl implements BeaconSender {
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions,no-cond-assign
             (payload = entry.builder.getNextPayload(
                 entry.prefix,
-                this.timestampProvider.getCurrentTimestamp(),
+                this.timestampProvider.getCurrentTimestampMs(),
             ))
         ) {
             const request = StatusRequestImpl.create(
                 this.appId,
                 entry.communicationState.serverId,
                 entry.communicationState.timestamp,
+            );
+
+            // Replace Send Timestamp of Events API
+            payload = payload.replace(
+                SEND_TIMESTAMP_PLACEHOLDER,
+                this.timestampProvider.getCurrentTimestampNs().toString(),
             );
 
             const response = await this.channel.sendPayloadData(

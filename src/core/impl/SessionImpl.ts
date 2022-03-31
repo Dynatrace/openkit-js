@@ -28,6 +28,7 @@ import {
     PrivacyConfiguration,
 } from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
+import { EventPayload } from '../payload/EventPayload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import {
     defaultTimestampProvider,
@@ -36,8 +37,8 @@ import {
 import {
     EVENT_MAX_PAYLOAD,
     isEventPayloadTooBig,
-    removeElement,
-} from '../utils/Utils';
+} from '../utils/EventPayloadUtils';
+import { removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
@@ -58,6 +59,7 @@ export class SessionImpl implements Session {
         sessionStartTime: number,
         private readonly config: PrivacyConfiguration & OpenKitConfiguration,
         timestampProvider: TimestampProvider = defaultTimestampProvider,
+        private readonly eventsPayload: EventPayload,
     ) {
         this.sessionId = sessionId;
         this.payloadData = new PayloadBuilderHelper(
@@ -289,30 +291,10 @@ export class SessionImpl implements Session {
             return;
         }
 
-        if (Object.keys(attributes).includes('name')) {
-            // Warning because name will be overridden
-            this.logger.debug(
-                'sendEvent',
-                'name property in the payload will be overridden',
-                { name },
-            );
-        }
-
-        const jsonPayload = JSON.stringify(
-            { ...attributes, name },
-            (key, value) => {
-                // Sorting out Null Json Values as they are not important
-                if (
-                    value !== value ||
-                    value === Infinity ||
-                    value === -Infinity ||
-                    value === null
-                ) {
-                    return;
-                }
-
-                return value;
-            },
+        const jsonPayload = this.eventsPayload.getEventsPayload(
+            name,
+            attributes,
+            this.sessionId,
         );
 
         if (isEventPayloadTooBig(jsonPayload)) {

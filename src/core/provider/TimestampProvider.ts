@@ -15,8 +15,11 @@
  */
 
 export class TimestampProvider {
-    public getCurrentTimestamp(): number {
+    public getCurrentTimestampMs(): number {
         return new Date().getTime();
+    }
+    public getCurrentTimestampNs(): number {
+        return this.getCurrentTimestampMs() * 1000000;
     }
 }
 

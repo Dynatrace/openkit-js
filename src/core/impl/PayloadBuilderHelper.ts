@@ -132,7 +132,7 @@ export class PayloadBuilderHelper {
     }
 
     public currentTimestamp(): number {
-        return this.timestampProvider.getCurrentTimestamp();
+        return this.timestampProvider.getCurrentTimestampMs();
     }
 
     public addWebRequest(

@@ -29,11 +29,6 @@ export interface OpenKitVersion {
 const MAX_VALUE_LENGTH = 250;
 
 /**
- * Maxium payload size for sending an event
- */
-export const EVENT_MAX_PAYLOAD = 16 * 1024;
-
-/**
  * Removes an element from a given array.
  * If there are multiple elements of the same instance, only the first is removed.
  *
@@ -62,33 +57,6 @@ export const isFinite = (n: number) =>
     typeof n === 'number' && n !== Infinity && n !== -Infinity && !isNaN(n);
 
 /**
- * Calculate the size of the string in bytes and returns if it is to
- * big for the event payload
- *
- * @param str string which should be used for event payload
- * @returns true if the payload is too big
- */
-export const isEventPayloadTooBig = (str: string): boolean => {
-    let s = str.length;
-
-    for (let i = str.length - 1; i >= 0; i--) {
-        const code = str.charCodeAt(i);
-
-        if (code > 0x7f && code <= 0x7ff) {
-            s++;
-        } else if (code > 0x7ff && code <= 0xffff) {
-            s += 2;
-        }
-
-        if (code >= 0xdc00 && code <= 0xdfff) {
-            i--; // trail surrogate
-        }
-    }
-
-    return s > EVENT_MAX_PAYLOAD;
-};
-
-/**
  * Returns the correct version string for OpenKit that is used in the basic data
  *
  * @param major Major version which should be reported
@@ -105,3 +73,8 @@ export const getVersionNumber = (
         version.major * 10000 + version.minor * 100 + version.build;
     return `${major}.${sprint}.${versionString}`;
 };
+
+export const isNode: boolean =
+    typeof process !== 'undefined' &&
+    process.release &&
+    process.release.name === 'node';

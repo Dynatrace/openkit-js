@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-import { anything, instance, mock, reset, spy, verify, when } from 'ts-mockito';
+import {
+    anyNumber,
+    anyString,
+    anything,
+    instance,
+    mock,
+    reset,
+    spy,
+    verify,
+    when,
+} from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
 import {
     OpenKitConfiguration,
@@ -27,6 +37,7 @@ import { PayloadBuilderHelper } from '../../../src/core/impl/PayloadBuilderHelpe
 import { SessionImpl } from '../../../src/core/impl/SessionImpl';
 import { WebRequestTracerImpl } from '../../../src/core/impl/WebRequestTracerImpl';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
+import { EventPayload } from '../../../src/core/payload/EventPayload';
 import { PayloadBuilder } from '../../../src/core/payload/PayloadBuilder';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 import { Mutable } from '../../Helpers';
@@ -35,6 +46,8 @@ describe('SessionImpl', () => {
     let config: Partial<Mutable<OpenKitConfiguration & PrivacyConfiguration>>;
     const payloadBuilder = mock(PayloadBuilder);
     const timestampProvider = mock(TimestampProvider);
+    const eventsPayload = mock(EventPayload);
+
     let session: SessionImpl;
 
     beforeEach(() => {
@@ -45,7 +58,14 @@ describe('SessionImpl', () => {
         reset(payloadBuilder);
         reset(timestampProvider);
 
-        when(timestampProvider.getCurrentTimestamp()).thenReturn(7000, 9000);
+        when(timestampProvider.getCurrentTimestampMs()).thenReturn(7000, 9000);
+        when(
+            eventsPayload.getEventsPayload(
+                anyString(),
+                anything(),
+                anyNumber(),
+            ),
+        ).thenReturn('Payload');
 
         session = new SessionImpl(
             40,
@@ -53,6 +73,7 @@ describe('SessionImpl', () => {
             5000,
             config as PrivacyConfiguration & OpenKitConfiguration,
             instance(timestampProvider),
+            instance(eventsPayload),
         );
     });
 
@@ -452,6 +473,15 @@ describe('SessionImpl', () => {
                     'This is a Test String, so the payload is big enough';
             }
 
+            // Override mock to return a payload which is big
+            when(
+                eventsPayload.getEventsPayload(
+                    anyString(),
+                    anything(),
+                    anyNumber(),
+                ),
+            ).thenReturn(JSON.stringify(jsonObject));
+
             // @ts-ignore
             session.sendEvent('EventName', jsonObject);
 
@@ -499,7 +529,6 @@ describe('SessionImpl', () => {
             session.sendEvent('name', {});
 
             // then
-            verify(payloadBuilder.sendEvent('{"name":"name"}')).once();
             verify(payloadBuilder.sendEvent(anything())).once();
         });
 
@@ -511,16 +540,6 @@ describe('SessionImpl', () => {
             session.sendEvent('name', {});
 
             // then
-            verify(payloadBuilder.sendEvent('{"name":"name"}')).once();
-            verify(payloadBuilder.sendEvent(anything())).once();
-        });
-
-        it('should override name if provided in payload', () => {
-            // when
-            session.sendEvent('myCustomName', { name: 'eventName' });
-
-            // then
-            verify(payloadBuilder.sendEvent('{"name":"myCustomName"}')).once();
             verify(payloadBuilder.sendEvent(anything())).once();
         });
     });

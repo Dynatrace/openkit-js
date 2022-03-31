@@ -51,11 +51,11 @@ describe('ActionImpl', () => {
 
         when(payloadBuilder.createSequenceNumber()).thenReturn(5, 6, 7);
         when(payloadBuilder.createActionId()).thenReturn(3);
-        when(timestampProviderMock.getCurrentTimestamp()).thenReturn(4500);
+        when(timestampProviderMock.getCurrentTimestampMs()).thenReturn(4500);
 
         const timestampInstance = instance(timestampProviderMock);
         when(payloadBuilder.currentTimestamp()).thenCall(() =>
-            timestampInstance.getCurrentTimestamp(),
+            timestampInstance.getCurrentTimestampMs(),
         );
 
         action = new ActionImpl(

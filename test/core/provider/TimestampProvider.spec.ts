@@ -24,9 +24,17 @@ describe('TimestampProvider', () => {
         expect(defaultTimestampProvider).toBeInstanceOf(TimestampProvider);
     });
 
-    it('should return the current timestamp', () => {
+    it('should return the current timestamp in milliseconds', () => {
         spyOn(Date.prototype, 'getTime').and.returnValue(5000);
 
-        expect(defaultTimestampProvider.getCurrentTimestamp()).toBe(5000);
+        expect(defaultTimestampProvider.getCurrentTimestampMs()).toBe(5000);
+    });
+
+    it('should return the current timestamp in nanoseconds', () => {
+        spyOn(Date.prototype, 'getTime').and.returnValue(5000);
+
+        expect(defaultTimestampProvider.getCurrentTimestampNs()).toBe(
+            5000000000,
+        );
     });
 });
