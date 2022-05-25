@@ -10,3 +10,6 @@ export const OS_NAME = 'os.name';
 export const DEVICE_MANUFACTURER = 'device.manufacturer';
 export const DEVICE_MODEL_IDENTIFIER = 'device.model.identifier';
 export const WINDOW_ORIENTATION = 'window.orientation';
+
+export const DT_TYPE_CUSTOM = 'custom';
+export const DT_TYPE_BIZ = 'biz';

@@ -15,6 +15,8 @@ import {
     DT_AGENT_TECHNOLOGY_TYPE,
     DT_AGENT_VERSION,
     DT_TYPE,
+    DT_TYPE_BIZ,
+    DT_TYPE_CUSTOM,
     OS_NAME,
     TIMESTAMP,
     WINDOW_ORIENTATION,
@@ -30,21 +32,71 @@ export class EventPayload {
         this.logger = config.openKit.loggerFactory.createLogger('EventPayload');
     }
 
-    public getEventsPayload(
+    public getBizEventsPayload(
+        type: string,
+        attributes: JSONObject,
+        session: number,
+    ): string {
+        const internalAttributes = { ...attributes };
+
+        this.addBasicEventData(internalAttributes, session);
+
+        if (internalAttributes.name === undefined) {
+            this.addNonOverridableAttribute(internalAttributes, 'name', type);
+        }
+
+        this.addNonOverridableAttribute(internalAttributes, 'type', type);
+        this.addNonOverridableAttribute(
+            internalAttributes,
+            DT_TYPE,
+            DT_TYPE_BIZ,
+        );
+
+        return this.getJsonStringPayload(internalAttributes);
+    }
+
+    public getCustomEventsPayload(
         name: string,
         attributes: JSONObject,
         session: number,
     ): string {
+        const internalAttributes = { ...attributes };
+
+        this.addBasicEventData(internalAttributes, session);
+
+        this.addNonOverridableAttribute(internalAttributes, 'name', name);
+        this.addOverridableAttribute(
+            internalAttributes,
+            DT_TYPE,
+            DT_TYPE_CUSTOM,
+        );
+
+        return this.getJsonStringPayload(internalAttributes);
+    }
+
+    private getJsonStringPayload(attributes: JSONObject): string {
+        return JSON.stringify({ ...attributes }, (key, value) => {
+            if (
+                Number.isNaN(value) ||
+                value === Infinity ||
+                value === -Infinity
+            ) {
+                return;
+            }
+
+            return value;
+        });
+    }
+
+    private addBasicEventData(attributes: JSONObject, session: number): void {
         this.removeReservedInternalAttributes(attributes);
 
-        this.addNonOverridableAttribute(attributes, 'name', name);
         this.addOverridableAttribute(
             attributes,
             TIMESTAMP,
             this.timestampProvider.getCurrentTimestampNs().toString(),
         );
 
-        this.addOverridableAttribute(attributes, DT_TYPE, 'custom');
         this.addNonOverridableAttribute(
             attributes,
             'dt.application_id',
@@ -106,18 +158,6 @@ export class EventPayload {
             WINDOW_ORIENTATION,
             this.config.device.orientation,
         );
-
-        return JSON.stringify({ ...attributes }, (key, value) => {
-            if (
-                Number.isNaN(value) ||
-                value === Infinity ||
-                value === -Infinity
-            ) {
-                return;
-            }
-
-            return value;
-        });
     }
 
     private removeReservedInternalAttributes(attributes: JSONObject) {

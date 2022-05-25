@@ -59,13 +59,6 @@ describe('SessionImpl', () => {
         reset(timestampProvider);
 
         when(timestampProvider.getCurrentTimestampMs()).thenReturn(7000, 9000);
-        when(
-            eventsPayload.getEventsPayload(
-                anyString(),
-                anything(),
-                anyNumber(),
-            ),
-        ).thenReturn('Payload');
 
         session = new SessionImpl(
             40,
@@ -436,6 +429,130 @@ describe('SessionImpl', () => {
         });
     });
 
+    describe('sendBizEvent', () => {
+        it('should not be possible to send an biz event if the type is not a string', () => {
+            // when
+            // @ts-ignore
+            session.sendBizEvent(1337, {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an biz event if the type is empty', () => {
+            // when
+            // @ts-ignore
+            session.sendBizEvent('', {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an biz event if payload contains top-level array', () => {
+            // when
+            // @ts-ignore
+            session.sendBizEvent('type', []);
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an biz event if payload is too big', () => {
+            // when
+            const jsonObject: { [key: string]: string } = {};
+
+            for (let i = 0; i < 1000; i++) {
+                jsonObject['Test' + i] =
+                    'This is a Test String, so the payload is big enough';
+            }
+
+            // Override mock to return a payload which is big
+            when(
+                eventsPayload.getBizEventsPayload(
+                    anyString(),
+                    anything(),
+                    anyNumber(),
+                ),
+            ).thenReturn(JSON.stringify(jsonObject));
+
+            // @ts-ignore
+            session.sendBizEvent('EventType', jsonObject);
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an biz event if payload has no top-level json or invalid json', () => {
+            // when
+            // @ts-ignore
+            session.sendBizEvent('eventType', []);
+            // @ts-ignore
+            session.sendBizEvent('eventType', NaN);
+            // @ts-ignore
+            session.sendBizEvent('eventType', 17);
+            // @ts-ignore
+            session.sendBizEvent('eventType', 'test');
+            // @ts-ignore
+            session.sendBizEvent('eventType', true);
+            // @ts-ignore
+            session.sendBizEvent('eventType', undefined);
+            // @ts-ignore
+            session.sendBizEvent('eventType', null);
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should not be possible to send an biz event if DCL = Off', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Off;
+
+            // when
+            session.sendBizEvent('type', {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).never();
+        });
+
+        it('should be able to send an biz event if DCL = Performance', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.Performance;
+
+            // when
+            when(
+                eventsPayload.getBizEventsPayload(
+                    anyString(),
+                    anything(),
+                    anyNumber(),
+                ),
+            ).thenReturn('Payload');
+
+            session.sendBizEvent('type', {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).once();
+        });
+
+        it('should be able to send an biz event if DCL = UserBehavior', () => {
+            // given
+            config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
+
+            // when
+            when(
+                eventsPayload.getBizEventsPayload(
+                    anyString(),
+                    anything(),
+                    anyNumber(),
+                ),
+            ).thenReturn('Payload');
+
+            session.sendBizEvent('type', {});
+
+            // then
+            verify(payloadBuilder.sendEvent(anything())).once();
+        });
+    });
+
     describe('sendEvent', () => {
         it('should not be possible to send an event if the name is not a string', () => {
             // when
@@ -475,7 +592,7 @@ describe('SessionImpl', () => {
 
             // Override mock to return a payload which is big
             when(
-                eventsPayload.getEventsPayload(
+                eventsPayload.getCustomEventsPayload(
                     anyString(),
                     anything(),
                     anyNumber(),
@@ -526,6 +643,14 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.Performance;
 
             // when
+            when(
+                eventsPayload.getCustomEventsPayload(
+                    anyString(),
+                    anything(),
+                    anyNumber(),
+                ),
+            ).thenReturn('Payload');
+
             session.sendEvent('name', {});
 
             // then
@@ -537,6 +662,14 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
 
             // when
+            when(
+                eventsPayload.getCustomEventsPayload(
+                    anyString(),
+                    anything(),
+                    anyNumber(),
+                ),
+            ).thenReturn('Payload');
+
             session.sendEvent('name', {});
 
             // then

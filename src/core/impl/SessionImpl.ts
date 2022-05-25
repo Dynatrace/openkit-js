@@ -257,6 +257,52 @@ export class SessionImpl implements Session {
     /**
      * @inheritDoc
      */
+    public sendBizEvent(type: string, attributes: JSONObject): void {
+        if (
+            this.isShutdown() ||
+            this.config.dataCollectionLevel === DataCollectionLevel.Off
+        ) {
+            return;
+        }
+
+        if (typeof type !== 'string' || type.length === 0) {
+            validationFailed(
+                this.logger,
+                'sendBizEvent',
+                'Type must be a non empty string',
+                { type },
+            );
+
+            return;
+        }
+
+        if (
+            typeof attributes !== 'object' ||
+            attributes === null ||
+            Array.isArray(attributes)
+        ) {
+            validationFailed(
+                this.logger,
+                'sendBizEvent',
+                'Payload toplevel must be an object!',
+                { attributes },
+            );
+
+            return;
+        }
+
+        this.sendEventHelper(
+            this.eventsPayload.getBizEventsPayload(
+                type,
+                attributes,
+                this.sessionId,
+            ),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
     sendEvent(name: string, attributes: JSONObject): void {
         if (
             this.isShutdown() ||
@@ -291,12 +337,28 @@ export class SessionImpl implements Session {
             return;
         }
 
-        const jsonPayload = this.eventsPayload.getEventsPayload(
-            name,
-            attributes,
-            this.sessionId,
+        this.sendEventHelper(
+            this.eventsPayload.getCustomEventsPayload(
+                name,
+                attributes,
+                this.sessionId,
+            ),
         );
+    }
 
+    public isShutdown(): boolean {
+        return this._isShutdown === true;
+    }
+
+    public _getOpenActions(): Action[] {
+        return this.openActions.slice(0);
+    }
+
+    public _endAction(action: Action): void {
+        removeElement(this.openActions, action);
+    }
+
+    private sendEventHelper(jsonPayload: string): void {
         if (isEventPayloadTooBig(jsonPayload)) {
             validationFailed(
                 this.logger,
@@ -311,17 +373,5 @@ export class SessionImpl implements Session {
         this.logger.debug('sendEvent', { jsonPayload });
 
         this.payloadData.sendEvent(jsonPayload);
-    }
-
-    public isShutdown(): boolean {
-        return this._isShutdown === true;
-    }
-
-    public _getOpenActions(): Action[] {
-        return this.openActions.slice(0);
-    }
-
-    public _endAction(action: Action): void {
-        removeElement(this.openActions, action);
     }
 }

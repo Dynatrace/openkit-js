@@ -16,6 +16,7 @@
 
 import { Action } from './Action';
 import { WebRequestTracer } from './WebRequestTracer';
+import { JSONObject } from './Json';
 
 /**
  * Session public interface
@@ -72,6 +73,14 @@ export interface Session {
      * @param attributes Payload of the event
      */
     // sendEvent(name: string, attributes: JSONObject): void;
+
+    /**
+     * Reports a BIZ event with a mandatory type and additional attributes
+     *
+     * @param type Type of the BIZ event which is mandatory
+     * @param attributes Additional attributes which are passed along side our internal attributes
+     */
+    sendBizEvent(type: string, attributes: JSONObject): void;
 
     /**
      * Ends the session and sends all remaining data.

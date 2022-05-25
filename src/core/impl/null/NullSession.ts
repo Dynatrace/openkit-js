@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Action, Session, WebRequestTracer } from '../../../api';
+import { Action, JSONObject, Session, WebRequestTracer } from '../../../api';
 import { defaultNullAction } from './NullAction';
 import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 
@@ -45,6 +45,10 @@ export class NullSession implements Session {
 
     public traceWebRequest(url: string): WebRequestTracer {
         return defaultNullWebRequestTracer;
+    }
+
+    public sendBizEvent(type: string, attributes: JSONObject): void {
+        // stub
     }
 }
 
