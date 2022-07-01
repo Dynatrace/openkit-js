@@ -27,14 +27,18 @@ export class AxiosHttpClient implements HttpClient {
 
     public async get(url: string): Promise<HttpResponse> {
         this.logger.debug('GET', url);
-        const response = await Axios.get<string>(url);
+        const response = await Axios.get<string>(url, {
+            transformResponse: [],
+        });
 
         return this.parseAxiosResponse(response);
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
         this.logger.debug('POST', url, payload);
-        const response = await Axios.post<string>(url, payload);
+        const response = await Axios.post<string>(url, payload, {
+            transformResponse: [],
+        });
 
         return this.parseAxiosResponse(response);
     }
