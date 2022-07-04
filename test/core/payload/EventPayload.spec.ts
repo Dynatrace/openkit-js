@@ -57,7 +57,7 @@ describe('EventPayload', () => {
         it('should provide enrichment data', () => {
             // given
             const predefinedAttributes = {
-                name: 'predefined',
+                'event.name': 'predefined',
             };
 
             // then
@@ -68,10 +68,10 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson.name).toEqual('customName');
+            expect(payloadJson['event.name']).toEqual('customName');
             expect(payloadJson.timestamp).not.toEqual(undefined);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
-            expect(payloadJson['dt.type']).toEqual('custom');
+            expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
                 SEND_TIMESTAMP_PLACEHOLDER,
             );
@@ -124,10 +124,10 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson.name).toEqual('customName');
+            expect(payloadJson['event.name']).toEqual('customName');
             expect(payloadJson.timestamp).not.toEqual(undefined);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
-            expect(payloadJson['dt.type']).toEqual('custom');
+            expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
                 SEND_TIMESTAMP_PLACEHOLDER,
             );
@@ -240,7 +240,7 @@ describe('EventPayload', () => {
         it('should be possible to override dt.type', () => {
             // given
             const predefinedAttributes = {
-                'dt.type': 'overridden',
+                'event.kind': 'overridden',
             };
 
             // then
@@ -251,8 +251,8 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.type']).toEqual('overridden');
-            expect(payloadJson['dt.overridden_keys']).toEqual(['dt.type']);
+            expect(payloadJson['event.kind']).toEqual('overridden');
+            expect(payloadJson['dt.overridden_keys']).toEqual(['event.kind']);
         });
 
         it('should be possible to override dt.agent.version', () => {
@@ -418,7 +418,7 @@ describe('EventPayload', () => {
         it('should override the name', () => {
             // given
             const predefinedAttributes = {
-                name: 'predefined',
+                'event.name': 'predefined',
             };
 
             // then
@@ -459,7 +459,7 @@ describe('EventPayload', () => {
         it('should provide enrichment data', () => {
             // given
             const predefinedAttributes = {
-                name: 'predefined',
+                'event.name': 'predefined',
             };
 
             // then
@@ -470,11 +470,11 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson.name).toEqual('predefined');
-            expect(payloadJson.type).toEqual('customType');
+            expect(payloadJson['event.name']).toEqual('predefined');
+            expect(payloadJson['event.type']).toEqual('customType');
             expect(payloadJson.timestamp).not.toEqual(undefined);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
-            expect(payloadJson['dt.type']).toEqual('biz');
+            expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
                 SEND_TIMESTAMP_PLACEHOLDER,
             );
@@ -496,7 +496,7 @@ describe('EventPayload', () => {
         it('should provide only enrichment data which is available', () => {
             // given
             const predefinedAttributes = {
-                name: 'predefined',
+                'event.name': 'predefined',
             };
 
             const configAll = {
@@ -527,11 +527,11 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson.name).toEqual('predefined');
-            expect(payloadJson.type).toEqual('customType');
+            expect(payloadJson['event.name']).toEqual('predefined');
+            expect(payloadJson['event.type']).toEqual('customType');
             expect(payloadJson.timestamp).not.toEqual(undefined);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
-            expect(payloadJson['dt.type']).toEqual('biz');
+            expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
                 SEND_TIMESTAMP_PLACEHOLDER,
             );
@@ -561,8 +561,8 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson.name).toEqual('customType');
-            expect(payloadJson.type).toEqual('customType');
+            expect(payloadJson['event.name']).toEqual('customType');
+            expect(payloadJson['event.type']).toEqual('customType');
             expect(payloadJson['dt.overridden_keys']).toEqual(undefined);
         });
 
@@ -672,7 +672,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.type']).toEqual('biz');
+            expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.overridden_keys']).toEqual(undefined);
         });
 

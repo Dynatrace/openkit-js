@@ -14,9 +14,9 @@ import {
     DT_AGENT_FLAVOR,
     DT_AGENT_TECHNOLOGY_TYPE,
     DT_AGENT_VERSION,
-    DT_TYPE,
-    DT_TYPE_BIZ,
-    DT_TYPE_CUSTOM,
+    EVENT_KIND,
+    EVENT_KIND_BIZ,
+    EVENT_KIND_RUM,
     OS_NAME,
     TIMESTAMP,
     WINDOW_ORIENTATION,
@@ -41,15 +41,19 @@ export class EventPayload {
 
         this.addBasicEventData(internalAttributes, session);
 
-        if (internalAttributes.name === undefined) {
-            this.addNonOverridableAttribute(internalAttributes, 'name', type);
+        if (internalAttributes['event.name'] === undefined) {
+            this.addNonOverridableAttribute(
+                internalAttributes,
+                'event.name',
+                type,
+            );
         }
 
-        this.addNonOverridableAttribute(internalAttributes, 'type', type);
+        this.addNonOverridableAttribute(internalAttributes, 'event.type', type);
         this.addNonOverridableAttribute(
             internalAttributes,
-            DT_TYPE,
-            DT_TYPE_BIZ,
+            EVENT_KIND,
+            EVENT_KIND_BIZ,
         );
 
         return this.getJsonStringPayload(internalAttributes);
@@ -64,11 +68,11 @@ export class EventPayload {
 
         this.addBasicEventData(internalAttributes, session);
 
-        this.addNonOverridableAttribute(internalAttributes, 'name', name);
+        this.addNonOverridableAttribute(internalAttributes, 'event.name', name);
         this.addOverridableAttribute(
             internalAttributes,
-            DT_TYPE,
-            DT_TYPE_CUSTOM,
+            EVENT_KIND,
+            EVENT_KIND_RUM,
         );
 
         return this.getJsonStringPayload(internalAttributes);
@@ -166,9 +170,7 @@ export class EventPayload {
         for (const key of jsonKeys) {
             if (
                 key === 'dt' ||
-                (key.startsWith('dt.') &&
-                    !key.startsWith('dt.agent.') &&
-                    key !== DT_TYPE)
+                (key.startsWith('dt.') && !key.startsWith('dt.agent.'))
             ) {
                 this.logger.warn(
                     'getEventsPayload',
