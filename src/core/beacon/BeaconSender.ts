@@ -205,7 +205,7 @@ export class BeaconSenderImpl implements BeaconSender {
 
             // Replace Send Timestamp of Events API
             payload = payload.replace(
-                SEND_TIMESTAMP_PLACEHOLDER,
+                encodeURIComponent('"' + SEND_TIMESTAMP_PLACEHOLDER + '"'),
                 this.timestampProvider.getCurrentTimestampNs().toString(),
             );
 
