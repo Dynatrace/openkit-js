@@ -742,6 +742,23 @@ describe('PayloadBuilder', () => {
             );
             payloadExpect(pairs, PayloadKey.Value, str250);
         });
+
+        it('should not truncate an event payload value longer than 250 characters', () => {
+            // given
+            const str = str250 + 'z'; // 251 characters
+            const payload = StaticPayloadBuilder.sendEvent(str);
+
+            // when
+            const { pairs } = parse(payload);
+
+            // then
+            payloadExpect(
+                pairs,
+                PayloadKey.EventType,
+                EventType.Event.toString(),
+            );
+            payloadExpect(pairs, PayloadKey.EventPayload, str);
+        });
     });
 
     describe('reportCrash', () => {
@@ -855,6 +872,9 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.sendEvent(
                 '{"name":"eventName"}',
             );
+
+            // eslint-disable-next-line no-console
+            console.log(payload);
 
             // when
             const { keys, pairs } = parse(payload);

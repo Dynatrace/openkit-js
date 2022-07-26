@@ -27,6 +27,12 @@ export abstract class QueryBuilder<T extends QueryKey | PayloadKey> {
         return this;
     }
 
+    public addWithoutTruncate(key: T, value: string | number): this {
+        this.options[key] = value.toString();
+
+        return this;
+    }
+
     public addIfDefined(key: T, value: string | number | undefined): this {
         if (value !== undefined) {
             this.add(key, value);

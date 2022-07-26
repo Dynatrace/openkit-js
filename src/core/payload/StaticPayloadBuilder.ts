@@ -103,7 +103,7 @@ export class StaticPayloadBuilder {
     public static sendEvent(jsonPayload: string): Payload {
         return new PayloadQueryBuilder()
             .add(PayloadKey.EventType, EventType.Event)
-            .add(PayloadKey.EventPayload, jsonPayload)
+            .addWithoutTruncate(PayloadKey.EventPayload, jsonPayload)
             .build();
     }
 
