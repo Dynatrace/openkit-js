@@ -98,7 +98,7 @@ export class EventPayload {
         this.addOverridableAttribute(
             attributes,
             TIMESTAMP,
-            this.timestampProvider.getCurrentTimestampNs().toString(),
+            this.timestampProvider.getCurrentTimestampNs(),
         );
 
         this.addNonOverridableAttribute(
@@ -186,7 +186,7 @@ export class EventPayload {
     private addOverridableAttribute(
         attributes: JSONObject,
         key: string,
-        value?: string,
+        value?: string | number | boolean,
     ) {
         if (value !== undefined) {
             if (key in attributes) {
@@ -205,7 +205,7 @@ export class EventPayload {
     private addNonOverridableAttribute(
         attributes: JSONObject,
         key: string,
-        value?: string,
+        value?: string | number | boolean,
     ) {
         if (value !== undefined) {
             if (key in attributes) {

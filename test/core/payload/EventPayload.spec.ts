@@ -50,7 +50,7 @@ describe('EventPayload', () => {
         reset(timestampProvider);
         when(timestampProvider.getCurrentTimestampMs()).thenReturn(7000);
         when(timestampProvider.getCurrentTimestampNs()).thenReturn(7000000);
-        eventPayload = new EventPayload(config, timestampProvider);
+        eventPayload = new EventPayload(config, instance(timestampProvider));
     });
 
     describe('getCustomEventsPayload', () => {
@@ -69,7 +69,7 @@ describe('EventPayload', () => {
             const payloadJson = JSON.parse(payload);
 
             expect(payloadJson['event.name']).toEqual('customName');
-            expect(payloadJson.timestamp).not.toEqual(undefined);
+            expect(payloadJson.timestamp).toEqual(7000000);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
             expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
@@ -114,7 +114,10 @@ describe('EventPayload', () => {
                 meta: {},
             };
 
-            const eventPayload = new EventPayload(configAll, timestampProvider);
+            const eventPayload = new EventPayload(
+                configAll,
+                instance(timestampProvider),
+            );
 
             // then
             const payload = eventPayload.getCustomEventsPayload(
@@ -125,7 +128,7 @@ describe('EventPayload', () => {
             const payloadJson = JSON.parse(payload);
 
             expect(payloadJson['event.name']).toEqual('customName');
-            expect(payloadJson.timestamp).not.toEqual(undefined);
+            expect(payloadJson.timestamp).toEqual(7000000);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
             expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
@@ -472,7 +475,7 @@ describe('EventPayload', () => {
 
             expect(payloadJson['event.name']).toEqual('predefined');
             expect(payloadJson['event.type']).toEqual('customType');
-            expect(payloadJson.timestamp).not.toEqual(undefined);
+            expect(payloadJson.timestamp).toEqual(7000000);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
@@ -517,7 +520,10 @@ describe('EventPayload', () => {
                 meta: {},
             };
 
-            const eventPayload = new EventPayload(configAll, timestampProvider);
+            const eventPayload = new EventPayload(
+                configAll,
+                instance(timestampProvider),
+            );
 
             // then
             const payload = eventPayload.getBizEventsPayload(
@@ -529,7 +535,7 @@ describe('EventPayload', () => {
 
             expect(payloadJson['event.name']).toEqual('predefined');
             expect(payloadJson['event.type']).toEqual('customType');
-            expect(payloadJson.timestamp).not.toEqual(undefined);
+            expect(payloadJson.timestamp).toEqual(7000000);
             expect(payloadJson['dt.application_id']).toEqual('application-id');
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.send_timestamp']).toEqual(
