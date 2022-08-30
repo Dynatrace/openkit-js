@@ -6,6 +6,10 @@
 
 [GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.3.0)
 
+### Added
+
+-   User-Agent header to http requests
+
 ### Improved
 
 -   waitForInit with timeout fixed

@@ -16,6 +16,7 @@
 
 import Axios, { AxiosResponse } from 'axios';
 import { Logger, LoggerFactory } from '../../../api';
+import { openKitVersion } from '../../../core/PlatformConstants';
 import { HttpClient, HttpResponse } from './HttpClient';
 
 export class AxiosHttpClient implements HttpClient {
@@ -29,6 +30,9 @@ export class AxiosHttpClient implements HttpClient {
         this.logger.debug('GET', url);
         const response = await Axios.get<string>(url, {
             transformResponse: [],
+            headers: {
+                'User-Agent': 'OpenKit/' + openKitVersion,
+            },
         });
 
         return this.parseAxiosResponse(response);
@@ -38,6 +42,9 @@ export class AxiosHttpClient implements HttpClient {
         this.logger.debug('POST', url, payload);
         const response = await Axios.post<string>(url, payload, {
             transformResponse: [],
+            headers: {
+                'User-Agent': 'OpenKit/' + openKitVersion,
+            },
         });
 
         return this.parseAxiosResponse(response);
