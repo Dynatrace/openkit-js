@@ -11,7 +11,7 @@
     "author": "Dynatrace",
     "license": "Apache-2.0",
     "dependencies": {
-        "@dynatrace/openkit-js": "latest",
+        "@dynatrace/openkit-js": "1.3.0",
         "axios": "^0.21.2"
     },
     "devDependencies": {

@@ -2,22 +2,29 @@
 # yarn lockfile v1
 
 
-"@dynatrace/openkit-js@latest":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@dynatrace/openkit-js/-/openkit-js-1.1.0.tgz#30737f82bc1e199093fef8900d9583885054f416"
-  integrity sha512-JW34eq1tkGHzhoLavnVtRKOWEFQf6h9CC87hGMU9FvIXr76tD0v270d3/60gHpN0IB54TgRg/bisXltzj+zCtA==
+"@dynatrace/openkit-js@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@dynatrace/openkit-js/-/openkit-js-1.3.0.tgz#c5b09032dfc03c41ef20154648c321dc67da70b6"
+  integrity sha512-hcSddH7CzLFRxOGIFiiZzSgC3pSlHBmq47SVTMWIlTkHqH/LNFPfBuLuhpnVj5Y4VXNrQBqudRYlXubbTk4VWA==
   dependencies:
-    axios "^0.21.1"
+    axios "^0.21.4"
 
 "@types/node@^12.7.1":
   version "12.7.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.3.tgz#27b3f40addaf2f580459fdb405222685542f907a"
   integrity sha512-3SiLAIBkDWDg6vFo0+5YJyHPWU9uwu40Qe+v+0MH8wRKYBimHvvAOyk3EzMrD/TrIlLYfXrqDqrg913PynrMJQ==
 
-axios@^0.21.1, axios@^0.21.2:
+axios@^0.21.2:
   version "0.21.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.2.tgz#21297d5084b2aeeb422f5d38e7be4fbb82239017"
   integrity sha512-87otirqUw3e8CzHTMO+/9kh/FSgXt/eVDvipijwDtEuwbkySWZ9SBm6VEubmJ/kLKEoLQV/POhxXFb66bfekfg==
+  dependencies:
+    follow-redirects "^1.14.0"
+
+axios@^0.21.4:
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
     follow-redirects "^1.14.0"
 
