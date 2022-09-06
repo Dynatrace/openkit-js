@@ -50,7 +50,7 @@
         "yarn": "^1.13.0"
     },
     "dependencies": {
-        "axios": "^0.21.4"
+        "axios": "^0.27.2"
     },
     "resolutions": {
         "minimist": "^1.2.0"
