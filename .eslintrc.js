@@ -4,7 +4,7 @@ module.exports = {
         browser: true,
         node: true,
     },
-    extends: ['prettier', 'prettier/@typescript-eslint'],
+    extends: ['prettier'],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         project: ['tsconfig.browser.json', 'tsconfig.node.json'],

@@ -281,7 +281,7 @@ describe('OpenKitImpl', () => {
             expect(v2).toBe(true);
         });
 
-        it('should resolve immedeately even with timeout', async (done) => {
+        it('should resolve immedeately even with timeout', async () => {
             jest.setTimeout(5000);
 
             const startTime = new Date().getTime();
@@ -292,8 +292,6 @@ describe('OpenKitImpl', () => {
 
                 expect(duration).toBeLessThan(1500);
                 expect(cb).toBe(true);
-
-                done();
             }, 3000);
 
             // when
