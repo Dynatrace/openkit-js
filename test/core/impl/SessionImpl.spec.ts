@@ -817,6 +817,14 @@ describe('SessionImpl', () => {
             expect(wr).toBe(defaultNullWebRequestTracer);
         });
 
+        it('should return defaultNullWebRequest if the url is not valid', () => {
+            // when
+            const wr = session.traceWebRequest('foobar/://');
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
         it('should return defaultNullWebRequest if dcl = Off', () => {
             // given
             config.dataCollectionLevel = DataCollectionLevel.Off;

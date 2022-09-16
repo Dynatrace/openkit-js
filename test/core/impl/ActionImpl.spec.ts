@@ -385,6 +385,14 @@ describe('ActionImpl', () => {
             expect(wr).toBe(defaultNullWebRequestTracer);
         });
 
+        it('should return defaultNullWebRequest if the url is not valid', () => {
+            // when
+            const wr = action.traceWebRequest('foobar/://');
+
+            // then
+            expect(wr).toBe(defaultNullWebRequestTracer);
+        });
+
         it('should return defaultNullWebRequest if the action is closed', () => {
             // when
             action.leaveAction();

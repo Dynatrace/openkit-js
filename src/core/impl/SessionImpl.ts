@@ -38,7 +38,7 @@ import {
     EVENT_MAX_PAYLOAD,
     isEventPayloadTooBig,
 } from '../utils/EventPayloadUtils';
-import { removeElement } from '../utils/Utils';
+import { isValidHttpUrl, removeElement } from '../utils/Utils';
 import { ActionImpl } from './ActionImpl';
 import { defaultNullAction } from './null/NullAction';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
@@ -233,6 +233,17 @@ export class SessionImpl implements Session {
                 this.logger,
                 'traceWebRequest',
                 'url must be a non empty string',
+                { url },
+            );
+
+            return defaultNullWebRequestTracer;
+        }
+
+        if (!isValidHttpUrl(url)) {
+            validationFailed(
+                this.logger,
+                'traceWebRequest',
+                'url must be a valid url',
                 { url },
             );
 

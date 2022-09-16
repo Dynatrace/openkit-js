@@ -25,7 +25,7 @@ import {
     PrivacyConfiguration,
 } from '../config/Configuration';
 import { validationFailed } from '../logging/LoggingUtils';
-import { isFinite } from '../utils/Utils';
+import { isFinite, isValidHttpUrl } from '../utils/Utils';
 import { defaultNullWebRequestTracer } from './null/NullWebRequestTracer';
 import { PayloadBuilderHelper } from './PayloadBuilderHelper';
 import { SessionImpl } from './SessionImpl';
@@ -196,6 +196,17 @@ export class ActionImpl implements Action {
                 this.logger,
                 'traceWebRequest',
                 'Url must be a non empty string',
+                { url },
+            );
+
+            return defaultNullWebRequestTracer;
+        }
+
+        if (!isValidHttpUrl(url)) {
+            validationFailed(
+                this.logger,
+                'traceWebRequest',
+                'url must be a valid url',
                 { url },
             );
 

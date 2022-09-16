@@ -78,3 +78,12 @@ export const isNode: boolean =
     typeof process !== 'undefined' &&
     process.release &&
     process.release.name === 'node';
+
+export const isValidHttpUrl = (url: string): boolean => {
+    try {
+        new URL(url);
+        return true;
+    } catch (_) {
+        return false;
+    }
+};
