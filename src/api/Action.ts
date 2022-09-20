@@ -53,6 +53,7 @@ export interface Action {
 
     /**
      * Reports an error with a specified name, error code and reason to Dynatrace.
+     * If the message is longer than 1000 characters, it is truncated to this value.
      *
      * @param name The name of the error.
      * @param code The error code.

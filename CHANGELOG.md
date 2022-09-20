@@ -2,6 +2,11 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.3.0...HEAD)
 
+### Changed
+
+-   Maximum length of reported error/crash stacktrace has been limited to 128k.
+-   Maximum length of reported error/crash reason has been limited to 1000.
+
 ## 1.3.0 [Release date: 2021-12-10]
 
 [GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v1.3.0)

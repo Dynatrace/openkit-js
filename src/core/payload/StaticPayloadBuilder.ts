@@ -32,6 +32,11 @@ import { PayloadQueryBuilder } from './PayloadQueryBuilder';
  */
 const MAX_STACKTRACE_LENGTH = 128_000;
 
+/**
+ * Maximum size of a reason message passed to Dynatrace.
+ */
+const MAX_REASON_LENGTH = 1000;
+
 export class StaticPayloadBuilder {
     public static reportCrash(
         errorName: string,
@@ -40,12 +45,25 @@ export class StaticPayloadBuilder {
         sequenceNumber: number,
         timeSinceSessionStart: number,
     ): Payload {
+        let stacktraceTruncateLength = MAX_STACKTRACE_LENGTH;
+
+        // Truncating stacktrace at last line break
+        if (stacktrace.length > MAX_STACKTRACE_LENGTH) {
+            const lastLineBreakIndex = stacktrace.lastIndexOf(
+                '\n',
+                MAX_STACKTRACE_LENGTH,
+            );
+            if (lastLineBreakIndex !== -1) {
+                stacktraceTruncateLength = lastLineBreakIndex;
+            }
+        }
+
         return StaticPayloadBuilder.basicEventData(EventType.Crash, errorName)
             .add(PayloadKey.ParentActionId, 0)
             .add(PayloadKey.StartSequenceNumber, sequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)
-            .add(PayloadKey.Reason, reason)
-            .add(PayloadKey.Stacktrace, stacktrace, MAX_STACKTRACE_LENGTH)
+            .add(PayloadKey.Reason, reason, MAX_REASON_LENGTH)
+            .add(PayloadKey.Stacktrace, stacktrace, stacktraceTruncateLength)
             .add(PayloadKey.ErrorTechnologyType, errorTechnologyType)
             .build();
     }
@@ -197,7 +215,7 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)
-            .add(PayloadKey.Reason, reason)
+            .add(PayloadKey.Reason, reason, MAX_REASON_LENGTH)
             .add(PayloadKey.ErrorValue, errorValue)
             .add(PayloadKey.ErrorTechnologyType, errorTechnologyType)
             .build();

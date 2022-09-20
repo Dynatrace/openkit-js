@@ -36,6 +36,7 @@ export interface Session {
 
     /**
      * Reports an error with a specified name, error code and reason to Dynatrace.
+     * If the message is longer than 1000 characters, it is truncated to this value.
      *
      * @param name The name of the error.
      * @param code The error code.
@@ -45,6 +46,8 @@ export interface Session {
 
     /**
      * Report a crash to Dynatrace.
+     * If the stacktrace is longer than 128.000 characters, it is truncated according to the last line break.
+     * If the message is longer than 1000 characters, it is truncated to this value.
      *
      * @param name The name of the crash.
      * @param message Why the crash occurred.
