@@ -16,6 +16,7 @@
 
 import { CaptureMode } from '../../api';
 import { CommunicationState } from '../beacon/CommunicationState';
+import { SupplementaryBasicData } from '../beacon/SupplementaryBasicData';
 import { createTag } from '../impl/WebRequestTracerImpl';
 import { combinePayloads, Payload } from './Payload';
 import { PayloadQueue } from './PayloadQueue';
@@ -29,7 +30,10 @@ export class PayloadBuilder {
     private readonly queue = new PayloadQueue();
     private readonly listeners: PayloadBuilderListener[] = [];
 
-    constructor(private readonly commState: CommunicationState) {}
+    constructor(
+        private readonly commState: CommunicationState,
+        private readonly supplementaryBasicData: SupplementaryBasicData,
+    ) {}
 
     public reportNamedEvent(
         name: string,
@@ -225,7 +229,11 @@ export class PayloadBuilder {
             return undefined;
         }
 
-        let payload = this.getCompletePrefix(prefix, transmissionTime);
+        let payload = this.getCompletePrefix(
+            prefix,
+            transmissionTime,
+            this.supplementaryBasicData,
+        );
 
         let remainingBeaconSize = this.commState.maxBeaconSize - payload.length;
 
@@ -274,10 +282,12 @@ export class PayloadBuilder {
     private getCompletePrefix(
         prefix: Payload,
         transmissionTime: number,
+        supplementaryBasicData: SupplementaryBasicData,
     ): Payload {
         const mutable = StaticPayloadBuilder.mutable(
             this.commState.multiplicity,
             transmissionTime,
+            supplementaryBasicData,
         );
 
         return combinePayloads(prefix, mutable);

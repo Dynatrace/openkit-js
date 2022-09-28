@@ -26,6 +26,9 @@ import {
     when,
 } from 'ts-mockito';
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src';
+import { ConnectionType } from '../../../src/api/ConnectionType';
+import { SupplementaryBasicData } from '../../../src/core/beacon/SupplementaryBasicData';
+import { SupplementaryBasicDataImpl } from '../../../src/core/beacon/SupplementaryBasicDataImpl';
 import {
     OpenKitConfiguration,
     PrivacyConfiguration,
@@ -47,6 +50,7 @@ describe('SessionImpl', () => {
     const payloadBuilder = mock(PayloadBuilder);
     const timestampProvider = mock(TimestampProvider);
     const eventsPayload = mock(EventPayload);
+    let supplementaryBasicData: SupplementaryBasicData;
 
     let session: SessionImpl;
 
@@ -60,6 +64,8 @@ describe('SessionImpl', () => {
 
         when(timestampProvider.getCurrentTimestampMs()).thenReturn(7000, 9000);
 
+        supplementaryBasicData = new SupplementaryBasicDataImpl();
+
         session = new SessionImpl(
             40,
             instance(payloadBuilder),
@@ -67,6 +73,7 @@ describe('SessionImpl', () => {
             config as PrivacyConfiguration & OpenKitConfiguration,
             instance(timestampProvider),
             instance(eventsPayload),
+            supplementaryBasicData,
         );
     });
 
@@ -856,6 +863,109 @@ describe('SessionImpl', () => {
 
             // then
             expect(wr).toBeInstanceOf(WebRequestTracerImpl);
+        });
+    });
+
+    describe('reportCarrier', () => {
+        it('should not be possible to report an empty carrier', () => {
+            session.reportCarrier('');
+            expect(supplementaryBasicData.carrier).toBe(undefined);
+        });
+
+        it('should not be possible to report an non string carrier', () => {
+            // @ts-ignore
+            session.reportCarrier(2);
+            expect(supplementaryBasicData.carrier).toBe(undefined);
+        });
+
+        it('should be possible to report carrier', () => {
+            session.reportCarrier('carrier');
+            expect(supplementaryBasicData.carrier).toBe('carrier');
+        });
+
+        it('should be possible to clear the carrier', () => {
+            session.reportCarrier('carrier');
+            session.reportCarrier(undefined);
+            expect(supplementaryBasicData.carrier).toBe(undefined);
+        });
+
+        it('should be possible to override the carrier', () => {
+            session.reportCarrier('carrier');
+            expect(supplementaryBasicData.carrier).toBe('carrier');
+
+            session.reportCarrier('carrier2');
+            expect(supplementaryBasicData.carrier).toBe('carrier2');
+        });
+    });
+
+    describe('reportNetworkTechnology', () => {
+        it('should not be possible to report an empty network technology', () => {
+            session.reportNetworkTechnology('');
+            expect(supplementaryBasicData.networkTechnology).toBe(undefined);
+        });
+
+        it('should not be possible to report an non string network technology', () => {
+            // @ts-ignore
+            session.reportNetworkTechnology(2);
+            expect(supplementaryBasicData.networkTechnology).toBe(undefined);
+        });
+
+        it('should be possible to report network technology', () => {
+            session.reportNetworkTechnology('network technology');
+            expect(supplementaryBasicData.networkTechnology).toBe(
+                'network technology',
+            );
+        });
+
+        it('should be possible to clear network technology', () => {
+            session.reportNetworkTechnology('network technology');
+            session.reportNetworkTechnology(undefined);
+            expect(supplementaryBasicData.networkTechnology).toBe(undefined);
+        });
+
+        it('should be possible to override the network technology', () => {
+            session.reportNetworkTechnology('network technology');
+            expect(supplementaryBasicData.networkTechnology).toBe(
+                'network technology',
+            );
+
+            session.reportNetworkTechnology('network technology2');
+            expect(supplementaryBasicData.networkTechnology).toBe(
+                'network technology2',
+            );
+        });
+    });
+
+    describe('reportConnectionType', () => {
+        it('should not be possible to report an int instead of connection type', () => {
+            // @ts-ignore
+            session.reportConnectionType(2);
+            expect(supplementaryBasicData.connectionType).toBe(undefined);
+        });
+
+        it('should be possible to report connection type', () => {
+            session.reportConnectionType(ConnectionType.Lan);
+            expect(supplementaryBasicData.connectionType).toBe(
+                ConnectionType.Lan,
+            );
+        });
+
+        it('should be possible to clear connection type', () => {
+            session.reportConnectionType(ConnectionType.Lan);
+            session.reportConnectionType(undefined);
+            expect(supplementaryBasicData.connectionType).toBe(undefined);
+        });
+
+        it('should be possible to override the connection type', () => {
+            session.reportConnectionType(ConnectionType.Mobile);
+            expect(supplementaryBasicData.connectionType).toBe(
+                ConnectionType.Mobile,
+            );
+
+            session.reportConnectionType(ConnectionType.Wifi);
+            expect(supplementaryBasicData.connectionType).toBe(
+                ConnectionType.Wifi,
+            );
         });
     });
 

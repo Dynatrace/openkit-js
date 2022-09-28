@@ -37,6 +37,9 @@ export const enum PayloadKey {
     ScreenHeight = 'sh',
     UserLanguage = 'ul',
     Orientation = 'so',
+    ConnectionType = 'ct',
+    NetworkTechnology = 'np',
+    Carrier = 'cr',
 
     // timestamp constants
     SessionStartTime = 'tv',

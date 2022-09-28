@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { SupplementaryBasicData } from '../beacon/SupplementaryBasicData';
 import { Configuration } from '../config/Configuration';
 import {
     agentTechnologyType,
@@ -176,10 +177,20 @@ export class StaticPayloadBuilder {
     public static mutable(
         multiplicity: number,
         transmissionTime: number,
+        supplementaryBasicData: SupplementaryBasicData,
     ): Payload {
         return new PayloadQueryBuilder()
             .add(PayloadKey.Multiplicity, multiplicity)
             .add(PayloadKey.TransmissionTime, transmissionTime)
+            .addIfDefined(
+                PayloadKey.NetworkTechnology,
+                supplementaryBasicData.networkTechnology,
+            )
+            .addIfDefined(
+                PayloadKey.ConnectionType,
+                supplementaryBasicData.connectionType,
+            )
+            .addIfDefined(PayloadKey.Carrier, supplementaryBasicData.carrier)
             .build();
     }
 

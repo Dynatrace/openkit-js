@@ -17,6 +17,7 @@
 import { Action } from './Action';
 import { WebRequestTracer } from './WebRequestTracer';
 import { JSONObject } from './Json';
+import { ConnectionType } from './ConnectionType';
 
 /**
  * Session public interface
@@ -92,6 +93,34 @@ export interface Session {
      * Therefore, even empty objects are valid.
      */
     sendBizEvent(type: string, attributes: JSONObject): void;
+
+    /**
+     * Reports the network technology in use (e.g. 2G, 3G, 802.11x, offline, ...)
+     * Use undefined to clear the value again and it will not be sent.
+     *
+     * @param technology the used network technology
+     */
+    reportNetworkTechnology(technology?: string): void;
+
+    /**
+     * Reports the type of connection with which the device is connected to the network.
+     * Use undefined to clear the value again and it will not be sent.
+     *
+     * @param connectionType the type of connection
+     */
+    reportConnectionType(connectionType?: ConnectionType): void;
+
+    /**
+     * Reports the name of the cellular network carrier.
+     * Use undefined to clear the value again and it will not be sent.
+     *
+     * <p>
+     * The given value will be truncated to 250 characters.
+     * </p>
+     *
+     * @param carrier the cellular network carrier
+     */
+    reportCarrier(carrier?: string): void;
 
     /**
      * Ends the session and sends all remaining data.

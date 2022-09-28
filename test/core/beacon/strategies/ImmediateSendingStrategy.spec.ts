@@ -25,6 +25,7 @@ import {
     CacheEntry,
 } from '../../../../src/core/beacon/strategies/BeaconCache';
 import { ImmediateSendingStrategy } from '../../../../src/core/beacon/strategies/ImmediateSendingStrategy';
+import { SupplementaryBasicDataImpl } from '../../../../src/core/beacon/SupplementaryBasicDataImpl';
 import { PayloadBuilder } from '../../../../src/core/payload/PayloadBuilder';
 
 describe('ImmediateSendingStrategy', () => {
@@ -53,7 +54,10 @@ describe('ImmediateSendingStrategy', () => {
         // given
         init();
         reset(sender);
-        const builder = new PayloadBuilder({} as CommunicationState);
+        const builder = new PayloadBuilder(
+            {} as CommunicationState,
+            new SupplementaryBasicDataImpl(),
+        );
         const builderSpy = spy(builder);
 
         // when

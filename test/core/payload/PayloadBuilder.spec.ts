@@ -21,6 +21,7 @@ import { CommunicationStateImpl } from '../../../src/core/beacon/CommunicationSt
 import { StaticPayloadBuilder } from '../../../src/core/payload/StaticPayloadBuilder';
 import { CaptureMode } from '../../../src/api';
 import { createTag } from '../../../src/core/impl/WebRequestTracerImpl';
+import { SupplementaryBasicDataImpl } from '../../../src/core/beacon/SupplementaryBasicDataImpl';
 
 describe('PayloadBuilder', () => {
     let builder: PayloadBuilder;
@@ -30,7 +31,10 @@ describe('PayloadBuilder', () => {
     let staticBuilderSpy: typeof StaticPayloadBuilder;
 
     beforeEach(() => {
-        builder = new PayloadBuilder(instance(state));
+        builder = new PayloadBuilder(
+            instance(state),
+            new SupplementaryBasicDataImpl(),
+        );
         builderSpy = spy(builder);
 
         staticBuilderSpy = spy(StaticPayloadBuilder);

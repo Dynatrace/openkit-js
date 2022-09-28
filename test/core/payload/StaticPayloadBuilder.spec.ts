@@ -15,6 +15,8 @@
  */
 
 import { CrashReportingLevel, DataCollectionLevel } from '../../../src/api';
+import { ConnectionType } from '../../../src/api/ConnectionType';
+import { SupplementaryBasicDataImpl } from '../../../src/core/beacon/SupplementaryBasicDataImpl';
 import {
     Configuration,
     OpenKitConfiguration,
@@ -396,7 +398,167 @@ describe('PayloadBuilder', () => {
     describe('mutable', () => {
         it('should build the correct payload', () => {
             // given
-            const payload = StaticPayloadBuilder.mutable(765, 98765);
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                new SupplementaryBasicDataImpl(),
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [PayloadKey.Multiplicity, PayloadKey.TransmissionTime].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+        });
+
+        it('should build the correct payload when setting connection type', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setConnectionType(ConnectionType.Lan);
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [
+                    PayloadKey.Multiplicity,
+                    PayloadKey.TransmissionTime,
+                    PayloadKey.ConnectionType,
+                ].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+            payloadExpect(pairs, PayloadKey.ConnectionType, 'l');
+        });
+
+        it('should build the correct payload when clearing connection type', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setConnectionType(ConnectionType.Lan);
+            suppBasicData.setConnectionType(undefined);
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [PayloadKey.Multiplicity, PayloadKey.TransmissionTime].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+        });
+
+        it('should build the correct payload when setting carrier', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setCarrier('carrier');
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [
+                    PayloadKey.Multiplicity,
+                    PayloadKey.TransmissionTime,
+                    PayloadKey.Carrier,
+                ].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+            payloadExpect(pairs, PayloadKey.Carrier, 'carrier');
+        });
+
+        it('should build the correct payload when clearing carrier', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setCarrier('carrier');
+            suppBasicData.setCarrier(undefined);
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [PayloadKey.Multiplicity, PayloadKey.TransmissionTime].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+        });
+
+        it('should cut a longer carrier when building the correct payload', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setCarrier('x'.repeat(300));
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [
+                    PayloadKey.Multiplicity,
+                    PayloadKey.TransmissionTime,
+                    PayloadKey.Carrier,
+                ].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+            payloadExpect(pairs, PayloadKey.Carrier, 'x'.repeat(250));
+        });
+
+        it('should build the correct payload when setting network technology', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setNetworkTechnology('technology');
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
+
+            // when
+            const { keys, pairs } = parse(payload);
+            expect(keys.sort()).toEqual(
+                [
+                    PayloadKey.Multiplicity,
+                    PayloadKey.TransmissionTime,
+                    PayloadKey.NetworkTechnology,
+                ].sort(),
+            );
+            payloadExpect(pairs, PayloadKey.Multiplicity, '765');
+            payloadExpect(pairs, PayloadKey.TransmissionTime, '98765');
+            payloadExpect(pairs, PayloadKey.NetworkTechnology, 'technology');
+        });
+
+        it('should build the correct payload when clearing network technology', () => {
+            // given
+            const suppBasicData = new SupplementaryBasicDataImpl();
+            suppBasicData.setNetworkTechnology('technology');
+            suppBasicData.setNetworkTechnology(undefined);
+            const payload = StaticPayloadBuilder.mutable(
+                765,
+                98765,
+                suppBasicData,
+            );
 
             // when
             const { keys, pairs } = parse(payload);
@@ -1164,9 +1326,6 @@ describe('PayloadBuilder', () => {
             const payload = StaticPayloadBuilder.sendEvent(
                 '{"name":"eventName"}',
             );
-
-            // eslint-disable-next-line no-console
-            console.log(payload);
 
             // when
             const { keys, pairs } = parse(payload);

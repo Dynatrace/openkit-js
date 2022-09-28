@@ -257,6 +257,16 @@ webRequestTracer.setBytesReceived(67890);
 webRequestTracer.stop(200); // stop the web request tracer, with the response code
 ```
 
+## Reporting optional metrics
+
+After creating a `Session` object, it provides APIs to set additional mutable metrics like network technology, connection type or network carrier:
+
+```javascript
+session.setNetworkTechnology('technology');
+session.setCarrier('carrier');
+session.setConnectionType(ConnectionType.LAN);
+```
+
 ## Terminating the OpenKit Instance
 
 When an OpenKit instance is no longer needed (e.g. the application using OpenKit is shut down), the previously

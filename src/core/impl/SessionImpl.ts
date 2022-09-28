@@ -22,7 +22,9 @@ import {
     Session,
     WebRequestTracer,
 } from '../../api';
+import { ConnectionType } from '../../api/ConnectionType';
 import { JSONObject } from '../../api/Json';
+import { SupplementaryBasicData } from '../beacon/SupplementaryBasicData';
 import {
     OpenKitConfiguration,
     PrivacyConfiguration,
@@ -60,6 +62,7 @@ export class SessionImpl implements Session {
         private readonly config: PrivacyConfiguration & OpenKitConfiguration,
         timestampProvider: TimestampProvider = defaultTimestampProvider,
         private readonly eventsPayload: EventPayload,
+        private readonly supplementaryBasicData: SupplementaryBasicData,
     ) {
         this.sessionId = sessionId;
         this.payloadData = new PayloadBuilderHelper(
@@ -355,6 +358,68 @@ export class SessionImpl implements Session {
                 this.sessionId,
             ),
         );
+    }
+
+    public reportNetworkTechnology(technology?: string) {
+        if (
+            technology !== undefined &&
+            (typeof technology !== 'string' || technology.length === 0)
+        ) {
+            validationFailed(
+                this.logger,
+                'reportNetworkTechnology',
+                'Technology must be a non empty string',
+                { technology },
+            );
+
+            return;
+        }
+
+        this.logger.debug('reportNetworkTechnology', { technology });
+        this.supplementaryBasicData.setNetworkTechnology(technology);
+    }
+
+    public reportConnectionType(connectionType?: ConnectionType) {
+        if (
+            !(
+                connectionType === ConnectionType.Lan ||
+                connectionType === ConnectionType.Mobile ||
+                connectionType === ConnectionType.Offline ||
+                connectionType === ConnectionType.Wifi ||
+                connectionType === undefined
+            )
+        ) {
+            validationFailed(
+                this.logger,
+                'reportConnectionType',
+                'ConnectionType must be a valid type',
+                { connectionType },
+            );
+
+            return;
+        }
+
+        this.logger.debug('reportConnectionType', { connectionType });
+        this.supplementaryBasicData.setConnectionType(connectionType);
+    }
+
+    public reportCarrier(carrier?: string) {
+        if (
+            carrier !== undefined &&
+            (typeof carrier !== 'string' || carrier.length === 0)
+        ) {
+            validationFailed(
+                this.logger,
+                'reportCarrier',
+                'Carrier must be a non empty string',
+                { carrier },
+            );
+
+            return;
+        }
+
+        this.logger.debug('reportCarrier', { carrier });
+        this.supplementaryBasicData.setCarrier(carrier);
     }
 
     public isShutdown(): boolean {

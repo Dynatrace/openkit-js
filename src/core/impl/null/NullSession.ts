@@ -15,6 +15,7 @@
  */
 
 import { Action, JSONObject, Session, WebRequestTracer } from '../../../api';
+import { ConnectionType } from '../../../api/ConnectionType';
 import { defaultNullAction } from './NullAction';
 import { defaultNullWebRequestTracer } from './NullWebRequestTracer';
 
@@ -48,6 +49,18 @@ export class NullSession implements Session {
     }
 
     public sendBizEvent(type: string, attributes: JSONObject): void {
+        // stub
+    }
+
+    public reportNetworkTechnology(technology?: string) {
+        // stub
+    }
+
+    public reportConnectionType(connectionType?: ConnectionType) {
+        // stub
+    }
+
+    public reportCarrier(carrier?: string) {
         // stub
     }
 }

@@ -25,6 +25,7 @@ import {
 import { BeaconSenderImpl } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
 import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
+import { SupplementaryBasicDataImpl } from '../beacon/SupplementaryBasicDataImpl';
 import {
     Configuration,
     OpenKitConfiguration,
@@ -151,8 +152,12 @@ export class OpenKitImpl implements OpenKit {
         const communicationState = new CommunicationStateImpl(
             this.config.openKit.applicationId,
         );
+        const supplementaryBasicData = new SupplementaryBasicDataImpl();
 
-        const payloadBuilder = new PayloadBuilder(communicationState);
+        const payloadBuilder = new PayloadBuilder(
+            communicationState,
+            supplementaryBasicData,
+        );
         const eventsPayload = new EventPayload(
             this.config,
             defaultTimestampProvider,
@@ -165,6 +170,7 @@ export class OpenKitImpl implements OpenKit {
             this.sessionConfig,
             defaultTimestampProvider,
             eventsPayload,
+            supplementaryBasicData,
         );
 
         const cacheEntry = this.cache.register(
