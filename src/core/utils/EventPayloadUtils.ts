@@ -1,10 +1,4 @@
 /**
- * Replacement for send timestamp. This will be replaced in the payload when data gets sent.
- */
-export const SEND_TIMESTAMP_PLACEHOLDER: string =
-    'DT_SEND_TIMESTAMP_PLACEHOLDER';
-
-/**
  * Maxium payload size for sending an event
  */
 export const EVENT_MAX_PAYLOAD = 16 * 1024;

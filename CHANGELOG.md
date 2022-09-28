@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v1.3.0...HEAD)
 
+### Added
+
+-   Business events capturing API `sendBizEvent`
+
 ### Changed
 
 -   Maximum length of reported error/crash stacktrace has been limited to 128k.

@@ -5,21 +5,17 @@ import {
     defaultTimestampProvider,
     TimestampProvider,
 } from '../provider/TimestampProvider';
-import { SEND_TIMESTAMP_PLACEHOLDER } from '../utils/EventPayloadUtils';
 import { isNode } from '../utils/Utils';
 import {
     APP_VERSION,
     DEVICE_MANUFACTURER,
     DEVICE_MODEL_IDENTIFIER,
-    DT_AGENT_FLAVOR,
-    DT_AGENT_TECHNOLOGY_TYPE,
-    DT_AGENT_VERSION,
     EVENT_KIND,
     EVENT_KIND_BIZ,
     EVENT_KIND_RUM,
+    EVENT_PROVIDER,
     OS_NAME,
     TIMESTAMP,
-    WINDOW_ORIENTATION,
 } from './EventPayloadAttributes';
 
 export class EventPayload {
@@ -50,6 +46,11 @@ export class EventPayload {
         }
 
         this.addNonOverridableAttribute(internalAttributes, 'event.type', type);
+        this.addOverridableAttribute(
+            internalAttributes,
+            EVENT_PROVIDER,
+            this.config.openKit.applicationId,
+        );
         this.addNonOverridableAttribute(
             internalAttributes,
             EVENT_KIND,
@@ -69,6 +70,11 @@ export class EventPayload {
         this.addBasicEventData(internalAttributes, session);
 
         this.addNonOverridableAttribute(internalAttributes, 'event.name', name);
+        this.addNonOverridableAttribute(
+            internalAttributes,
+            EVENT_PROVIDER,
+            this.config.openKit.applicationId,
+        );
         this.addOverridableAttribute(
             internalAttributes,
             EVENT_KIND,
@@ -103,38 +109,23 @@ export class EventPayload {
 
         this.addNonOverridableAttribute(
             attributes,
-            'dt.application_id',
+            'dt.rum.schema_version',
+            '1.0',
+        );
+        this.addNonOverridableAttribute(
+            attributes,
+            'dt.rum.application.id',
             this.config.openKit.applicationId,
         );
         this.addNonOverridableAttribute(
             attributes,
-            'dt.send_timestamp',
-            SEND_TIMESTAMP_PLACEHOLDER,
-        );
-        this.addNonOverridableAttribute(
-            attributes,
-            'dt.instance_id',
+            'dt.rum.instance.id',
             this.config.openKit.deviceId,
         );
         this.addNonOverridableAttribute(
             attributes,
-            'dt.sid',
+            'dt.rum.sid',
             session.toString(),
-        );
-        this.addOverridableAttribute(
-            attributes,
-            DT_AGENT_VERSION,
-            openKitVersion,
-        );
-        this.addOverridableAttribute(
-            attributes,
-            DT_AGENT_TECHNOLOGY_TYPE,
-            'openkit',
-        );
-        this.addOverridableAttribute(
-            attributes,
-            DT_AGENT_FLAVOR,
-            isNode ? 'nodejs' : 'webjs',
         );
 
         this.addOverridableAttribute(
@@ -157,21 +148,13 @@ export class EventPayload {
             DEVICE_MODEL_IDENTIFIER,
             this.config.device.modelId,
         );
-        this.addOverridableAttribute(
-            attributes,
-            WINDOW_ORIENTATION,
-            this.config.device.orientation,
-        );
     }
 
     private removeReservedInternalAttributes(attributes: JSONObject) {
         const jsonKeys = Object.keys(attributes);
 
         for (const key of jsonKeys) {
-            if (
-                key === 'dt' ||
-                (key.startsWith('dt.') && !key.startsWith('dt.agent.'))
-            ) {
+            if (key === 'dt' || key.startsWith('dt.')) {
                 this.logger.warn(
                     'getEventsPayload',
                     'key name dt or dt. is reserved. Data will be removed!',
@@ -189,14 +172,7 @@ export class EventPayload {
         value?: string | number | boolean,
     ) {
         if (value !== undefined) {
-            if (key in attributes) {
-                // Customer has overwritten this value
-                if (!('dt.overridden_keys' in attributes)) {
-                    attributes['dt.overridden_keys'] = [];
-                }
-
-                (attributes['dt.overridden_keys'] as string[]).push(key);
-            } else {
+            if (!(key in attributes)) {
                 attributes[key] = value;
             }
         }

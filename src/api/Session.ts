@@ -78,10 +78,18 @@ export interface Session {
     // sendEvent(name: string, attributes: JSONObject): void;
 
     /**
-     * Reports a BIZ event with a mandatory type and additional attributes
+     * Send a Business Event
      *
-     * @param type Type of the BIZ event which is mandatory
-     * @param attributes Additional attributes which are passed along side our internal attributes
+     * With sendBizEvent, you can report a business event. These standalone events are being sent detached
+     * from user actions or sessions.
+     *
+     * Note: Business events are only supported on Dynatrace SaaS deployments currently.
+     *
+     * @param type Mandatory event type
+     * @param attributes Must be a valid JSON object and cannot contain functions, undefined,
+     * Infinity, or NaN as values, otherwise they will be removed. Attributes need to be serializable using JSON.stringify.
+     * The resulting event will be populated with the 'attributes'-parameter and enriched with additional properties.
+     * Therefore, even empty objects are valid.
      */
     sendBizEvent(type: string, attributes: JSONObject): void;
 

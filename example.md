@@ -163,6 +163,28 @@ if it has no parent.
 action.leaveAction();
 ```
 
+## Business events capturing
+
+With `sendBizEvent`, you can report business events. These events are standalone events, as OneAgent sends them detached from user actions or user sessions.
+
+For more information on business events, see [dynatrace documentation](https://www.dynatrace.com/support/help/how-to-use-dynatrace/business-analytics/ba-events-capturing#expand--example-configuration-files-for-rum--2).
+
+```javascript
+session.sendBizEvent('com.easytravel.funnel.booking-finished', {
+    'event.name': 'Confirmed Booking',
+    screen: 'booking-confirmation',
+    product: 'Hotel Passy Eiffel',
+    amount: 358.35,
+    currency: 'USD',
+    reviewScore: 4.8,
+    arrivalDate: '2022-11-05',
+    departureDate: '2022-11-15',
+    journeyDuration: 10,
+    adultTravelers: 2,
+    childrenTravelers: 0,
+});
+```
+
 ## Report Named Event
 
 To report a named event use the `reportEvent` method on `Action`.
