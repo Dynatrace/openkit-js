@@ -208,7 +208,7 @@ describe('EventPayload', () => {
             expect(payloadJson['dt.rum.schema_version']).toEqual('1.0');
         });
 
-        it('should not be possible to override event.provider', () => {
+        it('should be possible to override event.provider', () => {
             // given
             const predefinedAttributes = {
                 'event.provider': 'overridden',
@@ -222,7 +222,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['event.provider']).toEqual('application-id');
+            expect(payloadJson['event.provider']).toEqual('overridden');
         });
 
         it('should be possible to override timestamp', () => {

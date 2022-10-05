@@ -46,11 +46,7 @@ export class EventPayload {
         }
 
         this.addNonOverridableAttribute(internalAttributes, 'event.type', type);
-        this.addOverridableAttribute(
-            internalAttributes,
-            EVENT_PROVIDER,
-            this.config.openKit.applicationId,
-        );
+
         this.addNonOverridableAttribute(
             internalAttributes,
             EVENT_KIND,
@@ -70,11 +66,7 @@ export class EventPayload {
         this.addBasicEventData(internalAttributes, session);
 
         this.addNonOverridableAttribute(internalAttributes, 'event.name', name);
-        this.addNonOverridableAttribute(
-            internalAttributes,
-            EVENT_PROVIDER,
-            this.config.openKit.applicationId,
-        );
+
         this.addOverridableAttribute(
             internalAttributes,
             EVENT_KIND,
@@ -147,6 +139,11 @@ export class EventPayload {
             attributes,
             DEVICE_MODEL_IDENTIFIER,
             this.config.device.modelId,
+        );
+        this.addOverridableAttribute(
+            attributes,
+            EVENT_PROVIDER,
+            this.config.openKit.applicationId,
         );
     }
 
