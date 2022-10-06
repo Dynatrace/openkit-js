@@ -96,11 +96,9 @@ export class PayloadBuilderHelper {
         parentActionId: number,
         name: string,
         code: number,
-        message: string,
     ): void {
         this.payloadBuilder.reportError(
             name,
-            message,
             code,
             parentActionId,
             this.createSequenceNumber(),

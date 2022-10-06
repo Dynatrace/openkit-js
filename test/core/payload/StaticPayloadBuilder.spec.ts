@@ -169,7 +169,6 @@ describe('PayloadBuilder', () => {
         const applicationId = 'application-id';
 
         const applicationVersion = '1.2.3.4.5';
-        const applicationName = 'My application name';
 
         const manufacturer = 'Dynatrace';
         const modelId = 'OpenKit';
@@ -191,7 +190,6 @@ describe('PayloadBuilder', () => {
                     applicationId,
                 },
                 meta: {
-                    applicationName,
                     applicationVersion,
                 },
                 device: {
@@ -215,7 +213,6 @@ describe('PayloadBuilder', () => {
                 PayloadKey.ProtocolVersion,
                 PayloadKey.OpenKitVersion,
                 PayloadKey.ApplicationId,
-                PayloadKey.ApplicationName,
                 PayloadKey.PlatformType,
                 PayloadKey.AgentTechnologyType,
                 PayloadKey.VisitorId,
@@ -247,7 +244,6 @@ describe('PayloadBuilder', () => {
                 agentTechnologyType,
             );
 
-            payloadExpect(pairs, PayloadKey.ApplicationName, applicationName);
             payloadExpect(
                 pairs,
                 PayloadKey.ApplicationVersion,
@@ -315,7 +311,6 @@ describe('PayloadBuilder', () => {
                 PayloadKey.VisitorId,
                 PayloadKey.DataCollectionLevel,
                 PayloadKey.CrashReportingLevel,
-                PayloadKey.ApplicationName,
             ]);
 
             payloadExpect(
@@ -336,7 +331,6 @@ describe('PayloadBuilder', () => {
                 agentTechnologyType,
             );
 
-            payloadExpect(pairs, PayloadKey.ApplicationName, '');
             payloadExpect(pairs, PayloadKey.ApplicationVersion, undefined);
             payloadExpect(pairs, PayloadKey.VisitorId, deviceId);
 
@@ -620,7 +614,6 @@ describe('PayloadBuilder', () => {
                 pAId,
                 sSN,
                 tSSS,
-                reason,
                 ev,
             );
 
@@ -635,7 +628,6 @@ describe('PayloadBuilder', () => {
                 PayloadKey.ParentActionId,
                 PayloadKey.StartSequenceNumber,
                 PayloadKey.Time0,
-                PayloadKey.Reason,
                 PayloadKey.ErrorValue,
                 PayloadKey.ErrorTechnologyType,
             ]);
@@ -654,7 +646,6 @@ describe('PayloadBuilder', () => {
                 sSN.toString(),
             );
             payloadExpect(pairs, PayloadKey.Time0, tSSS.toString());
-            payloadExpect(pairs, PayloadKey.Reason, reason);
             payloadExpect(pairs, PayloadKey.ErrorValue, ev.toString());
             payloadExpect(
                 pairs,
@@ -674,7 +665,6 @@ describe('PayloadBuilder', () => {
                 pAId,
                 sSN,
                 tSSS,
-                reason,
                 ev,
             );
 
@@ -689,7 +679,6 @@ describe('PayloadBuilder', () => {
                 PayloadKey.ParentActionId,
                 PayloadKey.StartSequenceNumber,
                 PayloadKey.Time0,
-                PayloadKey.Reason,
                 PayloadKey.ErrorValue,
                 PayloadKey.ErrorTechnologyType,
             ]);
@@ -708,7 +697,6 @@ describe('PayloadBuilder', () => {
                 sSN.toString(),
             );
             payloadExpect(pairs, PayloadKey.Time0, tSSS.toString());
-            payloadExpect(pairs, PayloadKey.Reason, reasonTruncated);
             payloadExpect(pairs, PayloadKey.ErrorValue, ev.toString());
             payloadExpect(
                 pairs,

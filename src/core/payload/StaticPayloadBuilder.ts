@@ -133,10 +133,6 @@ export class StaticPayloadBuilder {
             .add(PayloadKey.ProtocolVersion, protocolVersion)
             .add(PayloadKey.OpenKitVersion, openKitVersion)
             .add(PayloadKey.ApplicationId, openKit.applicationId)
-            .add(
-                PayloadKey.ApplicationName,
-                meta.applicationName === undefined ? '' : meta.applicationName,
-            )
             .addIfDefined(
                 PayloadKey.ApplicationVersion,
                 meta.applicationVersion,
@@ -219,14 +215,12 @@ export class StaticPayloadBuilder {
         parentActionId: number,
         startSequenceNumber: number,
         timeSinceSessionStart: number,
-        reason: string,
         errorValue: number,
     ): Payload {
         return StaticPayloadBuilder.basicEventData(EventType.Error, name)
             .add(PayloadKey.ParentActionId, parentActionId)
             .add(PayloadKey.StartSequenceNumber, startSequenceNumber)
             .add(PayloadKey.Time0, timeSinceSessionStart)
-            .add(PayloadKey.Reason, reason, MAX_REASON_LENGTH)
             .add(PayloadKey.ErrorValue, errorValue)
             .add(PayloadKey.ErrorTechnologyType, errorTechnologyType)
             .build();

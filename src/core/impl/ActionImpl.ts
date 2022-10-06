@@ -137,7 +137,7 @@ export class ActionImpl implements Action {
     /**
      * @inheritDoc
      */
-    public reportError(name: string, code: number, message: string): void {
+    public reportError(name: string, code: number): void {
         if (this.isActionLeft()) {
             validationFailed(
                 this.logger,
@@ -170,14 +170,9 @@ export class ActionImpl implements Action {
             return;
         }
 
-        this.logger.debug('reportError', { name, code, message });
+        this.logger.debug('reportError', { name, code });
 
-        this.payloadBuilder.reportError(
-            this.actionId,
-            name,
-            code,
-            String(message),
-        );
+        this.payloadBuilder.reportError(this.actionId, name, code);
     }
 
     public traceWebRequest(url: string): WebRequestTracer {

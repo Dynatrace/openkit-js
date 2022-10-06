@@ -75,7 +75,7 @@ describe('PayloadQueryBuilder', () => {
     describe('addIfDefinedAndNotNull', () => {
         it('should not add if the value is undefined', () => {
             builder.addIfDefinedAndNotNull(
-                PayloadKey.ApplicationName,
+                PayloadKey.ApplicationVersion,
                 undefined,
             );
 
@@ -83,29 +83,32 @@ describe('PayloadQueryBuilder', () => {
         });
 
         it('should not add if the value is null', () => {
-            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationName, null);
+            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationVersion, null);
 
             expect(builder.build()).toEqual('');
         });
 
         it('should add if the value is valid', () => {
-            builder.addIfDefinedAndNotNull(PayloadKey.ApplicationName, 'name');
+            builder.addIfDefinedAndNotNull(
+                PayloadKey.ApplicationVersion,
+                'name',
+            );
 
-            expect(builder.build()).toEqual('an=name');
+            expect(builder.build()).toEqual('vn=name');
         });
     });
 
     describe('addIfNotNegative', () => {
         it('should not add if the value is negative', () => {
-            builder.addIfNotNegative(PayloadKey.ApplicationName, -1);
+            builder.addIfNotNegative(PayloadKey.ApplicationVersion, -1);
 
             expect(builder.build()).toEqual('');
         });
 
         it('should add if the value is positive', () => {
-            builder.addIfNotNegative(PayloadKey.ApplicationName, 1);
+            builder.addIfNotNegative(PayloadKey.ApplicationVersion, 1);
 
-            expect(builder.build()).toEqual('an=1');
+            expect(builder.build()).toEqual('vn=1');
         });
     });
 

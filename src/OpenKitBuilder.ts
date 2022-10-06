@@ -39,7 +39,6 @@ import { isFinite, truncate, isNode } from './core/utils/Utils';
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
-const defaultApplicationName = '';
 
 const validDeviceIdPattern = /^-?\d{1,19}$/;
 
@@ -51,7 +50,6 @@ export class OpenKitBuilder {
     private readonly applicationId: string;
     private readonly deviceId: string;
 
-    private applicationName = defaultApplicationName;
     private operatingSystem = defaultOperatingSystem;
     private applicationVersion?: string;
 
@@ -86,19 +84,6 @@ export class OpenKitBuilder {
         this.beaconUrl = beaconURL;
         this.applicationId = applicationId;
         this.deviceId = String(deviceId);
-    }
-
-    /**
-     * Sets the application name.
-     * Defaults to <code>''</code> <i>(empty string)</i>
-     *
-     * @param appName The application name.
-     * @returns The current OpenKitBuilder
-     */
-    public withApplicationName(appName: string): this {
-        this.applicationName = String(appName);
-
-        return this;
     }
 
     /**
@@ -374,7 +359,6 @@ export class OpenKitBuilder {
             },
 
             meta: {
-                applicationName: this.applicationName,
                 applicationVersion: this.applicationVersion,
                 operatingSystem: this.operatingSystem,
             },

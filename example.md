@@ -31,7 +31,6 @@ customize OpenKit. This includes device specific information like operating syst
 
 | Method Name                | Description                     | Default Value                 |
 | -------------------------- | ------------------------------- | ----------------------------- |
-| `withApplicationName`      | sets the application name       | ` ` (empty string)            |
 | `withApplicationVersion`   | sets the application version    |                               |
 | `withOperatingSystem`      | sets the operating system name  |                               |
 | `withManufacturer`         | sets the manufacturer           |                               |
@@ -222,9 +221,8 @@ name, code and a reason. The code fragment below shows how.
 ```javascript
 const errorName = 'Unknown error';
 const errorCode = 42;
-const reason = "Not sure what's going on here";
 
-action.reportError(errorName, errorCode, reason);
+action.reportError(errorName, errorCode);
 ```
 
 ## Tracing Web Requests

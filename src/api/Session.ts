@@ -41,9 +41,8 @@ export interface Session {
      *
      * @param name The name of the error.
      * @param code The error code.
-     * @param message The message (reason) of the error.
      */
-    reportError(name: string, code: number, message: string): void;
+    reportError(name: string, code: number): void;
 
     /**
      * Report a crash to Dynatrace.

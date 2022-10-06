@@ -30,7 +30,7 @@ export class NullAction implements Action {
         // stub
     }
 
-    public reportError(name: string, code: number, message: string): void {
+    public reportError(name: string, code: number): void {
         // stub
     }
 

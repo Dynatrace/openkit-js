@@ -208,12 +208,11 @@ describe('PayloadBuilder', () => {
             when(state.captureErrors).thenReturn(CaptureMode.On);
 
             // when
-            builder.reportError('name', 'reason', 200, 6, 100, 500);
+            builder.reportError('name', 200, 6, 100, 500);
 
             // then
             verify(
                 staticBuilderSpy.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -230,12 +229,11 @@ describe('PayloadBuilder', () => {
             when(state.captureErrors).thenReturn(CaptureMode.Off);
 
             // when
-            builder.reportError('name', 'reason', 200, 6, 100, 500);
+            builder.reportError('name', 200, 6, 100, 500);
 
             // then
             verify(
                 staticBuilderSpy.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -252,7 +250,7 @@ describe('PayloadBuilder', () => {
             when(state.captureErrors).thenReturn(CaptureMode.On);
 
             // when
-            builder.reportError('name', 'reason', 200, 6, 100, 500);
+            builder.reportError('name', 200, 6, 100, 500);
 
             // then
             verify(
@@ -262,18 +260,10 @@ describe('PayloadBuilder', () => {
                     anything(),
                     anything(),
                     anything(),
-                    anything(),
                 ),
             ).once();
             verify(
-                staticBuilderSpy.reportError(
-                    'name',
-                    6,
-                    100,
-                    500,
-                    'reason',
-                    200,
-                ),
+                staticBuilderSpy.reportError('name', 6, 100, 500, 200),
             ).once();
             verify(builderSpy._push(anything())).once();
         });

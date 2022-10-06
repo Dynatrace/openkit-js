@@ -39,7 +39,6 @@ export interface DeviceMetadata {
 }
 
 export interface ApplicationMetadata {
-    readonly applicationName: string;
     readonly applicationVersion: string;
     readonly operatingSystem: string;
 }

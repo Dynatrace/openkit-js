@@ -27,7 +27,6 @@ async function executeSimpleApp(): Promise<void> {
 
     // create an OpenKit instance
     const openkit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
-        .withApplicationName('SimpleApp')
         .withApplicationVersion('1.0')
         .withOperatingSystem(process.platform)
         .withLogLevel(LogLevel.Debug)

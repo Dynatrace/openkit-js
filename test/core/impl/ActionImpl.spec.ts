@@ -280,47 +280,32 @@ describe('ActionImpl', () => {
         it('should not be possible to report an error if the name is not a string', () => {
             // when
             // @ts-ignore
-            action.reportError(action, 1337, 'message');
+            action.reportError(action, 1337);
 
             // then
             verify(
-                payloadBuilder.reportError(
-                    anything(),
-                    anything(),
-                    anything(),
-                    anything(),
-                ),
+                payloadBuilder.reportError(anything(), anything(), anything()),
             ).never();
         });
 
         it('should not be possible to report an error if the name is empty', () => {
             // when
-            action.reportError('', 1337, 'message');
+            action.reportError('', 1337);
 
             // then
             verify(
-                payloadBuilder.reportError(
-                    anything(),
-                    anything(),
-                    anything(),
-                    anything(),
-                ),
+                payloadBuilder.reportError(anything(), anything(), anything()),
             ).never();
         });
 
         it('should not be possible to report an error if the code is not a number', () => {
             // when
             // @ts-ignore
-            action.reportError('name', 'invalid number', 'message');
+            action.reportError('name', 'invalid number');
 
             // then
             verify(
-                payloadBuilder.reportError(
-                    anything(),
-                    anything(),
-                    anything(),
-                    anything(),
-                ),
+                payloadBuilder.reportError(anything(), anything(), anything()),
             ).never();
         });
 
@@ -329,39 +314,24 @@ describe('ActionImpl', () => {
             action.leaveAction();
 
             // when
-            action.reportError('name', 1337, 'message');
+            action.reportError('name', 1337);
 
             // then
             verify(
-                payloadBuilder.reportError(
-                    anything(),
-                    anything(),
-                    anything(),
-                    anything(),
-                ),
+                payloadBuilder.reportError(anything(), anything(), anything()),
             ).never();
         });
 
         it('should be able to report an error', () => {
             // when
-            action.reportError('name', 1337, 'message');
+            action.reportError('name', 1337);
 
             // then
             verify(
-                payloadBuilder.reportError(
-                    action.actionId,
-                    'name',
-                    1337,
-                    'message',
-                ),
+                payloadBuilder.reportError(action.actionId, 'name', 1337),
             ).once();
             verify(
-                payloadBuilder.reportError(
-                    anything(),
-                    anything(),
-                    anything(),
-                    anything(),
-                ),
+                payloadBuilder.reportError(anything(), anything(), anything()),
             ).once();
         });
     });

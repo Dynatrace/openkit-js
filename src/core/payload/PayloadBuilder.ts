@@ -87,7 +87,6 @@ export class PayloadBuilder {
 
     public reportError(
         name: string,
-        reason: string,
         errorValue: number,
         parentActionId: number,
         startSequenceNumber: number,
@@ -103,7 +102,6 @@ export class PayloadBuilder {
                 parentActionId,
                 startSequenceNumber,
                 timeSinceSessionStart,
-                reason,
                 errorValue,
             ),
         );

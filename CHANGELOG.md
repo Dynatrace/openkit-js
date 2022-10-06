@@ -10,6 +10,12 @@
 
 -   Maximum length of reported error/crash stacktrace has been limited to 128k.
 -   Maximum length of reported error/crash reason has been limited to 1000.
+-   `Action.reportError` has no longer a message, as it is unhandled in Dynatrace.
+-   `Session.reportError` has no longer a message, as it is unhandled in Dynatrace.
+
+### Removed
+
+-   `OpenKitBuilder.withApplicationName` because the name is configured in Dynatrace Web UI.
 
 ## 1.3.0 [Release date: 2021-12-10]
 

@@ -78,12 +78,6 @@ describe('OpenKitBuilder', () => {
         expect(config.openKit.beaconURL).toEqual('https://example.com');
     });
 
-    it('should set the application name', () => {
-        builder.withApplicationName('app-name');
-
-        expect(builder.getConfig().meta.applicationName).toEqual('app-name');
-    });
-
     it('should set the application version', () => {
         builder.withApplicationVersion('1.3.2');
 
@@ -151,7 +145,6 @@ describe('OpenKitBuilder', () => {
             .withOperatingSystem('Arch')
             .withDataCollectionLevel(DataCollectionLevel.UserBehavior)
             .withCrashReportingLevel(CrashReportingLevel.OptOutCrashes)
-            .withApplicationName('App Name')
             .withApplicationVersion('5.6.7')
             .getConfig();
 
@@ -163,7 +156,6 @@ describe('OpenKitBuilder', () => {
         expect(config.privacy.crashReportingLevel).toEqual(
             CrashReportingLevel.OptOutCrashes,
         );
-        expect(config.meta.applicationName).toEqual('App Name');
         expect(config.meta.applicationVersion).toEqual('5.6.7');
     });
 

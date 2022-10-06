@@ -36,7 +36,7 @@ describe('NullSession', () => {
     });
 
     it('should not crash if reportError is called', () => {
-        defaultNullSession.reportError('error name', 300, 'error message');
+        defaultNullSession.reportError('error name', 300);
     });
 
     it('should not crash if reportCrash is called', () => {

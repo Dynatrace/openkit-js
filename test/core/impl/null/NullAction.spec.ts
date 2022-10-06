@@ -31,7 +31,7 @@ describe('NullAction', () => {
     });
 
     it('should not crash if an error is reported', () => {
-        defaultNullAction.reportError('name', 404, 'message');
+        defaultNullAction.reportError('name', 404);
     });
 
     it('should return defaultNullWebRequestTracer on traceWebRequest', () => {

@@ -688,12 +688,11 @@ describe('SessionImpl', () => {
         it('should not be possible to report an error if the name is not a string', () => {
             // when
             // @ts-ignore
-            session.reportError(session, 1337, 'message');
+            session.reportError(session, 1337);
 
             // then
             verify(
                 payloadBuilder.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -705,12 +704,11 @@ describe('SessionImpl', () => {
 
         it('should not be possible to report an error if the name is empty', () => {
             // when
-            session.reportError('', 1337, 'message');
+            session.reportError('', 1337);
 
             // then
             verify(
                 payloadBuilder.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -723,12 +721,11 @@ describe('SessionImpl', () => {
         it('should not be possible to report an error if the code is not a number', () => {
             // when
             // @ts-ignore
-            session.reportError('name', 'invalid number', 'message');
+            session.reportError('name', 'invalid number');
 
             // then
             verify(
                 payloadBuilder.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -743,12 +740,11 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.Off;
 
             // when
-            session.reportError('name', 1337, 'message');
+            session.reportError('name', 1337);
 
             // then
             verify(
                 payloadBuilder.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -763,15 +759,12 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.Performance;
 
             // when
-            session.reportError('name', 1337, 'message');
+            session.reportError('name', 1337);
 
             // then
-            verify(
-                payloadBuilder.reportError('name', 'message', 1337, 0, 2, 2000),
-            ).once();
+            verify(payloadBuilder.reportError('name', 1337, 0, 2, 2000)).once();
             verify(
                 payloadBuilder.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),
@@ -786,15 +779,12 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
 
             // when
-            session.reportError('name', 1337, 'message');
+            session.reportError('name', 1337);
 
             // then
-            verify(
-                payloadBuilder.reportError('name', 'message', 1337, 0, 2, 2000),
-            ).once();
+            verify(payloadBuilder.reportError('name', 1337, 0, 2, 2000)).once();
             verify(
                 payloadBuilder.reportError(
-                    anything(),
                     anything(),
                     anything(),
                     anything(),

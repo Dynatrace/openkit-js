@@ -157,7 +157,7 @@ export class SessionImpl implements Session {
     /**
      * @inheritDoc
      */
-    public reportError(name: string, code: number, message: string): void {
+    public reportError(name: string, code: number): void {
         if (
             this.isShutdown() ||
             this.config.dataCollectionLevel === DataCollectionLevel.Off
@@ -187,9 +187,9 @@ export class SessionImpl implements Session {
             return;
         }
 
-        this.logger.debug('reportError', { name, code, message });
+        this.logger.debug('reportError', { name, code });
 
-        this.payloadData.reportError(0, name, code, String(message));
+        this.payloadData.reportError(0, name, code);
     }
 
     /**

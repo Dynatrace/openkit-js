@@ -136,13 +136,11 @@ This small example provides a rough overview how OpenKit can be used.
 Detailed explanation is available in [example.md](example.md).
 
 ```javascript
-const applicationName = 'My OpenKit application';
 const applicationID = 'application-id';
 const deviceID = 42;
 const endpointURL = 'https://tenantid.beaconurl.com/mbeacon';
 
 const openKit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
-    .withApplicationName(applicationName)
     .withApplicationVersion('1.0.0.0')
     .withOperatingSystem('Windows 10')
     .withManufacturer('MyCompany')

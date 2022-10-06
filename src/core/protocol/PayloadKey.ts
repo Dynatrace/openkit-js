@@ -18,7 +18,6 @@ export const enum PayloadKey {
     ProtocolVersion = 'vv',
     OpenKitVersion = 'va',
     ApplicationId = 'ap',
-    ApplicationName = 'an',
     ApplicationVersion = 'vn',
     PlatformType = 'pt',
     AgentTechnologyType = 'tt',
