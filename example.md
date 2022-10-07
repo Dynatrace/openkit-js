@@ -260,9 +260,9 @@ webRequestTracer.stop(200); // stop the web request tracer, with the response co
 After creating a `Session` object, it provides APIs to set additional mutable metrics like network technology, connection type or network carrier:
 
 ```javascript
-session.setNetworkTechnology('technology');
-session.setCarrier('carrier');
-session.setConnectionType(ConnectionType.LAN);
+session.reportNetworkTechnology('technology');
+session.reportCarrier('carrier');
+session.reportConnectionType(ConnectionType.LAN);
 ```
 
 ## Terminating the OpenKit Instance

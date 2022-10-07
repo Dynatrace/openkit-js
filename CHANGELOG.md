@@ -5,6 +5,9 @@
 ### Added
 
 -   Business events capturing API `sendBizEvent`
+-   `Session.reportNetworkTechnology(technology?: string)`
+-   `Session.reportCarrier(carrier?: string)`
+-   `Session.reportConnectionType(connectionType?: ConnectionType)`
 
 ### Changed
 
