@@ -172,7 +172,7 @@ For more information on business events, see [dynatrace documentation](https://w
 session.sendBizEvent('com.easytravel.funnel.booking-finished', {
     'event.name': 'Confirmed Booking',
     screen: 'booking-confirmation',
-    product: 'Hotel Passy Eiffel',
+    product: 'Danube Anna Hotel',
     amount: 358.35,
     currency: 'USD',
     reviewScore: 4.8,
