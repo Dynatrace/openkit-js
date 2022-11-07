@@ -28,6 +28,7 @@ export class StatusRequestImpl implements StatusRequest {
     public readonly platformType: number;
     public readonly serverId: number;
     public readonly timestamp: number;
+    public readonly sessionIdentifier?: string;
 
     constructor(
         agentTechnology: string,
@@ -36,6 +37,8 @@ export class StatusRequestImpl implements StatusRequest {
         platformType: number,
         serverId: number,
         timestamp: number,
+        deviceId?: string,
+        sessionId?: number,
     ) {
         this.agentTechnologyType = agentTechnology;
         this.applicationId = applicationId;
@@ -43,12 +46,18 @@ export class StatusRequestImpl implements StatusRequest {
         this.platformType = platformType;
         this.serverId = serverId;
         this.timestamp = timestamp;
+
+        if (sessionId !== undefined && deviceId !== undefined) {
+            this.sessionIdentifier = `${deviceId}_${sessionId}`;
+        }
     }
 
     public static create(
         appId: string,
         serverId: number,
         timestamp: number,
+        deviceId?: string,
+        sessionId?: number,
     ): StatusRequestImpl {
         return new StatusRequestImpl(
             agentTechnologyType,
@@ -57,6 +66,8 @@ export class StatusRequestImpl implements StatusRequest {
             platformTypeOpenKit,
             serverId,
             timestamp,
+            deviceId,
+            sessionId,
         );
     }
 }

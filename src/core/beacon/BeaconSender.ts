@@ -40,6 +40,7 @@ export class BeaconSenderImpl implements BeaconSender {
     private readonly logger: Logger;
 
     private okServerId: number = defaultServerId;
+    private readonly deviceId: string;
 
     private isShutdown = false;
     private initialized = false;
@@ -54,6 +55,7 @@ export class BeaconSenderImpl implements BeaconSender {
         this.beaconUrl = config.beaconURL;
         this.channel = config.communicationChannel;
         this.sendingStrategies = config.sendingStrategies;
+        this.deviceId = config.deviceId;
 
         this.logger = config.loggerFactory.createLogger('BeaconSender');
     }
@@ -159,6 +161,8 @@ export class BeaconSenderImpl implements BeaconSender {
                 this.appId,
                 entry.communicationState.serverId,
                 entry.communicationState.timestamp,
+                this.deviceId,
+                entry.session.sessionId,
             ),
         );
 
@@ -200,6 +204,8 @@ export class BeaconSenderImpl implements BeaconSender {
                 this.appId,
                 entry.communicationState.serverId,
                 entry.communicationState.timestamp,
+                this.deviceId,
+                entry.session.sessionId,
             );
 
             const response = await this.channel.sendPayloadData(

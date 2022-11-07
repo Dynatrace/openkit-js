@@ -34,11 +34,30 @@ describe('HttpUrlBuilder', () => {
             'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&cts=5&resp=json',
         );
     });
+
     it('should build the status request url for a new session', () => {
         const url = buildHttpUrl('https://example.com', request, true);
 
         expect(url).toEqual(
             'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&cts=5&resp=json&ns=1',
+        );
+    });
+
+    it('should build the status request url including session identifier', () => {
+        const request: StatusRequest = {
+            agentTechnologyType: 'okjs',
+            applicationId: '7.0.000',
+            openKitVersion: '1.0',
+            platformType: 1,
+            serverId: 5,
+            timestamp: 5,
+            sessionIdentifier: '1_1',
+        };
+
+        const url = buildHttpUrl('https://example.com', request, false);
+
+        expect(url).toEqual(
+            'https://example.com?type=m&srvid=5&app=7.0.000&va=1.0&pt=1&tt=okjs&cts=5&resp=json&si=1_1',
         );
     });
 });

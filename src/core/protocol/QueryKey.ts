@@ -24,4 +24,5 @@ export const enum QueryKey {
     NewSession = 'ns',
     ConfigurationTimestamp = 'cts',
     ResponseFormat = 'resp',
+    SessionIdentifier = 'si',
 }

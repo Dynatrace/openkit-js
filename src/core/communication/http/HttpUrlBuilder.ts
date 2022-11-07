@@ -32,5 +32,9 @@ export const buildHttpUrl = (
         .add(QueryKey.AgentTechnologyType, statusRequest.agentTechnologyType)
         .add(QueryKey.ConfigurationTimestamp, statusRequest.timestamp)
         .add(QueryKey.ResponseFormat, 'json')
+        .addIfDefined(
+            QueryKey.SessionIdentifier,
+            statusRequest.sessionIdentifier,
+        )
         .addIfDefined(QueryKey.NewSession, newSession ? 1 : undefined)
         .build();

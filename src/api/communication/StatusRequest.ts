@@ -48,4 +48,9 @@ export interface StatusRequest {
      * 0 ms when no configuration was yet received.
      */
     readonly timestamp: number;
+
+    /**
+     * Contains visitor and session id. It is required to determine a new server id, when value sent with srvid is down.
+     */
+    readonly sessionIdentifier?: string;
 }

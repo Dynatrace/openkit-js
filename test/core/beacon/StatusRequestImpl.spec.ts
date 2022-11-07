@@ -60,6 +60,50 @@ describe('StatusRequestImpl', () => {
         expect(request.timestamp).toEqual(23);
     });
 
+    it('should not return a session identifier when session id is undefined', () => {
+        const request = new StatusRequestImpl(
+            'agentTechnology',
+            'app-id',
+            'version',
+            7,
+            42,
+            23,
+            'device',
+        );
+
+        expect(request.sessionIdentifier).toEqual(undefined);
+    });
+
+    it('should not return a session identifier when device id is undefined', () => {
+        const request = new StatusRequestImpl(
+            'agentTechnology',
+            'app-id',
+            'version',
+            7,
+            42,
+            23,
+            undefined,
+            123,
+        );
+
+        expect(request.sessionIdentifier).toEqual(undefined);
+    });
+
+    it('should return a session identifier when session and device id are set', () => {
+        const request = new StatusRequestImpl(
+            'agentTechnology',
+            'app-id',
+            'version',
+            7,
+            42,
+            23,
+            '123',
+            123,
+        );
+
+        expect(request.sessionIdentifier).toEqual('123_123');
+    });
+
     it('should create the request from a state', () => {
         request = StatusRequestImpl.create('app-id', 8, 42);
 
@@ -69,5 +113,6 @@ describe('StatusRequestImpl', () => {
         expect(request.platformType).toEqual(platformTypeOpenKit);
         expect(request.serverId).toBe(8);
         expect(request.timestamp).toBe(42);
+        expect(request.sessionIdentifier).toBe(undefined);
     });
 });
