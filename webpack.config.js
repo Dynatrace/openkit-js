@@ -10,6 +10,13 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
+        alias: {
+            [path.resolve(__dirname, 'src/core/utils/TextEncoderUtil.ts')]:
+                path.resolve(
+                    __dirname,
+                    'src/core/utils/TextEncoderUtilPolyfill.ts',
+                ),
+        },
     },
     module: {
         rules: [

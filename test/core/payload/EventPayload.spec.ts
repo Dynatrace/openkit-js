@@ -367,6 +367,22 @@ describe('EventPayload', () => {
             expect(payload).toContain('dt.rum.application.id');
             expect(payload).toContain('customName');
         });
+
+        it('should not contain size attribute', () => {
+            // given
+            const predefinedAttributes = {
+                'event.name': 'predefined',
+            };
+
+            // then
+            const payload = eventPayload.getCustomEventsPayload(
+                'customName',
+                predefinedAttributes,
+                1234,
+            );
+
+            expect(payload).not.toContain('dt.rum.custom_attributes_size');
+        });
     });
 
     describe('getBizEventsPayload', () => {
@@ -719,6 +735,40 @@ describe('EventPayload', () => {
 
             expect(payload).toContain('dt.rum.application.id');
             expect(payload).toContain('customType');
+        });
+
+        it('should calculate the size of the incoming attributes', () => {
+            // given
+            const predefinedAttributes = {
+                'ga.status': 'green',
+            };
+
+            // then
+            const payload = eventPayload.getBizEventsPayload(
+                'Klaus',
+                predefinedAttributes,
+                1234,
+            );
+            const payloadJson = JSON.parse(payload);
+
+            expect(payloadJson['dt.rum.custom_attributes_size']).toEqual(42);
+        });
+
+        it('should not be possible to override dt.rum.custom_attributes_size', () => {
+            // given
+            const predefinedAttributes = {
+                'dt.rum.custom_attributes_size': 'overridden',
+            };
+
+            // then
+            const payload = eventPayload.getBizEventsPayload(
+                'customType',
+                predefinedAttributes,
+                1234,
+            );
+            const payloadJson = JSON.parse(payload);
+
+            expect(payloadJson['dt.rum.custom_attributes_size']).toEqual(72);
         });
     });
 });

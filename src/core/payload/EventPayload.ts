@@ -1,11 +1,10 @@
 import { JSONObject, Logger } from '../../api';
 import { Configuration } from '../config/Configuration';
-import { openKitVersion } from '../PlatformConstants';
 import {
     defaultTimestampProvider,
     TimestampProvider,
 } from '../provider/TimestampProvider';
-import { isNode } from '../utils/Utils';
+import { lengthInUtf8Bytes } from '../utils/TextEncoderUtil';
 import {
     APP_VERSION,
     DEVICE_MANUFACTURER,
@@ -35,6 +34,12 @@ export class EventPayload {
     ): string {
         const internalAttributes = { ...attributes };
 
+        this.addNonOverridableAttribute(internalAttributes, 'event.type', type);
+
+        const sizePayload = lengthInUtf8Bytes(
+            this.getJsonStringPayload(internalAttributes),
+        );
+
         this.addBasicEventData(internalAttributes, session);
 
         if (internalAttributes['event.name'] === undefined) {
@@ -45,12 +50,16 @@ export class EventPayload {
             );
         }
 
-        this.addNonOverridableAttribute(internalAttributes, 'event.type', type);
-
         this.addNonOverridableAttribute(
             internalAttributes,
             EVENT_KIND,
             EVENT_KIND_BIZ,
+        );
+
+        this.addNonOverridableAttribute(
+            internalAttributes,
+            'dt.rum.custom_attributes_size',
+            sizePayload,
         );
 
         return this.getJsonStringPayload(internalAttributes);
