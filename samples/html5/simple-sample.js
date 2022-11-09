@@ -40,7 +40,6 @@ async function createMainOpenKit(
 ) {
     // create an OpenKit instance
     const openkit = new OpenKitBuilder(endpointURL, applicationID, deviceID)
-        .withApplicationName('exampleApp')
         .withApplicationVersion('1.0')
         .withOperatingSystem('windows')
         .build();
