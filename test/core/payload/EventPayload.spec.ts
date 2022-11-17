@@ -128,7 +128,7 @@ describe('EventPayload', () => {
             expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
             expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.0');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             // Not available as they are not provided in the config
@@ -205,7 +205,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.0');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
         });
 
         it('should be possible to override event.provider', () => {
@@ -409,7 +409,7 @@ describe('EventPayload', () => {
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
             expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.0');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             expect(payloadJson['app.version']).toEqual('1.0');
@@ -420,9 +420,7 @@ describe('EventPayload', () => {
 
         it('should provide only enrichment data which is available', () => {
             // given
-            const predefinedAttributes = {
-                'event.name': 'predefined',
-            };
+            const predefinedAttributes = {};
 
             const configAll = {
                 openKit: {
@@ -455,7 +453,6 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['event.name']).toEqual('predefined');
             expect(payloadJson['event.type']).toEqual('customType');
             expect(payloadJson.timestamp).toEqual(7000000);
             expect(payloadJson['dt.rum.application.id']).toEqual(
@@ -464,7 +461,7 @@ describe('EventPayload', () => {
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
             expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.0');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             // Not available as they are not provided in the config
@@ -472,22 +469,6 @@ describe('EventPayload', () => {
             expect(payloadJson['os.name']).toEqual(undefined);
             expect(payloadJson['device.manufacturer']).toEqual(undefined);
             expect(payloadJson['device.model.identifier']).toEqual(undefined);
-        });
-
-        it('should take the type as name if name is not available', () => {
-            // given
-            const predefinedAttributes = {};
-
-            // then
-            const payload = eventPayload.getBizEventsPayload(
-                'customType',
-                predefinedAttributes,
-                1234,
-            );
-            const payloadJson = JSON.parse(payload);
-
-            expect(payloadJson['event.name']).toEqual('customType');
-            expect(payloadJson['event.type']).toEqual('customType');
         });
 
         it('should not be possible to override dt.rum.sid', () => {
@@ -557,7 +538,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.0');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
         });
 
         it('should be possible to override event.provider', () => {

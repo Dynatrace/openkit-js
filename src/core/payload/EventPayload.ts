@@ -42,14 +42,6 @@ export class EventPayload {
 
         this.addBasicEventData(internalAttributes, session);
 
-        if (internalAttributes['event.name'] === undefined) {
-            this.addNonOverridableAttribute(
-                internalAttributes,
-                'event.name',
-                type,
-            );
-        }
-
         this.addNonOverridableAttribute(
             internalAttributes,
             EVENT_KIND,
@@ -111,7 +103,7 @@ export class EventPayload {
         this.addNonOverridableAttribute(
             attributes,
             'dt.rum.schema_version',
-            '1.0',
+            '1.1',
         );
         this.addNonOverridableAttribute(
             attributes,
