@@ -1,6 +1,8 @@
 # Dynatrace OpenKit - JavaScript Reference Implementation
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Build Status](https://github.com/Dynatrace/openkit-js/actions/workflows/build.yml/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/Dynatrace/openkit-js/badge.svg?branch=main)](https://coveralls.io/github/TheHighriser/openkit-js?branch=main)
 
 :information_source: We changed the default branch name to `main`. You can find the necessary steps to update your local clone on [Scott Hanselman's Blog](https://www.hanselman.com/blog/EasilyRenameYourGitDefaultBranchFromMasterToMain.aspx).  
 We encourage you to rename the default branch in your forks too.
