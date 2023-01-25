@@ -64,6 +64,13 @@ describe('OverloadPreventionState', () => {
             client: instance(httpClientMock),
             stateMachine: instance(httpCommunicationChannelMock),
         };
+
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
     });
 
     it('should not redirect sendStatusRequest to a httpclient', async () => {
