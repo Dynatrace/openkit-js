@@ -15,8 +15,8 @@
  */
 
 type Primitive = string | number | boolean;
-type JSONArray = JSONValue[];
-type JSONValue = Primitive | JSONArray | JSONObject;
+export type JSONArray = JSONValue[];
+export type JSONValue = Primitive | JSONArray | JSONObject;
 
 /**
  * JSON Object which can be used for sendEvent API

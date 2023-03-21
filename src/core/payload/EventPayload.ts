@@ -1,9 +1,26 @@
+/*
+ * Copyright 2023 Dynatrace LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { JSONObject, Logger } from '../../api';
 import { Configuration } from '../config/Configuration';
 import {
     defaultTimestampProvider,
     TimestampProvider,
 } from '../provider/TimestampProvider';
+import { isEventContainingNonFiniteNumericValues } from '../utils/EventPayloadUtils';
 import { lengthInUtf8Bytes } from '../utils/TextEncoderUtil';
 import {
     APP_VERSION,
@@ -37,7 +54,7 @@ export class EventPayload {
         this.addNonOverridableAttribute(internalAttributes, 'event.type', type);
 
         const sizePayload = lengthInUtf8Bytes(
-            this.getJsonStringPayload(internalAttributes),
+            JSON.stringify(internalAttributes),
         );
 
         this.addBasicEventData(internalAttributes, session);
@@ -54,7 +71,15 @@ export class EventPayload {
             sizePayload,
         );
 
-        return this.getJsonStringPayload(internalAttributes);
+        if(isEventContainingNonFiniteNumericValues(internalAttributes)){
+            this.addNonOverridableAttribute(
+                internalAttributes,
+                'dt.rum.has_nfn_values',
+                true
+            );
+        }
+
+        return JSON.stringify(internalAttributes);
     }
 
     public getCustomEventsPayload(
@@ -74,21 +99,15 @@ export class EventPayload {
             EVENT_KIND_RUM,
         );
 
-        return this.getJsonStringPayload(internalAttributes);
-    }
+        if(isEventContainingNonFiniteNumericValues(internalAttributes)){
+            this.addNonOverridableAttribute(
+                internalAttributes,
+                'dt.rum.has_nfn_values',
+                true
+            );
+        }
 
-    private getJsonStringPayload(attributes: JSONObject): string {
-        return JSON.stringify({ ...attributes }, (key, value) => {
-            if (
-                Number.isNaN(value) ||
-                value === Infinity ||
-                value === -Infinity
-            ) {
-                return;
-            }
-
-            return value;
-        });
+        return JSON.stringify(internalAttributes);
     }
 
     private addBasicEventData(attributes: JSONObject, session: number): void {
@@ -103,7 +122,7 @@ export class EventPayload {
         this.addNonOverridableAttribute(
             attributes,
             'dt.rum.schema_version',
-            '1.1',
+            '1.2',
         );
         this.addNonOverridableAttribute(
             attributes,

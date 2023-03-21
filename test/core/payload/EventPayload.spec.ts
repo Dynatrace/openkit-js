@@ -7,7 +7,6 @@ import { HttpCommunicationChannel } from '../../../src/core/communication/http/s
 import { Configuration } from '../../../src/core/config/Configuration';
 import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFactory';
 import { EventPayload } from '../../../src/core/payload/EventPayload';
-import { openKitVersion } from '../../../src/core/PlatformConstants';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
 
@@ -128,7 +127,7 @@ describe('EventPayload', () => {
             expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
             expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             // Not available as they are not provided in the config
@@ -205,7 +204,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
         });
 
         it('should be possible to override event.provider', () => {
@@ -383,6 +382,24 @@ describe('EventPayload', () => {
 
             expect(payload).not.toContain('dt.rum.custom_attributes_size');
         });
+
+        it('should contain dt.rum.has_nfn_values when using nfn value', () => {
+            // given
+            const predefinedAttributes = {
+                custom: NaN,
+            };
+
+            // then
+            const payload = eventPayload.getCustomEventsPayload(
+                'customName',
+                predefinedAttributes,
+                1234,
+            );
+            const payloadJson = JSON.parse(payload);
+
+            expect(payloadJson.custom).toEqual(null);
+            expect(payloadJson['dt.rum.has_nfn_values']).toEqual(true);
+        });
     });
 
     describe('getBizEventsPayload', () => {
@@ -409,7 +426,7 @@ describe('EventPayload', () => {
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
             expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             expect(payloadJson['app.version']).toEqual('1.0');
@@ -461,7 +478,7 @@ describe('EventPayload', () => {
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
             expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             // Not available as they are not provided in the config
@@ -538,7 +555,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.1');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
         });
 
         it('should be possible to override event.provider', () => {
@@ -750,6 +767,40 @@ describe('EventPayload', () => {
             const payloadJson = JSON.parse(payload);
 
             expect(payloadJson['dt.rum.custom_attributes_size']).toEqual(72);
+        });
+
+        it('should contain dt.rum.has_nfn_values when using nfn value', () => {
+            // given
+            const predefinedAttributes = {
+                custom: NaN,
+            };
+
+            // then
+            const payload = eventPayload.getBizEventsPayload(
+                'customType',
+                predefinedAttributes,
+                1234,
+            );
+            const payloadJson = JSON.parse(payload);
+
+            expect(payloadJson.custom).toEqual(null);
+            expect(payloadJson['dt.rum.has_nfn_values']).toEqual(true);
+        });
+    });
+
+    describe('JSON Stringify', () => {
+
+        it('should not change array length when stringify Nfn values', () => {
+            const strArr = JSON.stringify({
+                a: [Number.POSITIVE_INFINITY, 1, Number.NEGATIVE_INFINITY, 2, Number.NaN],
+            });
+
+            const jsonArr = JSON.parse(strArr);
+
+            expect(jsonArr.a.length).toBe(5);
+            expect(jsonArr.a[0]).toBe(null);
+            expect(jsonArr.a[2]).toBe(null);
+            expect(jsonArr.a[4]).toBe(null);
         });
     });
 });

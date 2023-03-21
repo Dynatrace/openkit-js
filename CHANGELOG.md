@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.0.0...HEAD)
 
+### Changed
+
+-   Non-finite numeric values are serialized as JSON null in reported events, and a special field is added for supportability.
+
 ## 2.0.0 [Release date: 2022-11-09]
 
 [GitHub Releases](https://github.com/Dynatrace/openkit-js/releases/tag/v2.0.0)
