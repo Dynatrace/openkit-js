@@ -510,39 +510,9 @@ describe('SessionImpl', () => {
             verify(payloadBuilder.sendEvent(anything())).never();
         });
 
-        it('should not be possible to send an biz event if DCL = Off', () => {
+        it('should be possible to send an biz event if DCL = Off', () => {
             // given
             config.dataCollectionLevel = DataCollectionLevel.Off;
-
-            // when
-            session.sendBizEvent('type', {});
-
-            // then
-            verify(payloadBuilder.sendEvent(anything())).never();
-        });
-
-        it('should be able to send an biz event if DCL = Performance', () => {
-            // given
-            config.dataCollectionLevel = DataCollectionLevel.Performance;
-
-            // when
-            when(
-                eventsPayload.getBizEventsPayload(
-                    anyString(),
-                    anything(),
-                    anyNumber(),
-                ),
-            ).thenReturn('Payload');
-
-            session.sendBizEvent('type', {});
-
-            // then
-            verify(payloadBuilder.sendEvent(anything())).once();
-        });
-
-        it('should be able to send an biz event if DCL = UserBehavior', () => {
-            // given
-            config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
 
             // when
             when(

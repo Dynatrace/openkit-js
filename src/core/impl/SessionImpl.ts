@@ -273,8 +273,7 @@ export class SessionImpl implements Session {
      */
     public sendBizEvent(type: string, attributes: JSONObject): void {
         if (
-            this.isShutdown() ||
-            this.config.dataCollectionLevel === DataCollectionLevel.Off
+            this.isShutdown()
         ) {
             return;
         }
