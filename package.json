@@ -49,7 +49,7 @@
         "yarn": "^1.22.15"
     },
     "dependencies": {
-        "axios": "^0.27.2"
+        "axios": "^1.4.0"
     },
     "resolutions": {
         "minimist": "^1.2.0"

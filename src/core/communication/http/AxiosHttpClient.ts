@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import Axios, { AxiosResponse } from 'axios';
+import axios, { AxiosHeaders, AxiosResponse } from 'axios';
 import { Logger, LoggerFactory } from '../../../api';
 import { openKitVersion } from '../../../core/PlatformConstants';
 import { HttpClient, HttpResponse } from './HttpClient';
@@ -28,7 +28,7 @@ export class AxiosHttpClient implements HttpClient {
 
     public async get(url: string): Promise<HttpResponse> {
         this.logger.debug('GET', url);
-        const response = await Axios.get<string>(url, {
+        const response = await axios.get<string>(url, {
             transformResponse: [],
             headers: {
                 'User-Agent': 'OpenKit/' + openKitVersion,
@@ -40,7 +40,7 @@ export class AxiosHttpClient implements HttpClient {
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
         this.logger.debug('POST', url, payload);
-        const response = await Axios.post<string>(url, payload, {
+        const response = await axios.post<string>(url, payload, {
             transformResponse: [],
             headers: {
                 'User-Agent': 'OpenKit/' + openKitVersion,
@@ -56,10 +56,18 @@ export class AxiosHttpClient implements HttpClient {
             payload: response.data,
         });
 
+        const headers: Record<string, string> = {};
+
+        Object.entries(response.headers).forEach(([key, value]) => {
+            if (value != null) {
+                headers[key] = value.toString();
+            }
+        });
+
         return {
             status: response.status,
             payload: response.data,
-            headers: response.headers,
+            headers,
         };
     }
 }
