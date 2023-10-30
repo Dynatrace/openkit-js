@@ -1,9 +1,16 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.1.0...HEAD)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.2.0...HEAD)
+
+## 2.2.0 [Release date: 2023-10-30]
 
 ### Changed
-- `Session.sendBizEvent` will always send an event regardless of the `DataCollectionLevel` 
+
+-   `Session.sendBizEvent` will always send an event regardless of the `DataCollectionLevel`
+
+### Security
+
+-   Update vulnerable axios dependency (See https://security.snyk.io/vuln/SNYK-JS-AXIOS-6032459)
 
 ## 2.1.0 [Release date: 2023-06-05]
 
