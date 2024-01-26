@@ -16,7 +16,7 @@
  */
 
 import { Action, Session } from '@dynatrace/openkit-js';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 /**
  * Issues a GET request with X-dynaTrace header and fills tracer with response data.
@@ -37,7 +37,9 @@ export const makeGetRequest = async (
     const tracer = action.traceWebRequest(url);
 
     // add dynatrace tag to headers
-    const headers = { 'X-dynaTrace': tracer.getTag() };
+    const headers = new AxiosHeaders({
+        'X-dynaTrace': tracer.getTag(),
+    });
 
     // prepare web request
     const requestConfig: AxiosRequestConfig = { headers };
@@ -49,16 +51,18 @@ export const makeGetRequest = async (
         // initiate the request
         response = await axios.get(url, requestConfig);
 
-        // axios does not expose the request headers, private API has to be used if needed
-        const requestHeader = response.request.socket._httpMessage._header;
+        if (response !== undefined) {
+            // axios does not expose the request headers, private API has to be used if needed
+            const requestHeader = response.request.socket._httpMessage._header;
 
-        // set bytesSent, bytesReceived
-        tracer
-            .setBytesSent(Buffer.byteLength(requestHeader)) // bytes sent
-            .setBytesReceived(approximateResponseBytes(response)); // bytes processed
+            // set bytesSent, bytesReceived
+            tracer
+                .setBytesSent(Buffer.byteLength(requestHeader)) // bytes sent
+                .setBytesReceived(approximateResponseBytes(response)); // bytes processed
 
-        // set response code and stop the tracer
-        tracer.stop(response.status);
+            // set response code and stop the tracer
+            tracer.stop(response.status);
+        }
     } catch (e) {
         if (session !== undefined) {
             // Report HTTP issue as crash
