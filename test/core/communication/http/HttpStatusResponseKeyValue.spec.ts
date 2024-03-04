@@ -178,5 +178,39 @@ describe('HttpStatusResponse', () => {
                 expect(response.serverId).toBe(5);
             });
         });
+
+        describe('TrafficControl', () => {
+            it('should be 100 if the value is higher than 100', () => {
+                const response = new HttpStatusResponseKeyValue(
+                    { status: 200, payload: 'type=m&tc=155', headers: {} },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(100);
+            });
+
+            it('should be 100 if the value is negative', () => {
+                const response = new HttpStatusResponseKeyValue(
+                    { status: 200, payload: 'type=m&tc=-1', headers: {} },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(100);
+            });
+
+            it('should be 100 if the value is NaN', () => {
+                const response = new HttpStatusResponseKeyValue(
+                    { status: 200, payload: 'type=m&tc=l33t', headers: {} },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(100);
+            });
+
+            it('should be the value passed in', () => {
+                const response = new HttpStatusResponseKeyValue(
+                    { status: 200, payload: 'type=m&tc=5', headers: {} },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(5);
+            });
+        });
     });
 });

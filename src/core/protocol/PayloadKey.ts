@@ -25,6 +25,7 @@ export const enum PayloadKey {
     SessionNumber = 'sn',
     ClientIpAddress = 'ip',
     Multiplicity = 'mp',
+    TrafficControl = 'tc',
     DataCollectionLevel = 'dl',
     CrashReportingLevel = 'cl',
 

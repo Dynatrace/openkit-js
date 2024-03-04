@@ -25,6 +25,15 @@ const parsePositiveInt = (str: string, defaultValue: number): number => {
     return parsed >= 0 ? parsed : defaultValue;
 };
 
+const parsePositiveIntWithMaxValue = (
+    str: string,
+    defaultValue: number,
+    maxValue: number,
+): number => {
+    const parsedNumber = parsePositiveInt(str, defaultValue);
+    return Math.min(parsedNumber, maxValue);
+};
+
 /**
  * Class which is checking the old key value response and is sanitizing
  * the values if they are wrong.
@@ -79,6 +88,14 @@ export class HttpStatusResponseKeyValue extends HttpStatusResponseBase {
 
             case ResponseKey.ServerId:
                 this.serverId = parsePositiveInt(value, 1);
+                break;
+
+            case ResponseKey.TrafficControl:
+                this.trafficControlPercentage = parsePositiveIntWithMaxValue(
+                    value,
+                    100,
+                    100,
+                );
                 break;
         }
     }

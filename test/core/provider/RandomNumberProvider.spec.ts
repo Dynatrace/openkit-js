@@ -31,4 +31,10 @@ describe('DefaultRandomNumberProvider', () => {
 
         expect(random.nextPositiveInteger()).toBe(next);
     });
+
+    it('should return the next random percentage value', () => {
+        const next = random.nextPercentageValue();
+        expect(next).toBeGreaterThanOrEqual(0);
+        expect(next).toBeLessThanOrEqual(100);
+    });
 });

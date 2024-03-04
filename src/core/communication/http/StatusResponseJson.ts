@@ -74,6 +74,12 @@ export interface AppConfig {
      * The application which this configuration applies to.
      */
     readonly applicationId?: string;
+
+    /**
+     * traffic control percentage. Ranges from 1 to 100. Default is 100.
+     * 0 is not allowed as it is the same as capture=0.
+     */
+    readonly trafficControlPercentage?: number;
 }
 
 export interface DynamicConfig {

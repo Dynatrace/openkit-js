@@ -141,7 +141,8 @@ export class OpenKitImpl implements OpenKit {
         this.logger.debug('createSession', { clientIP });
 
         const sessionId = this.createSessionId();
-        const sessionStartTime = defaultTimestampProvider.getCurrentTimestampMs();
+        const sessionStartTime =
+            defaultTimestampProvider.getCurrentTimestampMs();
         const sessionPrefix = StaticPayloadBuilder.sessionPrefix(
             this.applicationWidePrefix,
             sessionId,
@@ -154,9 +155,12 @@ export class OpenKitImpl implements OpenKit {
         );
         const supplementaryBasicData = new SupplementaryBasicDataImpl();
 
+        const trafficControlPercentage =
+            this.config.openKit.random.nextPercentageValue();
         const payloadBuilder = new PayloadBuilder(
             communicationState,
             supplementaryBasicData,
+            trafficControlPercentage,
         );
         const eventsPayload = new EventPayload(
             this.config,

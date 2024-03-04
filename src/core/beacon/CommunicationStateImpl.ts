@@ -22,6 +22,7 @@ const defaultMaxBeaconSize = 30720; // 30 * 1024
 const defaultMultiplicity = 1;
 const defaultCaptureErrors = CaptureMode.On;
 const defaultCrashReportingMode = CaptureMode.On;
+const defaultTrafficControl = 100;
 
 export class CommunicationStateImpl implements CommunicationState {
     public serverId: number = defaultServerId;
@@ -29,6 +30,7 @@ export class CommunicationStateImpl implements CommunicationState {
     public multiplicity: number = defaultMultiplicity;
     public captureCrashes: CaptureMode = defaultCrashReportingMode;
     public captureErrors: CaptureMode = defaultCaptureErrors;
+    public trafficControlPercentage: number = defaultTrafficControl;
     public capture: CaptureMode = CaptureMode.On;
     public timestamp: number = 0;
     private serverIdLocked: boolean;
@@ -100,6 +102,11 @@ export class CommunicationStateImpl implements CommunicationState {
         // Timestap
         if (response.timestamp !== undefined) {
             this.timestamp = response.timestamp;
+        }
+
+        // Traffic Control
+        if (response.trafficControlPercentage !== undefined) {
+            this.trafficControlPercentage = response.trafficControlPercentage;
         }
     }
 

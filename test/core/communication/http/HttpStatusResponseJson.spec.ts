@@ -347,6 +347,60 @@ describe('HttpStatusResponseJson', () => {
             });
         });
 
+        describe('Traffic Control', () => {
+            it('should be 100 if the value is negative', () => {
+                const response = new HttpStatusResponseJson(
+                    {
+                        status: 200,
+                        payload:
+                            '{ "appConfig": { "trafficControlPercentage" : -1 } }',
+                        headers: {},
+                    },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(100);
+            });
+
+            it('should be 100 if the value is higher than 100', () => {
+                const response = new HttpStatusResponseJson(
+                    {
+                        status: 200,
+                        payload:
+                            '{ "appConfig": { "trafficControlPercentage" : 155 } }',
+                        headers: {},
+                    },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(100);
+            });
+
+            it('should be 100 if the value is NaN', () => {
+                const response = new HttpStatusResponseJson(
+                    {
+                        status: 200,
+                        payload:
+                            '{ "appConfig": { "trafficControlPercentage" : "l33t" } }',
+                        headers: {},
+                    },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(100);
+            });
+
+            it('should be the value passed in', () => {
+                const response = new HttpStatusResponseJson(
+                    {
+                        status: 200,
+                        payload:
+                            '{ "appConfig": { "trafficControlPercentage" : 55 } }',
+                        headers: {},
+                    },
+                    defaultNullLoggerFactory,
+                );
+                expect(response.trafficControlPercentage).toBe(55);
+            });
+        });
+
         describe('Application Id', () => {
             it('should be the value passed in', () => {
                 const response = new HttpStatusResponseJson(

@@ -22,4 +22,9 @@ export interface RandomNumberProvider {
      * Generates a random number between 0 and 2**31, inclusive.
      */
     nextPositiveInteger(): number;
+
+    /**
+     * Returns a positive random integer number in range [{@code 0}, {@code 100}).
+     */
+    nextPercentageValue(): number;
 }

@@ -28,6 +28,7 @@ export abstract class HttpStatusResponseBase implements StatusResponse {
     public captureMode: CaptureMode | undefined;
     public maxBeaconSizeInKb: number | undefined;
     public multiplicity: number | undefined;
+    public trafficControlPercentage: number | undefined;
     public serverId: number | undefined;
 
     public valid = true;

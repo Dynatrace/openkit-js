@@ -2,6 +2,14 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.2.0...HEAD)
 
+### Added
+
+-   Traffic Control will be read and used when sending data
+
+### Improved
+
+-   When a session already contained data but was not fully initialized, data will be cleared when capturing off is received
+
 ## 2.2.0 [Release date: 2023-10-30]
 
 ### Changed

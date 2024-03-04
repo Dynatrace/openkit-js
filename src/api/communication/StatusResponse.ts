@@ -57,6 +57,11 @@ export interface StatusResponse {
     readonly multiplicity?: number;
 
     /**
+     * traffic control percentage.
+     */
+    readonly trafficControlPercentage?: number;
+
+    /**
      * The application which this configuration applies to.
      */
     readonly applicationId?: string;

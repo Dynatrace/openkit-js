@@ -53,6 +53,10 @@ describe('CommunicationStateImpl', () => {
         it('should return a configuration timestamp of 0', () => {
             expect(state.timestamp).toBe(CaptureMode.On);
         });
+
+        it('should return a traffic control value of 100', () => {
+            expect(state.trafficControlPercentage).toBe(100);
+        });
     });
 
     describe('updateState with a status request', () => {
@@ -74,6 +78,14 @@ describe('CommunicationStateImpl', () => {
         it('should update timestamp', () => {
             state.updateFromResponse({ valid: true, timestamp: 7 });
             expect(state.timestamp).toBe(7);
+        });
+
+        it('should update traffic control', () => {
+            state.updateFromResponse({
+                valid: true,
+                trafficControlPercentage: 7,
+            });
+            expect(state.trafficControlPercentage).toBe(7);
         });
 
         it('should not update any values, if the status is not 200', () => {

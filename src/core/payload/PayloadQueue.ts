@@ -38,4 +38,8 @@ export class PayloadQueue {
     public _getCurrentQueue(): Payload[] {
         return this.queue.slice(0);
     }
+
+    public clearQueue(): void {
+        this.queue.splice(0, this.queue.length);
+    }
 }

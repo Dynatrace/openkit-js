@@ -187,7 +187,12 @@ export class BeaconSenderImpl implements BeaconSender {
         const entries = this.cache.getAllInitializedSessions();
 
         for (const entry of entries) {
-            await this.sendPayload(entry);
+            if (!entry.builder.isCaptureDisabled()) {
+                await this.sendPayload(entry);
+            } else {
+                // Clear Data
+                entry.builder.clearPayload();
+            }
         }
     }
 

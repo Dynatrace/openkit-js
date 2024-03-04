@@ -21,6 +21,15 @@ import { StatusResponseJson, Status } from './StatusResponseJson';
 const checkNumber = (num: number, defaultValue: number): number =>
     num >= 0 ? num : defaultValue;
 
+const checkNumberWithMaxValue = (
+    num: number,
+    defaultValue: number,
+    maxValue: number,
+): number => {
+    const value = checkNumber(num, defaultValue);
+    return Math.min(value, maxValue);
+};
+
 /**
  * Class which is checking the json response and is sanitizing
  * the values if they are wrong.
@@ -107,6 +116,17 @@ export class HttpStatusResponseJson extends HttpStatusResponseBase {
                         jsonResponse.appConfig.reportErrors === 1
                             ? CaptureMode.On
                             : CaptureMode.Off;
+                }
+
+                if (
+                    jsonResponse.appConfig.trafficControlPercentage !==
+                    undefined
+                ) {
+                    this.trafficControlPercentage = checkNumberWithMaxValue(
+                        jsonResponse.appConfig.trafficControlPercentage,
+                        100,
+                        100,
+                    );
                 }
             }
 

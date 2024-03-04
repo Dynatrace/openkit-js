@@ -33,6 +33,7 @@ export class PayloadBuilder {
     constructor(
         private readonly commState: CommunicationState,
         private readonly supplementaryBasicData: SupplementaryBasicData,
+        private readonly trafficControlPercentage: number,
     ) {}
 
     public reportNamedEvent(
@@ -277,6 +278,18 @@ export class PayloadBuilder {
         return this.queue;
     }
 
+    public isCaptureDisabled(): boolean {
+        return (
+            this.commState.capture === CaptureMode.Off ||
+            this.trafficControlPercentage >=
+                this.commState.trafficControlPercentage
+        );
+    }
+
+    public clearPayload(): void {
+        this.queue.clearQueue();
+    }
+
     private getCompletePrefix(
         prefix: Payload,
         transmissionTime: number,
@@ -289,10 +302,6 @@ export class PayloadBuilder {
         );
 
         return combinePayloads(prefix, mutable);
-    }
-
-    private isCaptureDisabled(): boolean {
-        return this.commState.capture === CaptureMode.Off;
     }
 
     private isCaptureErrorsDisabled(): boolean {

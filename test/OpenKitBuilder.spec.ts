@@ -192,6 +192,7 @@ describe('OpenKitBuilder', () => {
     describe('deviceId', () => {
         const randomNumberProvider: RandomNumberProvider = {
             nextPositiveInteger: () => 1337,
+            nextPercentageValue: () => 100,
         };
 
         it('should generate a random device id, if the id is not a numeric string', () => {

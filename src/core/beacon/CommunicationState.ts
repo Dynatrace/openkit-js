@@ -48,6 +48,11 @@ export interface CommunicationState {
     readonly capture: CaptureMode;
 
     /**
+     * traffic control percentage.
+     */
+    readonly trafficControlPercentage: number;
+
+    /**
      * Timestamp of the current configuration
      */
     readonly timestamp: number;

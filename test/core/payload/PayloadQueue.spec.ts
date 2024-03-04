@@ -98,4 +98,11 @@ describe('PayloadQueue', () => {
         expect(e1).toBeUndefined();
         expect(e2).toBeUndefined();
     });
+
+    it('should be empty when clearing the queue', () => {
+        queue.push('payload-1');
+        expect(queue.isEmpty()).toBeFalsy();
+        queue.clearQueue();
+        expect(queue.isEmpty()).toBeTruthy();
+    });
 });

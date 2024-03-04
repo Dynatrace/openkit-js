@@ -21,4 +21,5 @@ export const enum ResponseKey {
     CaptureErrors = 'er',
     CaptureCrashes = 'cr',
     Multiplicity = 'mp',
+    TrafficControl = 'tc',
 }

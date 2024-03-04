@@ -57,6 +57,7 @@ describe('ImmediateSendingStrategy', () => {
         const builder = new PayloadBuilder(
             {} as CommunicationState,
             new SupplementaryBasicDataImpl(),
+            100,
         );
         const builderSpy = spy(builder);
 

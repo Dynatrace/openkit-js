@@ -34,10 +34,13 @@ describe('PayloadBuilder', () => {
         builder = new PayloadBuilder(
             instance(state),
             new SupplementaryBasicDataImpl(),
+            50,
         );
         builderSpy = spy(builder);
 
         staticBuilderSpy = spy(StaticPayloadBuilder);
+
+        when(state.trafficControlPercentage).thenReturn(51);
     });
 
     describe('reportCrash', () => {
@@ -66,6 +69,28 @@ describe('PayloadBuilder', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.On);
             when(state.captureCrashes).thenReturn(CaptureMode.Off);
+
+            // when
+            builder.reportCrash('name', 'reason', 'stack', 6, 100);
+
+            // then
+            verify(
+                staticBuilderSpy.reportCrash(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.captureCrashes).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
 
             // when
             builder.reportCrash('name', 'reason', 'stack', 6, 100);
@@ -180,6 +205,26 @@ describe('PayloadBuilder', () => {
             verify(builderSpy._push(anything())).never();
         });
 
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // when
+            builder.reportNamedEvent('name', 5, 6, 100);
+
+            // then
+            verify(
+                staticBuilderSpy.reportNamedEvent(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
         it('should build the payload and add it to the queue', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.On);
@@ -244,6 +289,28 @@ describe('PayloadBuilder', () => {
             verify(builderSpy._push(anything())).never();
         });
 
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.captureErrors).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // when
+            builder.reportError('name', 200, 6, 100, 500);
+
+            // then
+            verify(
+                staticBuilderSpy.reportError(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
         it('should build the payload and add it to the queue', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.On);
@@ -273,6 +340,27 @@ describe('PayloadBuilder', () => {
         it('should not create the payload if capture is disabled', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.Off);
+
+            // when
+            builder.reportValue('name', 5, 6, 100, 500);
+
+            // then
+            verify(
+                staticBuilderSpy.reportValue(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
 
             // when
             builder.reportValue('name', 5, 6, 100, 500);
@@ -331,6 +419,25 @@ describe('PayloadBuilder', () => {
             verify(builderSpy._push(anything())).never();
         });
 
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // when
+            builder.identifyUser('name', 5, 6);
+
+            // then
+            verify(
+                staticBuilderSpy.identifyUser(
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
         it('should build the payload and add it to the queue', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.On);
@@ -355,6 +462,28 @@ describe('PayloadBuilder', () => {
         it('should not create the payload if capture is disabled', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.Off);
+
+            // when
+            builder.action('name', 5, 6, 7, 600, 1000);
+
+            // then
+            verify(
+                staticBuilderSpy.action(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
 
             // when
             builder.action('name', 5, 6, 7, 600, 1000);
@@ -409,6 +538,19 @@ describe('PayloadBuilder', () => {
             verify(builderSpy._push(anything())).never();
         });
 
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // when
+            builder.startSession(7);
+
+            // then
+            verify(staticBuilderSpy.startSession(anything())).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
         it('should build the payload and add it to the queue', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.On);
@@ -436,6 +578,19 @@ describe('PayloadBuilder', () => {
             verify(builderSpy._push(anything())).never();
         });
 
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // when
+            builder.endSession(7, 500);
+
+            // then
+            verify(staticBuilderSpy.endSession(anything(), anything())).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
         it('should build the payload and add it to the queue', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.On);
@@ -454,6 +609,41 @@ describe('PayloadBuilder', () => {
         it('should not create the payload if capture is disabled', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.Off);
+
+            // when
+            builder.webRequest(
+                'https://example.com',
+                6,
+                4,
+                100,
+                5,
+                6000,
+                100,
+                200,
+                300,
+            );
+
+            // then
+            verify(
+                staticBuilderSpy.webRequest(
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                    anything(),
+                ),
+            ).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
 
             // when
             builder.webRequest(
@@ -613,10 +803,59 @@ describe('PayloadBuilder', () => {
         });
     });
 
+    describe('isCaptureDisabled', () => {
+        it('should be true when capture is off', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.Off);
+
+            // then
+            expect(builder.isCaptureDisabled()).toBeTruthy();
+        });
+
+        it('should be true when traffic control is active', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // then
+            expect(builder.isCaptureDisabled()).toBeTruthy();
+        });
+
+        it('should be true when both traffic control is active and capture is off', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.Off);
+            when(state.trafficControlPercentage).thenReturn(49);
+
+            // then
+            expect(builder.isCaptureDisabled()).toBeTruthy();
+        });
+
+        it('should be false when both traffic control is not active and capture is on', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+
+            // then
+            expect(builder.isCaptureDisabled()).toBeFalsy();
+        });
+    });
+
     describe('sendEvent', () => {
         it('should not create the payload if capture is disabled', () => {
             // given
             when(state.capture).thenReturn(CaptureMode.Off);
+
+            // when
+            builder.sendEvent('{"name":"eventName"}');
+
+            // then
+            verify(staticBuilderSpy.sendEvent(anything())).never();
+            verify(builderSpy._push(anything())).never();
+        });
+
+        it('should not create the payload if it is disallowed by traffic control', () => {
+            // given
+            when(state.capture).thenReturn(CaptureMode.On);
+            when(state.trafficControlPercentage).thenReturn(49);
 
             // when
             builder.sendEvent('{"name":"eventName"}');

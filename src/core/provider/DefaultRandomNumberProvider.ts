@@ -34,4 +34,11 @@ export class DefaultRandomNumberProvider implements RandomNumberProvider {
     public nextPositiveInteger(): number {
         return randomInteger(0, 2 ** 31);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public nextPercentageValue(): number {
+        return randomInteger(0, 100);
+    }
 }
