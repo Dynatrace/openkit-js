@@ -20,7 +20,7 @@ import { getVersionNumber } from './utils/Utils';
  * The OpenKit-JavaScript version.
  * For now, it must be equal to the mobile agent version.
  */
-export const openKitVersion = getVersionNumber(8, 279, {
+export const openKitVersion = getVersionNumber(8, 287, {
     major: 2,
     minor: 3,
     build: 0,

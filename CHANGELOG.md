@@ -1,6 +1,8 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.2.0...HEAD)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.3.0...HEAD)
+
+## 2.3.0 [Release date: 2023-03-13]
 
 ### Added
 

@@ -1,6 +1,6 @@
 {
     "name": "@dynatrace/openkit-js",
-    "version": "2.3.0-SNAPSHOT",
+    "version": "2.3.0",
     "description": "OpenKit-JavaScript reference implementation",
     "author": "Dynatrace",
     "types": "dist/types/index.d.ts",
