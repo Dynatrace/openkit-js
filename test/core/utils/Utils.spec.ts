@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { getVersionNumber, removeElement } from '../../../src/core/utils/Utils';
+import {
+    getVersionNumber,
+    isInteger,
+    removeElement,
+} from '../../../src/core/utils/Utils';
 
 describe('Utils', () => {
     describe('removeElement', () => {
@@ -37,6 +41,46 @@ describe('Utils', () => {
             expect(
                 getVersionNumber(8, 237, { major: 1, minor: 3, build: 0 }),
             ).toBe('8.237.10300');
+        });
+    });
+
+    describe('isInteger', () => {
+        it('should identify a number as decimal', () => {
+            expect(isInteger(0)).toBe(true);
+            expect(isInteger(1)).toBe(true);
+            expect(isInteger(-100000)).toBe(true);
+            // String(n) is removing the .0
+            expect(isInteger(5.0)).toBe(true);
+
+            // Too huge and losing precision
+            expect(isInteger(5.0000000000000001)).toBe(true);
+            expect(isInteger(4500000000000000.1)).toBe(true);
+        });
+
+        it('should identify a number as non decimal', () => {
+            expect(isInteger(99999999999999999999999)).toBe(false);
+            expect(isInteger(0.1)).toBe(false);
+            expect(isInteger(Math.PI)).toBe(false);
+
+            expect(isInteger(NaN)).toBe(false);
+            expect(isInteger(Infinity)).toBe(false);
+            expect(isInteger(-Infinity)).toBe(false);
+            // @ts-expect-error
+            expect(isInteger('10')).toBe(false);
+            // @ts-expect-error
+            expect(isInteger(true)).toBe(false);
+            // @ts-expect-error
+            expect(isInteger(false)).toBe(false);
+            // @ts-expect-error
+            expect(isInteger([1])).toBe(false);
+            // @ts-expect-error
+            expect(isInteger(null)).toBe(false);
+            // @ts-expect-error
+            expect(isInteger(undefined)).toBe(false);
+            // @ts-expect-error
+            expect(isInteger({})).toBe(false);
+
+            expect(isInteger(5.000000000000001)).toBe(false);
         });
     });
 });

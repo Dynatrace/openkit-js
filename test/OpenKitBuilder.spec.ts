@@ -195,11 +195,12 @@ describe('OpenKitBuilder', () => {
             nextPercentageValue: () => 100,
         };
 
-        it('should generate a random device id, if the id is not a numeric string', () => {
+        it('should generate a random hashed device id, if the id is not a number', () => {
             // given
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
+                // @ts-expect-error
                 'not a numeric string',
             ).withRandomNumberProvider(randomNumberProvider);
 
@@ -207,7 +208,7 @@ describe('OpenKitBuilder', () => {
             const config = builder.getConfig();
 
             // then
-            expect(config.openKit.deviceId).toBe('1337');
+            expect(config.openKit.deviceId).toBe('1327014210109086');
         });
 
         it('should generate a random device id, if the dcl = Off', () => {
@@ -236,49 +237,19 @@ describe('OpenKitBuilder', () => {
             expect(config.openKit.deviceId).toBe('1337');
         });
 
-        it('should remove a "+" from the start of a device id', () => {
+        it('should generate a random hashed device id, if the number is not decimal', () => {
             // given
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
-                '+12345',
-            );
-
-            // when
-            const config = builder.getConfig();
-
-            // then
-            expect(config.openKit.deviceId).toBe('12345');
-        });
-
-        it('should generate a random device id, if there is a "+" in the device id, which is not at the start', () => {
-            // given
-            builder = new OpenKitBuilder(
-                'https://example.com',
-                '123',
-                '12+431',
+                12.431,
             ).withRandomNumberProvider(randomNumberProvider);
 
             // when
             const config = builder.getConfig();
 
             // then
-            expect(config.openKit.deviceId).toBe('1337');
-        });
-
-        it('should generate a random device id, if there is a "+" at the start, but no number', () => {
-            // given
-            builder = new OpenKitBuilder(
-                'https://example.com',
-                '123',
-                '+',
-            ).withRandomNumberProvider(randomNumberProvider);
-
-            // when
-            const config = builder.getConfig();
-
-            // then
-            expect(config.openKit.deviceId).toBe('1337');
+            expect(config.openKit.deviceId).toBe('7839169842339463');
         });
 
         it('should use the device id if it is negative', () => {
@@ -286,7 +257,7 @@ describe('OpenKitBuilder', () => {
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
-                '-54321',
+                -54321,
             ).withRandomNumberProvider(randomNumberProvider);
 
             // when
@@ -296,49 +267,68 @@ describe('OpenKitBuilder', () => {
             expect(config.openKit.deviceId).toBe('-54321');
         });
 
-        it('should generate a random device id, if the number is longer than 19 characters', () => {
+        it('should generate a random hashed device id, if the number is outside of MIN SAFE INTEGER', () => {
             // given
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
-                '-11111222223333344444',
+                -1111122222333334444,
             ).withRandomNumberProvider(randomNumberProvider);
 
             // when
             const config = builder.getConfig();
 
             // then
-            expect(config.openKit.deviceId).toBe('1337');
+            expect(config.openKit.deviceId).toBe('2516693505744517');
         });
 
-        it('should use the device id, if it is 19 characters and negative', () => {
+        it('should generate a random hashed device id, if the number is outside of MAX SAFE INTEGER', () => {
             // given
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
-                '-1111122222333334444',
+                1111122222333334444,
             ).withRandomNumberProvider(randomNumberProvider);
 
             // when
             const config = builder.getConfig();
 
             // then
-            expect(config.openKit.deviceId).toBe('-1111122222333334444');
+            expect(config.openKit.deviceId).toBe('5796182413525351');
         });
 
-        it('should use the device id, if it is 19 characters and positive', () => {
+        it('should use the device id, if it is MAX SAFE INTEGER', () => {
             // given
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
-                '1111122222333334444',
+                Number.MAX_SAFE_INTEGER,
             ).withRandomNumberProvider(randomNumberProvider);
 
             // when
             const config = builder.getConfig();
 
             // then
-            expect(config.openKit.deviceId).toBe('1111122222333334444');
+            expect(config.openKit.deviceId).toBe(
+                String(Number.MAX_SAFE_INTEGER),
+            );
+        });
+
+        it('should use the device id, if it is MIN SAFE INTEGER', () => {
+            // given
+            builder = new OpenKitBuilder(
+                'https://example.com',
+                '123',
+                Number.MIN_SAFE_INTEGER,
+            ).withRandomNumberProvider(randomNumberProvider);
+
+            // when
+            const config = builder.getConfig();
+
+            // then
+            expect(config.openKit.deviceId).toBe(
+                String(Number.MIN_SAFE_INTEGER),
+            );
         });
 
         it('should use the device id, if it is 1 character', () => {
@@ -346,7 +336,7 @@ describe('OpenKitBuilder', () => {
             builder = new OpenKitBuilder(
                 'https://example.com',
                 '123',
-                '5',
+                5,
             ).withRandomNumberProvider(randomNumberProvider);
 
             // when
@@ -554,7 +544,7 @@ describe('OpenKitBuilder', () => {
 
             it('should update the screen resolution properties with valid numbers as string', () => {
                 // when
-                // @ts-ignore
+                // @ts-expect-error
                 builder.withScreenResolution('1200', '900');
 
                 // then

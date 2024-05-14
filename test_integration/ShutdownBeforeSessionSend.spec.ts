@@ -74,7 +74,7 @@ describe('ShutdownBeforeSessionSend', () => {
         const builder = new OpenKitBuilder(
             'https://example.com/beaconEndpoint',
             '1234-56-78-90-123456',
-            '42',
+            42,
         ).withCommunicationChannel(
             new HttpCommunicationChannel(
                 client,

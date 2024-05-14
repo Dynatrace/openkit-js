@@ -19,19 +19,18 @@ import { lengthInUtf8Bytes } from '../../../src/core/utils/TextEncoderUtilPolyfi
 
 describe('TextEncoderUtilPolyfill', () => {
     beforeEach(() => {
-        // @ts-ignore
+        // @ts-expect-error
         global.window = {
             TextEncoder: TextEncoderOrig,
         };
 
-        // @ts-ignore
+        // @ts-expect-error
         global.globalThis.TextEncoder = TextEncoderOrig;
     });
 
     it('should use TextEncoder API of globalThis if available', () => {
-        // @ts-ignore
+        // @ts-expect-error
         global.window = {
-            // @ts-ignore
             TextEncoder: undefined,
         };
 
@@ -39,7 +38,7 @@ describe('TextEncoderUtilPolyfill', () => {
             encode: () => 'mockedGlobal',
         }));
 
-        // @ts-ignore
+        // @ts-expect-error
         global.globalThis.TextEncoder = mockedTextEncoder;
 
         expect(lengthInUtf8Bytes('Hello')).toBe('mockedGlobal'.length);
@@ -50,25 +49,24 @@ describe('TextEncoderUtilPolyfill', () => {
             encode: () => 'mockedWindowObj',
         }));
 
-        // @ts-ignore
+        // @ts-expect-error
         global.window = {
             TextEncoder: mockedTextEncoder,
         };
 
-        // @ts-ignore
+        // @ts-expect-error
         global.globalThis.TextEncoder = undefined;
 
         expect(lengthInUtf8Bytes('Hello')).toBe('mockedWindowObj'.length);
     });
 
     it('should use a fallback if no TextEncoder API is available', () => {
-        // @ts-ignore
+        // @ts-expect-error
         global.window = {
-            // @ts-ignore
             TextEncoder: undefined,
         };
 
-        // @ts-ignore
+        // @ts-expect-error
         global.globalThis.TextEncoder = undefined;
 
         expect(lengthInUtf8Bytes('Hello')).toBe(5);

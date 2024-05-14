@@ -723,10 +723,9 @@ describe('EventPayload', () => {
             const predefinedAttributes = null;
 
             // then
-            // @ts-ignore
             const payload = eventPayload.getBizEventsPayload(
                 'customType',
-                // @ts-ignore
+                // @ts-expect-error
                 predefinedAttributes,
                 1234,
             );
@@ -789,10 +788,15 @@ describe('EventPayload', () => {
     });
 
     describe('JSON Stringify', () => {
-
         it('should not change array length when stringify Nfn values', () => {
             const strArr = JSON.stringify({
-                a: [Number.POSITIVE_INFINITY, 1, Number.NEGATIVE_INFINITY, 2, Number.NaN],
+                a: [
+                    Number.POSITIVE_INFINITY,
+                    1,
+                    Number.NEGATIVE_INFINITY,
+                    2,
+                    Number.NaN,
+                ],
             });
 
             const jsonArr = JSON.parse(strArr);

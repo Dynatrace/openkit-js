@@ -140,7 +140,7 @@ describe('SessionImpl', () => {
             config.dataCollectionLevel = DataCollectionLevel.UserBehavior;
 
             // when
-            session.identifyUser((null as unknown) as string);
+            session.identifyUser(null as unknown as string);
 
             // then
             verify(
@@ -439,7 +439,7 @@ describe('SessionImpl', () => {
     describe('sendBizEvent', () => {
         it('should not be possible to send an biz event if the type is not a string', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent(1337, {});
 
             // then
@@ -448,7 +448,6 @@ describe('SessionImpl', () => {
 
         it('should not be possible to send an biz event if the type is empty', () => {
             // when
-            // @ts-ignore
             session.sendBizEvent('', {});
 
             // then
@@ -457,7 +456,7 @@ describe('SessionImpl', () => {
 
         it('should not be possible to send an biz event if payload contains top-level array', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('type', []);
 
             // then
@@ -482,7 +481,6 @@ describe('SessionImpl', () => {
                 ),
             ).thenReturn(JSON.stringify(jsonObject));
 
-            // @ts-ignore
             session.sendBizEvent('EventType', jsonObject);
 
             // then
@@ -491,19 +489,19 @@ describe('SessionImpl', () => {
 
         it('should not be possible to send an biz event if payload has no top-level json or invalid json', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', []);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', NaN);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', 17);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', 'test');
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', true);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', undefined);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendBizEvent('eventType', null);
 
             // then
@@ -533,7 +531,7 @@ describe('SessionImpl', () => {
     describe('sendEvent', () => {
         it('should not be possible to send an event if the name is not a string', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent(1337, {});
 
             // then
@@ -542,7 +540,6 @@ describe('SessionImpl', () => {
 
         it('should not be possible to send an event if the name is empty', () => {
             // when
-            // @ts-ignore
             session.sendEvent('', {});
 
             // then
@@ -551,7 +548,7 @@ describe('SessionImpl', () => {
 
         it('should not be possible to send an event if payload contains top-level array', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('name', []);
 
             // then
@@ -576,7 +573,6 @@ describe('SessionImpl', () => {
                 ),
             ).thenReturn(JSON.stringify(jsonObject));
 
-            // @ts-ignore
             session.sendEvent('EventName', jsonObject);
 
             // then
@@ -585,19 +581,19 @@ describe('SessionImpl', () => {
 
         it('should not be possible to send an event if payload has no top-level json or invalid json', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', []);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', NaN);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', 17);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', 'test');
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', true);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', undefined);
-            // @ts-ignore
+            // @ts-expect-error
             session.sendEvent('eventName', null);
 
             // then
@@ -657,7 +653,7 @@ describe('SessionImpl', () => {
     describe('reportError', () => {
         it('should not be possible to report an error if the name is not a string', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.reportError(session, 1337);
 
             // then
@@ -690,7 +686,7 @@ describe('SessionImpl', () => {
 
         it('should not be possible to report an error if the code is not a number', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             session.reportError('name', 'invalid number');
 
             // then
@@ -768,7 +764,6 @@ describe('SessionImpl', () => {
     describe('traceWebRequest', () => {
         it('should return defaultNullWebRequest if the url is not a string', () => {
             // when
-            // @ts-ignore
             const wr = session.traceWebRequest({} as string);
 
             // then
@@ -777,7 +772,6 @@ describe('SessionImpl', () => {
 
         it('should return defaultNullWebRequest if the url is empty string', () => {
             // when
-            // @ts-ignore
             const wr = session.traceWebRequest('');
 
             // then
@@ -833,7 +827,7 @@ describe('SessionImpl', () => {
         });
 
         it('should not be possible to report an non string carrier', () => {
-            // @ts-ignore
+            // @ts-expect-error
             session.reportCarrier(2);
             expect(supplementaryBasicData.carrier).toBe(undefined);
         });
@@ -865,7 +859,7 @@ describe('SessionImpl', () => {
         });
 
         it('should not be possible to report an non string network technology', () => {
-            // @ts-ignore
+            // @ts-expect-error
             session.reportNetworkTechnology(2);
             expect(supplementaryBasicData.networkTechnology).toBe(undefined);
         });
@@ -898,7 +892,7 @@ describe('SessionImpl', () => {
 
     describe('reportConnectionType', () => {
         it('should not be possible to report an int instead of connection type', () => {
-            // @ts-ignore
+            // @ts-expect-error
             session.reportConnectionType(2);
             expect(supplementaryBasicData.connectionType).toBe(undefined);
         });

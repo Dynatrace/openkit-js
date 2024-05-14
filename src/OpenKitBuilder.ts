@@ -34,13 +34,12 @@ import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
 import { ConsoleLoggerFactory } from './core/logging/ConsoleLoggerFactory';
 import { DefaultRandomNumberProvider } from './core/provider/DefaultRandomNumberProvider';
-import { isFinite, truncate, isNode } from './core/utils/Utils';
+import { to53BitHash } from './core/utils/HashUtils';
+import { truncate, isNode, isInteger } from './core/utils/Utils';
 
 const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
-
-const validDeviceIdPattern = /^-?\d{1,19}$/;
 
 /**
  * Builder for an OpenKit instance.
@@ -48,7 +47,7 @@ const validDeviceIdPattern = /^-?\d{1,19}$/;
 export class OpenKitBuilder {
     private readonly beaconUrl: string;
     private readonly applicationId: string;
-    private readonly deviceId: string;
+    private readonly deviceId: number;
 
     private operatingSystem = defaultOperatingSystem;
     private applicationVersion?: string;
@@ -74,16 +73,14 @@ export class OpenKitBuilder {
      *
      * @param beaconURL The url to the beacon endpoint
      * @param applicationId The id of the custom application
-     * @param deviceId The id of the current device, which must be a number between 1 and 19 digits inclusive.
+     * @param deviceId The id of the current device, which must be a decimal number
+     * in the range of Number.MIN_SAFE_INTEGER to Number.MAX_SAFE_INTEGER. If the
+     * number is outside of this range, not decimal or invalid it will be hashed.
      */
-    constructor(
-        beaconURL: string,
-        applicationId: string,
-        deviceId: number | string,
-    ) {
+    constructor(beaconURL: string, applicationId: string, deviceId: number) {
         this.beaconUrl = beaconURL;
         this.applicationId = applicationId;
-        this.deviceId = String(deviceId);
+        this.deviceId = deviceId;
     }
 
     /**
@@ -335,7 +332,7 @@ export class OpenKitBuilder {
             this.randomNumberProvider || new DefaultRandomNumberProvider();
 
         // user does not allow data tracking
-        const deviceId = normalizeDeviceId(
+        const deviceIdStr = normalizeDeviceId(
             this.deviceId,
             this.dataCollectionLevel,
             random,
@@ -345,7 +342,7 @@ export class OpenKitBuilder {
         return {
             openKit: {
                 beaconURL: this.beaconUrl,
-                deviceId,
+                deviceId: deviceIdStr,
                 applicationId: this.applicationId,
                 communicationChannel,
                 random,
@@ -376,26 +373,21 @@ export class OpenKitBuilder {
 }
 
 const normalizeDeviceId = (
-    deviceId: string,
+    deviceId: number,
     dcl: DataCollectionLevel,
     random: RandomNumberProvider,
 ): string => {
-    // Check if we may capture the device id
-    let id =
-        dcl !== DataCollectionLevel.UserBehavior
-            ? String(random.nextPositiveInteger())
-            : deviceId;
-
-    // remove a possible '+' at the start
-    if (id.charAt(0) === '+') {
-        id = id.substr(1);
+    if (dcl !== DataCollectionLevel.UserBehavior) {
+        return String(random.nextPositiveInteger());
     }
 
-    if (!validDeviceIdPattern.test(id)) {
-        id = String(random.nextPositiveInteger());
+    const deviceIdStr = String(deviceId);
+
+    if (!isInteger(deviceId)) {
+        return String(to53BitHash(deviceIdStr));
     }
 
-    return id;
+    return deviceIdStr;
 };
 
 const getContextBasedSendingStrategies = (): SendingStrategy[] => {

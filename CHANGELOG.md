@@ -1,6 +1,12 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v2.3.0...HEAD)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v3.0.0...HEAD)
+
+## 3.0.0 [Release date: 2024-04-XX]
+
+### Changed
+
+-   `OpenKitBuilder(beaconURL: string, applicationId: string, deviceId: number | string)` has no longer a deviceId which has type string.
 
 ## 2.3.0 [Release date: 2023-03-13]
 

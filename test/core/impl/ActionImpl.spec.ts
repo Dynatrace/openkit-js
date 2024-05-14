@@ -149,7 +149,7 @@ describe('ActionImpl', () => {
             });
 
             it('should not report a value if the name is not a string', () => {
-                action.reportValue((undefined as unknown) as string, '');
+                action.reportValue(undefined as unknown as string, '');
                 verify(
                     payloadBuilder.reportValue(
                         anything(),
@@ -171,7 +171,7 @@ describe('ActionImpl', () => {
             });
 
             it('should not report a value if the value not a string, number, null or undefined', () => {
-                action.reportValue('Name', ({} as unknown) as undefined);
+                action.reportValue('Name', {} as unknown as undefined);
                 verify(
                     payloadBuilder.reportValue(
                         anything(),
@@ -249,7 +249,7 @@ describe('ActionImpl', () => {
 
         it('should not be able to report an event if name is not a string', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             action.reportEvent(action);
 
             // then
@@ -279,7 +279,7 @@ describe('ActionImpl', () => {
     describe('reportError', () => {
         it('should not be possible to report an error if the name is not a string', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             action.reportError(action, 1337);
 
             // then
@@ -300,7 +300,7 @@ describe('ActionImpl', () => {
 
         it('should not be possible to report an error if the code is not a number', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             action.reportError('name', 'invalid number');
 
             // then
@@ -339,7 +339,7 @@ describe('ActionImpl', () => {
     describe('traceWebRequest', () => {
         it('should return defaultNullWebRequest if the url is not a string', () => {
             // when
-            // @ts-ignore
+            // @ts-expect-error
             const wr = action.traceWebRequest(action);
 
             // then
@@ -348,7 +348,6 @@ describe('ActionImpl', () => {
 
         it('should return defaultNullWebRequest if the url is empty string', () => {
             // when
-            // @ts-ignore
             const wr = action.traceWebRequest('');
 
             // then

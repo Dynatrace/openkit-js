@@ -56,6 +56,9 @@ export const timeout = (milliseconds: number): Promise<void> =>
 export const isFinite = (n: number) =>
     typeof n === 'number' && n !== Infinity && n !== -Infinity && !isNaN(n);
 
+export const isInteger = (n: number) =>
+    Number.isSafeInteger(n) && String(n).indexOf('.') === -1;
+
 /**
  * Returns the correct version string for OpenKit that is used in the basic data
  *
