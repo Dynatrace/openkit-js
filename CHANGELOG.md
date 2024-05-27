@@ -2,11 +2,11 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v3.0.0...HEAD)
 
-## 3.0.0 [Release date: 2024-04-XX]
+## 3.0.0 [Release date: 2024-05-27]
 
 ### Changed
 
--   `OpenKitBuilder(beaconURL: string, applicationId: string, deviceId: number | string)` has no longer a deviceId which has type string.
+-   `OpenKitBuilder(beaconURL: string, applicationId: string, deviceId: number | string)` changed to `OpenKitBuilder(beaconURL: string, applicationId: string, deviceId: number)`, meaning it is no longer possible to use a deviceId of type string. The deviceId must be a decimal number in the range of Number.MIN_SAFE_INTEGER to Number.MAX_SAFE_INTEGER. If the number is outside of this range, not decimal or invalid, it will be hashed.
 
 ## 2.3.0 [Release date: 2023-03-13]
 
