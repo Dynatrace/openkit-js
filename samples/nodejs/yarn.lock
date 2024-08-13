@@ -3,30 +3,25 @@
 
 
 "@dynatrace/openkit-js@latest":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@dynatrace/openkit-js/-/openkit-js-1.1.0.tgz"
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/@dynatrace/openkit-js/-/openkit-js-3.0.0.tgz"
+  integrity sha512-yEkmkT6cV8quHFrK7sVtdScGr1TuTmvw/VvcHjhj8L/Wf/tKJ73rL6AA/OdmKKxQ/uk2wBDzGTK48cvGTirUrg==
   dependencies:
-    axios "^0.21.1"
+    axios "^1.6.0"
 
 "@types/node@^12.7.1":
-  version "12.7.3"
-  resolved "https://registry.npmjs.org/@types/node/-/node-12.7.3.tgz"
+  version "12.20.55"
 
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
 
-axios@^0.21.1:
-  version "0.21.2"
-  resolved "https://registry.npmjs.org/axios/-/axios-0.21.2.tgz"
+axios@^1.6.0, axios@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.npmjs.org/axios/-/axios-1.7.3.tgz"
+  integrity sha512-Ar7ND9pU99eJ9GpoGQKhKf58GpUOgnzuaB7ueNQ5BMi0p+LZ5oaEnfF999fAArcTIBwXTCHAmGcHOZJaWPq9Nw==
   dependencies:
-    follow-redirects "^1.14.0"
-
-axios@^1.6.7:
-  version "1.6.7"
-  resolved "https://registry.npmjs.org/axios/-/axios-1.6.7.tgz"
-  dependencies:
-    follow-redirects "^1.15.4"
+    follow-redirects "^1.15.6"
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
@@ -40,9 +35,10 @@ delayed-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz"
 
-follow-redirects@^1.14.0, follow-redirects@^1.15.4:
+follow-redirects@^1.15.6:
   version "1.15.6"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz"
+  integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
 
 form-data@^4.0.0:
   version "4.0.0"
@@ -67,5 +63,6 @@ proxy-from-env@^1.1.0:
   resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
 
 typescript@^3.6.2:
-  version "3.6.2"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-3.6.2.tgz"
+  version "3.9.10"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-3.9.10.tgz"
+  integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
