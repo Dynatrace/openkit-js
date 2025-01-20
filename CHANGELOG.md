@@ -1,6 +1,12 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v3.0.0...HEAD)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v3.0.1...HEAD)
+
+## 3.0.1 [Release date: 2025-01-20]
+
+### Security
+
+-   Update vulnerable axios dependency
 
 ## 3.0.0 [Release date: 2024-05-27]
 
