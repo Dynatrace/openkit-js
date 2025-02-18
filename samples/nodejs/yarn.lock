@@ -3,27 +3,21 @@
 
 
 "@dynatrace/openkit-js@latest":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@dynatrace/openkit-js/-/openkit-js-2.0.0.tgz"
-  integrity sha512-ZfMJq0Vf9l3/XdLC2TOnrjD6wBvyk22XYSWA7ZkHC6PwjiLjmEuYZfVQ8VDHQ8/RMBHNhI5BQOgifY/2SVhpAA==
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@dynatrace/openkit-js/-/openkit-js-3.0.1.tgz#d8d3390674f6129f0067d9138a062c0d69b1db2c"
+  integrity sha512-GxZIMp5dibPLufRdPxuuMIyK2IttKLmiaEF03POUTN3bkr3Kg1E+gSRyCUVKRGTjZiOjS0z9HGJNRbq2Ps3O7A==
   dependencies:
-    axios "^0.27.2"
+    axios "^1.7.9"
 
 "@types/node@^12.7.1":
   version "12.20.55"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.55.tgz#c329cbd434c42164f846b909bd6f85b5537f6240"
+  integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
-
-axios@^0.27.2:
-  version "0.27.2"
-  resolved "https://registry.npmjs.org/axios/-/axios-0.27.2.tgz"
-  integrity sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==
-  dependencies:
-    follow-redirects "^1.14.9"
-    form-data "^4.0.0"
 
 axios@^1.7.9:
   version "1.7.9"
@@ -46,7 +40,7 @@ delayed-stream@~1.0.0:
   resolved "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz"
   integrity sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==
 
-follow-redirects@^1.14.9, follow-redirects@^1.15.6:
+follow-redirects@^1.15.6:
   version "1.15.9"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.9.tgz"
   integrity sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==
