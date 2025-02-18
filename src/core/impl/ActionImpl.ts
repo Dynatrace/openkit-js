@@ -39,9 +39,6 @@ export class ActionImpl implements Action {
     private readonly logger: Logger;
 
     private _endTime = -1;
-    public get endTime(): number {
-        return this._endTime;
-    }
 
     constructor(
         public readonly name: string,
@@ -58,6 +55,10 @@ export class ActionImpl implements Action {
         );
 
         this.logger.debug('created', { name });
+    }
+
+    public get endTime(): number {
+        return this._endTime;
     }
 
     /**

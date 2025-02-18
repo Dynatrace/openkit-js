@@ -25,37 +25,7 @@ module.exports = {
                 default: 'array-simple',
             },
         ],
-        '@typescript-eslint/ban-types': [
-            'error',
-            {
-                types: {
-                    Object: {
-                        message:
-                            'Avoid using the `Object` type. Did you mean `object`?',
-                    },
-                    Function: {
-                        message:
-                            'Avoid using the `Function` type. Prefer a specific function type, like `() => void`.',
-                    },
-                    Boolean: {
-                        message:
-                            'Avoid using the `Boolean` type. Did you mean `boolean`?',
-                    },
-                    Number: {
-                        message:
-                            'Avoid using the `Number` type. Did you mean `number`?',
-                    },
-                    String: {
-                        message:
-                            'Avoid using the `String` type. Did you mean `string`?',
-                    },
-                    Symbol: {
-                        message:
-                            'Avoid using the `Symbol` type. Did you mean `symbol`?',
-                    },
-                },
-            },
-        ],
+        '@typescript-eslint/no-wrapper-object-types': 'error',
         '@typescript-eslint/consistent-type-assertions': 'error',
         '@typescript-eslint/consistent-type-definitions': 'error',
         '@typescript-eslint/dot-notation': 'error',
@@ -143,7 +113,7 @@ module.exports = {
         'import/order': 'error',
         'jsdoc/check-alignment': 'error',
         'jsdoc/check-indentation': 'error',
-        'jsdoc/newline-after-description': 'error',
+        'jsdoc/tag-lines': [2, 'any', { startLines: 1 }],
         'max-classes-per-file': ['error', 1],
         'max-len': [
             'error',
