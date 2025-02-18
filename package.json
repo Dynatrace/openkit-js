@@ -1,6 +1,6 @@
 {
     "name": "@dynatrace/openkit-js",
-    "version": "3.1.0-SNAPSHOT",
+    "version": "4.0.0-SNAPSHOT",
     "description": "OpenKit-JavaScript reference implementation",
     "author": "Dynatrace",
     "types": "dist/types/index.d.ts",
@@ -25,7 +25,7 @@
     },
     "devDependencies": {
         "@types/jest": "^27.0.2",
-        "@types/node": "^14.18.28",
+        "@types/node": "^18.18.9",
         "@typescript-eslint/eslint-plugin": "^4.33.0",
         "@typescript-eslint/parser": "^4.33.0",
         "eslint": "^7.32.0",
@@ -43,13 +43,10 @@
         "ts-mockito": "^2.6.1",
         "typedoc": "^0.23.24",
         "typedoc-plugin-markdown": "^3.11.2",
-        "typescript": "^4.4.3",
+        "typescript": "^4.6.4",
         "webpack": "^5.56.1",
         "webpack-cli": "^4.8.0",
         "yarn": "^1.22.15"
-    },
-    "dependencies": {
-        "axios": "^1.7.3"
     },
     "resolutions": {
         "minimist": "^1.2.0"

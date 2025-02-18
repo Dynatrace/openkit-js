@@ -14,46 +14,51 @@
  * limitations under the License.
  */
 
-import axios, { AxiosHeaders, AxiosResponse } from 'axios';
 import { Logger, LoggerFactory } from '../../../api';
-import { openKitVersion } from '../../../core/PlatformConstants';
+import { openKitVersion } from '../../PlatformConstants';
 import { HttpClient, HttpResponse } from './HttpClient';
 
-export class AxiosHttpClient implements HttpClient {
+export class FetchHttpClient implements HttpClient {
     private readonly logger: Logger;
 
     constructor(loggerFactory: LoggerFactory) {
-        this.logger = loggerFactory.createLogger('AxiosHttpClient');
+        this.logger = loggerFactory.createLogger('FetchHttpClient');
     }
 
     public async get(url: string): Promise<HttpResponse> {
         this.logger.debug('GET', url);
-        const response = await axios.get<string>(url, {
-            transformResponse: [],
+
+        const response = await fetch(url, {
             headers: {
                 'User-Agent': 'OpenKit/' + openKitVersion,
             },
         });
 
-        return this.parseAxiosResponse(response);
+        return this.parseFetchResponse(response);
     }
 
     public async post(url: string, payload: string): Promise<HttpResponse> {
         this.logger.debug('POST', url, payload);
-        const response = await axios.post<string>(url, payload, {
-            transformResponse: [],
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: payload,
             headers: {
                 'User-Agent': 'OpenKit/' + openKitVersion,
             },
         });
 
-        return this.parseAxiosResponse(response);
+        return this.parseFetchResponse(response);
     }
 
-    private parseAxiosResponse(response: AxiosResponse<string>): HttpResponse {
+    private async parseFetchResponse(
+        response: Response,
+    ): Promise<HttpResponse> {
+        const responseString = await response.text();
+
         this.logger.debug('RESPONSE', {
             status: response.status,
-            payload: response.data,
+            payload: responseString,
         });
 
         const headers: Record<string, string> = {};
@@ -66,7 +71,7 @@ export class AxiosHttpClient implements HttpClient {
 
         return {
             status: response.status,
-            payload: response.data,
+            payload: responseString,
             headers,
         };
     }

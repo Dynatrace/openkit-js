@@ -23,7 +23,7 @@ import {
     verify,
 } from 'ts-mockito';
 import { StatusRequest } from '../../../../../src/api';
-import { AxiosHttpClient } from '../../../../../src/core/communication/http/AxiosHttpClient';
+import { FetchHttpClient } from '../../../../../src/core/communication/http/FetchHttpClient';
 import { HttpCommunicationChannel } from '../../../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OverloadPreventionState } from '../../../../../src/core/communication/http/state/OverloadPreventionState';
 import { SendingState } from '../../../../../src/core/communication/http/state/SendingState';
@@ -42,7 +42,7 @@ const request: StatusRequest = {
 describe('OverloadPreventionState', () => {
     let context: StateContext;
     const httpCommunicationChannelMock = mock(HttpCommunicationChannel);
-    const httpClientMock = mock(AxiosHttpClient);
+    const httpClientMock = mock(FetchHttpClient);
 
     const buildState = (ra?: string) => {
         const headers: Record<string, string> =

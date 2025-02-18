@@ -1,44 +1,43 @@
 name: OpenKit JS Build
 
 on:
-  push:
-    branches: [ "main" ]
+    push:
+        branches: ['main']
 
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.x, 20.x, 22.x]
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x, 19.x]
+        steps:
+            - uses: actions/checkout@v3
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'yarn'
+            - run: yarn install
+            - run: npm run build --if-present
+            - run: npx jest --forceExit
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-    - run: yarn install
-    - run: npm run build --if-present
-    - run: npx jest --forceExit
+    coverage:
+        needs: build
+        runs-on: ubuntu-latest
 
-  coverage:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'yarn'
-    - run: yarn install
-    - run: npx jest --coverage --forceExit
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        path-to-lcov: './build/coverage/lcov.info'
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: actions/checkout@v3
+            - name: Use Node.js 18.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18.x'
+                  cache: 'yarn'
+            - run: yarn install
+            - run: npx jest --coverage --forceExit
+            - name: Coveralls
+              uses: coverallsapp/github-action@master
+              with:
+                  path-to-lcov: './build/coverage/lcov.info'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}

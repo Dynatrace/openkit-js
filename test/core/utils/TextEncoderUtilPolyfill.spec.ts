@@ -24,7 +24,6 @@ describe('TextEncoderUtilPolyfill', () => {
             TextEncoder: TextEncoderOrig,
         };
 
-        // @ts-expect-error
         global.globalThis.TextEncoder = TextEncoderOrig;
     });
 
@@ -38,7 +37,6 @@ describe('TextEncoderUtilPolyfill', () => {
             encode: () => 'mockedGlobal',
         }));
 
-        // @ts-expect-error
         global.globalThis.TextEncoder = mockedTextEncoder;
 
         expect(lengthInUtf8Bytes('Hello')).toBe('mockedGlobal'.length);

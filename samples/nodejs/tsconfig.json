@@ -7,13 +7,12 @@
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
-        "noImplicitUseStrict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "sourceMap": true,
         "esModuleInterop": true,
         "strictNullChecks": true
     },
-    "include": ["src/**/*"],
+    "include": ["src/RequestUtil.ts", "src/SimpleApp.ts"],
     "exclude": ["node_modules", "dist"]
 }

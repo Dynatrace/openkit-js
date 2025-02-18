@@ -28,7 +28,7 @@ import {
 import { ImmediateSendingStrategy } from './core/beacon/strategies/ImmediateSendingStrategy';
 import { IntervalSendingStrategy } from './core/beacon/strategies/IntervalSendingStrategy';
 import { SendingStrategy } from './core/beacon/strategies/SendingStrategy';
-import { AxiosHttpClient } from './core/communication/http/AxiosHttpClient';
+import { FetchHttpClient } from './core/communication/http/FetchHttpClient';
 import { HttpCommunicationChannel } from './core/communication/http/state/HttpCommunicationChannel';
 import { Configuration } from './core/config/Configuration';
 import { OpenKitImpl } from './core/impl/OpenKitImpl';
@@ -324,7 +324,7 @@ export class OpenKitBuilder {
         const communicationChannel =
             this.communicationChannel ||
             new HttpCommunicationChannel(
-                new AxiosHttpClient(loggerFactory),
+                new FetchHttpClient(loggerFactory),
                 loggerFactory,
             );
 

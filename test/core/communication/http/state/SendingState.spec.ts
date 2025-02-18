@@ -26,7 +26,7 @@ import {
     when,
 } from 'ts-mockito';
 import { StatusRequest } from '../../../../../src/api';
-import { AxiosHttpClient } from '../../../../../src/core/communication/http/AxiosHttpClient';
+import { FetchHttpClient } from '../../../../../src/core/communication/http/FetchHttpClient';
 import { HttpCommunicationChannel } from '../../../../../src/core/communication/http/state/HttpCommunicationChannel';
 import { OverloadPreventionState } from '../../../../../src/core/communication/http/state/OverloadPreventionState';
 import { SendingState } from '../../../../../src/core/communication/http/state/SendingState';
@@ -43,7 +43,7 @@ const request: StatusRequest = {
 
 describe('SendingState', () => {
     const httpCommunicationChannelMock = mock(HttpCommunicationChannel);
-    const httpClient = mock(AxiosHttpClient);
+    const httpClient = mock(FetchHttpClient);
 
     let state: SendingState;
 

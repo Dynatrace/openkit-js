@@ -16,7 +16,7 @@
  */
 
 import { Action, Session } from '@dynatrace/openkit-js';
-import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 /**
  * Issues a GET request with X-dynaTrace header and fills tracer with response data.
@@ -36,13 +36,12 @@ export const makeGetRequest = async (
     // get the tracer
     const tracer = action.traceWebRequest(url);
 
-    // add dynatrace tag to headers
-    const headers = new AxiosHeaders({
-        'X-dynaTrace': tracer.getTag(),
-    });
-
     // prepare web request
-    const requestConfig: AxiosRequestConfig = { headers };
+    const requestConfig: AxiosRequestConfig = {
+        headers: {
+            'X-dynaTrace': tracer.getTag(),
+        },
+    };
 
     // start timing for web request
     tracer.start();

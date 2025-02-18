@@ -53,8 +53,8 @@ polyfilled using a polyfill library.
 
 ### Communication library
 
-If you use a platform without XMLHttpRequests and not node.js (http-module), you have to either polyfill
-the XMLHttpRequest, or provide your own CommunicationChannel implementation, which can use the protocol
+If you use a platform without fetch or node.js lower than 18, you have to either polyfill
+the fetch API, or provide your own CommunicationChannel implementation, which can use the protocol
 you want (e.g. MQTT).
 
 ## Obtaining OpenKit from npm
