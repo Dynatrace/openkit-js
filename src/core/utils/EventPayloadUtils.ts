@@ -39,10 +39,12 @@ export const isEventPayloadTooBig = (str: string): boolean => {
  * @param attributes Attributes sent via an event
  * @returns True if attributes contain NaN, -Inf or Inf
  */
-export const isEventContainingNonFiniteNumericValues = (attributes: JSONObject): boolean => {
+export const isEventContainingNonFiniteNumericValues = (
+    attributes: JSONObject,
+): boolean => {
     for (const key in attributes) {
         if (Object.prototype.hasOwnProperty.call(attributes, key)) {
-            if(isElementNonFiniteNumericValue(attributes[key])){
+            if (isElementNonFiniteNumericValue(attributes[key])) {
                 return true;
             }
         }
@@ -62,7 +64,6 @@ export const isPOJO = (obj: unknown): obj is JSONObject => {
 
     return Object.getPrototypeOf(obj) === Object.prototype;
 };
-
 
 /**
  * Goes through the JSON array and returns true if NaN, -Inf or Inf is used.
@@ -87,6 +88,18 @@ const isArrayContainingNonFiniteNumericValues = (array: JSONArray): boolean => {
  * @returns True if item is/contains NaN, -Inf or Inf
  */
 const isElementNonFiniteNumericValue = (item: JSONValue): boolean =>
-    (isPOJO(item) && isEventContainingNonFiniteNumericValues(item))
-    || (Array.isArray(item) && isArrayContainingNonFiniteNumericValues(item))
-    || (typeof item === 'number' && !isFinite(item));
+    (isPOJO(item) && isEventContainingNonFiniteNumericValues(item)) ||
+    (Array.isArray(item) && isArrayContainingNonFiniteNumericValues(item)) ||
+    (typeof item === 'number' && !isFinite(item));
+
+/**
+ * Creates the session information for biz events
+ *
+ * @param visitorId Visitor ID
+ * @param sessionId Session ID
+ * @returns String containing session information
+ */
+export const createSessionInfo = (
+    visitorId: string,
+    sessionId: number,
+): string => `${visitorId}_${sessionId.toString()}`;

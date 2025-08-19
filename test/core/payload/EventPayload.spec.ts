@@ -73,7 +73,7 @@ describe('EventPayload', () => {
             );
             expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
-            expect(payloadJson['dt.rum.sid']).toEqual('1234');
+            expect(payloadJson['dt.rum.sid']).toEqual('42_1234');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             expect(payloadJson['app.version']).toEqual('1.0');
@@ -126,8 +126,8 @@ describe('EventPayload', () => {
             );
             expect(payloadJson['event.kind']).toEqual('RUM_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
-            expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
+            expect(payloadJson['dt.rum.sid']).toEqual('42_1234');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.3');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             // Not available as they are not provided in the config
@@ -151,7 +151,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.sid']).toEqual('1234');
+            expect(payloadJson['dt.rum.sid']).toEqual('42_1234');
         });
 
         it('should not be possible to override dt.rum.instance.id', () => {
@@ -204,7 +204,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.3');
         });
 
         it('should be possible to override event.provider', () => {
@@ -425,8 +425,8 @@ describe('EventPayload', () => {
             );
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
-            expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
+            expect(payloadJson['dt.rum.sid']).toEqual('42_1234');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.3');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             expect(payloadJson['app.version']).toEqual('1.0');
@@ -477,8 +477,8 @@ describe('EventPayload', () => {
             );
             expect(payloadJson['event.kind']).toEqual('BIZ_EVENT');
             expect(payloadJson['dt.rum.instance.id']).toEqual('42');
-            expect(payloadJson['dt.rum.sid']).toEqual('1234');
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
+            expect(payloadJson['dt.rum.sid']).toEqual('42_1234');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.3');
             expect(payloadJson['event.provider']).toEqual('application-id');
 
             // Not available as they are not provided in the config
@@ -502,7 +502,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.sid']).toEqual('1234');
+            expect(payloadJson['dt.rum.sid']).toEqual('42_1234');
         });
 
         it('should not be possible to override dt.rum.instance.id', () => {
@@ -555,7 +555,7 @@ describe('EventPayload', () => {
             );
             const payloadJson = JSON.parse(payload);
 
-            expect(payloadJson['dt.rum.schema_version']).toEqual('1.2');
+            expect(payloadJson['dt.rum.schema_version']).toEqual('1.3');
         });
 
         it('should be possible to override event.provider', () => {

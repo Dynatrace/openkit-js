@@ -20,7 +20,10 @@ import {
     defaultTimestampProvider,
     TimestampProvider,
 } from '../provider/TimestampProvider';
-import { isEventContainingNonFiniteNumericValues } from '../utils/EventPayloadUtils';
+import {
+    isEventContainingNonFiniteNumericValues,
+    createSessionInfo,
+} from '../utils/EventPayloadUtils';
 import { lengthInUtf8Bytes } from '../utils/TextEncoderUtil';
 import {
     APP_VERSION,
@@ -71,11 +74,11 @@ export class EventPayload {
             sizePayload,
         );
 
-        if(isEventContainingNonFiniteNumericValues(internalAttributes)){
+        if (isEventContainingNonFiniteNumericValues(internalAttributes)) {
             this.addNonOverridableAttribute(
                 internalAttributes,
                 'dt.rum.has_nfn_values',
-                true
+                true,
             );
         }
 
@@ -99,11 +102,11 @@ export class EventPayload {
             EVENT_KIND_RUM,
         );
 
-        if(isEventContainingNonFiniteNumericValues(internalAttributes)){
+        if (isEventContainingNonFiniteNumericValues(internalAttributes)) {
             this.addNonOverridableAttribute(
                 internalAttributes,
                 'dt.rum.has_nfn_values',
-                true
+                true,
             );
         }
 
@@ -122,7 +125,7 @@ export class EventPayload {
         this.addNonOverridableAttribute(
             attributes,
             'dt.rum.schema_version',
-            '1.2',
+            '1.3',
         );
         this.addNonOverridableAttribute(
             attributes,
@@ -137,7 +140,7 @@ export class EventPayload {
         this.addNonOverridableAttribute(
             attributes,
             'dt.rum.sid',
-            session.toString(),
+            createSessionInfo(this.config.openKit.deviceId, session),
         );
 
         this.addOverridableAttribute(
