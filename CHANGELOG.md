@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v4.1.0...HEAD)
 
-## 4.1.0 [Release date: 2025-08-21]
+## 4.1.0 [Release date: 2025-08-20]
 
 ### Changed
 
