@@ -41,6 +41,9 @@ const defaultDataCollectionLevel = DataCollectionLevel.UserBehavior;
 const defaultCrashReportingLevel = CrashReportingLevel.OptInCrashes;
 const defaultOperatingSystem = 'OpenKit';
 
+export * from './api';
+export * from './core';
+
 /**
  * Builder for an OpenKit instance.
  */
