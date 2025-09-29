@@ -30,3 +30,4 @@ export * from './logging/LogLevel';
 export * from './logging/LoggerFactory';
 export * from './logging/Logger';
 export * from './Json';
+export * from './SessionNumberStrategy';

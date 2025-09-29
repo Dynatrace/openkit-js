@@ -29,21 +29,22 @@ const openKit = new OpenKitBuilder(beaconUrl, applicationId, deviceId).build();
 In addition to the mandatory parameters described above, the builder provides additional methods to further
 customize OpenKit. This includes device specific information like operating system, manufacturer, or model id.
 
-| Method Name                | Description                     | Default Value                 |
-| -------------------------- | ------------------------------- | ----------------------------- |
-| `withApplicationVersion`   | sets the application version    |                               |
-| `withOperatingSystem`      | sets the operating system name  |                               |
-| `withManufacturer`         | sets the manufacturer           |                               |
-| `withModelId`              | sets the model id               |                               |
-| `withUserLanguage`         | sets the user language          |                               |
-| `withScreenResolution`     | sets the screen resolution      |                               |
-| `withScreenOrientation`    | sets the screen orientation     |                               |
-| `withDataCollectionLevel`  | sets the data collection level  | `2` (User Behavior)           |
-| `withCrashReportingLevel`  | sets the crash reporting level  | `2` (OptIn)                   |
-| `withCommunicationChannel` | sets the communication channel  | `HttpCommunicationChannel`    |
-| `withRandomNumberProvider` | sets the random number provider | `DefaultRandomNumberProvider` |
-| `withLoggerFactory`        | sets the logger factory         | `ConsoleLoggerFactory`        |
-| `withLogLevel`             | sets the log level              | `LogLevel.Info`               |
+| Method Name                 | Description                      | Default Value                   |
+| --------------------------- | -------------------------------- | ------------------------------- |
+| `withApplicationVersion`    | sets the application version     |                                 |
+| `withOperatingSystem`       | sets the operating system name   |                                 |
+| `withManufacturer`          | sets the manufacturer            |                                 |
+| `withModelId`               | sets the model id                |                                 |
+| `withUserLanguage`          | sets the user language           |                                 |
+| `withScreenResolution`      | sets the screen resolution       |                                 |
+| `withScreenOrientation`     | sets the screen orientation      |                                 |
+| `withDataCollectionLevel`   | sets the data collection level   | `2` (User Behavior)             |
+| `withCrashReportingLevel`   | sets the crash reporting level   | `2` (OptIn)                     |
+| `withCommunicationChannel`  | sets the communication channel   | `HttpCommunicationChannel`      |
+| `withRandomNumberProvider`  | sets the random number provider  | `DefaultRandomNumberProvider`   |
+| `withLoggerFactory`         | sets the logger factory          | `ConsoleLoggerFactory`          |
+| `withLogLevel`              | sets the log level               | `LogLevel.Info`                 |
+| `withSessionNumberStrategy` | sets the session number strategy | `SessionNumberStrategy.Default` |
 
 ❕ Please refer to the the TypeDoc for more information regarding possible configuration values.
 

@@ -22,6 +22,7 @@ import {
     Orientation,
     RandomNumberProvider,
 } from '../../api';
+import { SessionNumberStrategy } from '../../api/SessionNumberStrategy';
 import { SendingStrategy } from '../beacon/strategies/SendingStrategy';
 
 export interface PrivacyConfiguration {
@@ -52,6 +53,7 @@ export interface OpenKitConfiguration {
     readonly communicationChannel: CommunicationChannel;
     readonly loggerFactory: LoggerFactory;
     readonly random: RandomNumberProvider;
+    readonly sessionNumberStrategy: SessionNumberStrategy;
 }
 
 export interface Configuration {

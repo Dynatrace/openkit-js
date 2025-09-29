@@ -1,6 +1,13 @@
 # OpenKit JS Changelog
 
-## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v4.1.0...HEAD)
+## [Unreleased](https://github.com/Dynatrace/openkit-js/compare/v4.2.0...HEAD)
+
+## 4.2.0 [Release date: 2025-09-29]
+
+### Added
+
+-   `SessionNumberStrategy.Default` and `SessionNumberStrategy.Random`
+-   `OpenKitBuilder.withSessionNumberStrategy(sessionNumberStrategy: SessionNumberStrategy)`
 
 ## 4.1.0 [Release date: 2025-08-20]
 

@@ -25,6 +25,7 @@ import {
     Orientation,
     RandomNumberProvider,
 } from './api';
+import { SessionNumberStrategy } from './api/SessionNumberStrategy';
 import { ImmediateSendingStrategy } from './core/beacon/strategies/ImmediateSendingStrategy';
 import { IntervalSendingStrategy } from './core/beacon/strategies/IntervalSendingStrategy';
 import { SendingStrategy } from './core/beacon/strategies/SendingStrategy';
@@ -67,6 +68,7 @@ export class OpenKitBuilder {
     private screenWidth?: number;
     private screenHeight?: number;
     private orientation?: Orientation;
+    private sessionNumberStrategy = SessionNumberStrategy.Default;
 
     /**
      * Creates a new OpenKitBuilder
@@ -295,6 +297,26 @@ export class OpenKitBuilder {
     }
 
     /**
+     * Sets the session number strategy which will be used. If not used at
+     * all OpenKit will default to the normal session number strategy.
+     *
+     * @param sessionNumberStrategy Session number strategy which should be used.
+     */
+    public withSessionNumberStrategy(
+        sessionNumberStrategy: SessionNumberStrategy,
+    ): this {
+        if (
+            typeof sessionNumberStrategy === 'number' &&
+            sessionNumberStrategy >= 0 &&
+            sessionNumberStrategy <= 1
+        ) {
+            this.sessionNumberStrategy = sessionNumberStrategy;
+        }
+
+        return this;
+    }
+
+    /**
      * Builds and gets the current configuration.
      *
      * @returns the current configuration
@@ -348,6 +370,7 @@ export class OpenKitBuilder {
                 random,
                 loggerFactory,
                 sendingStrategies,
+                sessionNumberStrategy: this.sessionNumberStrategy,
             },
 
             privacy: {

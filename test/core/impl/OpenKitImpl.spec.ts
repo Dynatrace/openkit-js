@@ -36,6 +36,7 @@ import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFa
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { timeout } from '../../../src/core/utils/Utils';
 import { Mutable } from '../../Helpers';
+import { SessionNumberStrategy } from '../../../src/api/SessionNumberStrategy';
 
 describe('OpenKitImpl', () => {
     let ok: OpenKitImpl;
@@ -55,6 +56,7 @@ describe('OpenKitImpl', () => {
                 communicationChannel: instance(comm),
                 sendingStrategies: [instance(ss)],
                 beaconURL: 'http://example.com',
+                sessionNumberStrategy: SessionNumberStrategy.Default,
             },
 
             privacy: {
@@ -328,6 +330,49 @@ describe('OpenKitImpl', () => {
                 cache.register(session, anyString(), anything(), anything()),
             ).once();
             expect(session.sessionId).toBe(1);
+        });
+
+        it('should return a valid session with a random number if strategy is chosen', () => {
+            const randomMock = new DefaultRandomNumberProvider();
+            const nextNumberSpy = jest.spyOn(randomMock, 'nextPositiveInteger');
+            nextNumberSpy.mockReturnValue(42);
+
+            const configWithRandom = {
+                openKit: {
+                    loggerFactory: defaultNullLoggerFactory,
+                    deviceId: '42',
+                    applicationId: 'application-id',
+                    random: randomMock,
+                    communicationChannel: instance(comm),
+                    sendingStrategies: [instance(ss)],
+                    beaconURL: 'http://example.com',
+                    sessionNumberStrategy: SessionNumberStrategy.Random,
+                },
+
+                privacy: {
+                    crashReportingLevel: CrashReportingLevel.OptInCrashes,
+                    dataCollectionLevel: DataCollectionLevel.UserBehavior,
+                },
+                device: {},
+                meta: {},
+            };
+
+            const okWithRandom = new OpenKitImpl(configWithRandom);
+
+            // given
+            const sender = spy(okWithRandom._getBeaconSender());
+            const cache = spy(okWithRandom._getPayloadCache());
+
+            // when
+            const session = okWithRandom.createSession() as SessionImpl;
+
+            // then
+            expect(session).toBeInstanceOf(SessionImpl);
+            verify(sender.sessionAdded(anything())).once();
+            verify(
+                cache.register(session, anyString(), anything(), anything()),
+            ).once();
+            expect(session.sessionId).toBe(42);
         });
     });
 });

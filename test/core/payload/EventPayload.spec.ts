@@ -9,6 +9,7 @@ import { defaultNullLoggerFactory } from '../../../src/core/logging/NullLoggerFa
 import { EventPayload } from '../../../src/core/payload/EventPayload';
 import { DefaultRandomNumberProvider } from '../../../src/core/provider/DefaultRandomNumberProvider';
 import { TimestampProvider } from '../../../src/core/provider/TimestampProvider';
+import { SessionNumberStrategy } from '../../../src/api/SessionNumberStrategy';
 
 describe('EventPayload', () => {
     let config: Configuration;
@@ -29,6 +30,7 @@ describe('EventPayload', () => {
                 communicationChannel: instance(comm),
                 sendingStrategies: [instance(ss)],
                 beaconURL: 'http://example.com',
+                sessionNumberStrategy: SessionNumberStrategy.Default,
             },
             privacy: {
                 crashReportingLevel: CrashReportingLevel.OptInCrashes,
@@ -97,6 +99,7 @@ describe('EventPayload', () => {
                     communicationChannel: instance(comm),
                     sendingStrategies: [instance(ss)],
                     beaconURL: 'http://example.com',
+                    sessionNumberStrategy: SessionNumberStrategy.Default,
                 },
                 privacy: {
                     crashReportingLevel: CrashReportingLevel.OptInCrashes,
@@ -448,6 +451,7 @@ describe('EventPayload', () => {
                     communicationChannel: instance(comm),
                     sendingStrategies: [instance(ss)],
                     beaconURL: 'http://example.com',
+                    sessionNumberStrategy: SessionNumberStrategy.Default,
                 },
                 privacy: {
                     crashReportingLevel: CrashReportingLevel.OptInCrashes,

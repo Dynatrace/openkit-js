@@ -19,9 +19,11 @@ import {
     InitCallback,
     Logger,
     OpenKit,
+    RandomNumberProvider,
     Session,
     ShutdownCallback,
 } from '../../api';
+import { SessionNumberStrategy } from '../../api/SessionNumberStrategy';
 import { BeaconSenderImpl } from '../beacon/BeaconSender';
 import { CommunicationStateImpl } from '../beacon/CommunicationStateImpl';
 import { BeaconCacheImpl } from '../beacon/strategies/BeaconCache';
@@ -37,6 +39,7 @@ import { Payload } from '../payload/Payload';
 import { PayloadBuilder } from '../payload/PayloadBuilder';
 import { StaticPayloadBuilder } from '../payload/StaticPayloadBuilder';
 import { IdProvider } from '../provider/IdProvider';
+import { RandomSequenceIdProvider } from '../provider/RandomSequenceIdProvider';
 import { SequenceIdProvider } from '../provider/SequenceIdProvider';
 import { SingleIdProvider } from '../provider/SingleIdProvider';
 import { defaultTimestampProvider } from '../provider/TimestampProvider';
@@ -44,10 +47,29 @@ import { CallbackHolder } from '../utils/CallbackHolder';
 import { defaultNullSession } from './null/NullSession';
 import { SessionImpl } from './SessionImpl';
 
-const createIdProvider = (dcl: DataCollectionLevel) =>
-    dcl === DataCollectionLevel.UserBehavior
-        ? new SequenceIdProvider()
-        : new SingleIdProvider(1);
+/**
+ * Helper function which is creating the id provider for the session number
+ *
+ * @param dataCollectionLevel Used data collection level
+ * @param sessionNumberStrategy Strategy for the session number
+ * @param randomNumberProvider Random number provider for extended session number strategy
+ * @returns Session number provider
+ */
+const createIdProvider = (
+    dataCollectionLevel: DataCollectionLevel,
+    sessionNumberStrategy: SessionNumberStrategy,
+    randomNumberProvider: RandomNumberProvider,
+) => {
+    if (dataCollectionLevel !== DataCollectionLevel.UserBehavior) {
+        return new SingleIdProvider(1);
+    }
+
+    if (sessionNumberStrategy === SessionNumberStrategy.Random) {
+        return new RandomSequenceIdProvider(randomNumberProvider);
+    }
+
+    return new SequenceIdProvider();
+};
 
 /**
  * Implementation of the {@link OpenKit} interface.
@@ -76,6 +98,8 @@ export class OpenKitImpl implements OpenKit {
 
         this.sessionIdProvider = createIdProvider(
             config.privacy.dataCollectionLevel,
+            config.openKit.sessionNumberStrategy,
+            config.openKit.random,
         );
         this.sessionConfig = { ...config.privacy, ...config.openKit };
         this.applicationWidePrefix = StaticPayloadBuilder.applicationWidePrefix(
