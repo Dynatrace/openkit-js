@@ -23,7 +23,7 @@ import { getVersionNumber } from './utils/Utils';
 export const openKitVersion = getVersionNumber(8, 323, {
     major: 4,
     minor: 2,
-    build: 0,
+    build: 1,
 });
 
 /**
