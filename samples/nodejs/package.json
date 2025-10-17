@@ -12,7 +12,7 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@dynatrace/openkit-js": "latest",
-        "axios": "^1.7.9"
+        "axios": "^1.12.2"
     },
     "devDependencies": {
         "@types/node": "^12.7.1",
