@@ -9,13 +9,6 @@ module.exports = {
     // The directory where Jest should output its coverage files
     coverageDirectory: 'build/coverage',
 
-    // A set of global variables that need to be available in all test environments
-    globals: {
-        'ts-jest': {
-            tsconfig: 'tsconfig.node.json',
-        },
-    },
-
     // An array of file extensions your modules use
     moduleFileExtensions: ['js', 'ts'],
 
@@ -27,7 +20,7 @@ module.exports = {
 
     // A map from regular expressions to paths to transformers
     transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest',
+        '^.+.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.node.json' }],
     },
 
     moduleNameMapper: {

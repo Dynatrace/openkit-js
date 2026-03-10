@@ -40,7 +40,7 @@ describe('RandomSequenceIdProvider', () => {
         const provider = new RandomSequenceIdProvider(random);
 
         expect(provider.next()).toBe(42);
-        expect(nextNumberSpy).toBeCalledTimes(2);
+        expect(nextNumberSpy).toHaveBeenCalledTimes(2);
     });
 
     it('initial id is maximum - 1', () => {
@@ -52,9 +52,9 @@ describe('RandomSequenceIdProvider', () => {
         const provider = new RandomSequenceIdProvider(random);
 
         expect(provider.next()).toBe(2 ** 31 - 1);
-        expect(nextNumberSpy).toBeCalledTimes(1);
+        expect(nextNumberSpy).toHaveBeenCalledTimes(1);
         expect(provider.next()).toBe(42);
-        expect(nextNumberSpy).toBeCalledTimes(2);
+        expect(nextNumberSpy).toHaveBeenCalledTimes(2);
     });
 
     it('initial id is -1', () => {
@@ -66,6 +66,6 @@ describe('RandomSequenceIdProvider', () => {
         const provider = new RandomSequenceIdProvider(random);
 
         expect(provider.next()).toBe(42);
-        expect(nextNumberSpy).toBeCalledTimes(2);
+        expect(nextNumberSpy).toHaveBeenCalledTimes(2);
     });
 });
